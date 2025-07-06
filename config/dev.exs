@@ -64,3 +64,9 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :atlas, Atlas.Accounts.Guardian,
+  issuer: "atlas",
+  secret_key: "your-dev-secret-key-here-make-it-long-enough",
+  ttl: {30, :days},
+  allowed_drift: 2000

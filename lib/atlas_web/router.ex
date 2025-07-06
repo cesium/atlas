@@ -5,8 +5,32 @@ defmodule AtlasWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", AtlasWeb do
+  pipeline :api_auth do
+    plug :accepts, ["json"]
+
+    plug Guardian.Plug.Pipeline,
+      otp_app: :atlas,
+      error_handler: AtlasWeb.Plugs.GuardianErrorHandler,
+      module: Atlas.Accounts.Guardian
+
+    plug Guardian.Plug.VerifySession
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+  end
+
+  scope "/v1", AtlasWeb do
     pipe_through :api
+
+    scope "/auth" do
+      post "/sign_in", AuthController, :sign_in
+      post "/refresh", AuthController, :refresh
+    end
+  end
+
+  scope "/v1", AtlasWeb do
+    pipe_through [:api, :api_auth]
+    get "/auth/me", AuthController, :me
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

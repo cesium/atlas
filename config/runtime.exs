@@ -48,6 +48,19 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  secret_key_guardian =
+    System.get_env("SECRET_KEY_GUARDIAN") ||
+      raise("""
+      environment variable SECRET_KEY_GUARDIAN is missing.
+      You can generate one by calling: mix guardian.gen.secret
+      """)
+
+  config :atlas, Atlas.Accounts.Guardian,
+    issuer: "atlas",
+    secret_key: secret_key_guardian,
+    ttl: {30, :days},
+    allowed_drift: 2000
+
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
