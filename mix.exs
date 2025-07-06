@@ -55,7 +55,10 @@ defmodule Atlas.MixProject do
 
       # server
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.2"}
+      {:bandit, "~> 1.2"},
+
+      # rate limiting
+      {:hammer, "~> 7.0"}
     ]
   end
 
