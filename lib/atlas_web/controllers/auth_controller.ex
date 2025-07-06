@@ -10,8 +10,7 @@ defmodule AtlasWeb.AuthController do
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
       %User{} = user ->
-        {:ok, access_token, _claims} =
-          Guardian.encode_and_sign(user, %{}, token_type: "access", ttl: {7, :day})
+        access_token = generate_access_token(user)
 
         conn
         |> json(%{
@@ -42,5 +41,27 @@ defmodule AtlasWeb.AuthController do
       |> put_status(:unauthorized)
       |> json(%{error: "Not authenticated"})
     end
+  end
+
+  def refresh(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    if user do
+      access_token = generate_access_token(user)
+
+      conn
+      |> json(%{token: access_token})
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Not authenticated"})
+    end
+  end
+
+  defp generate_access_token(user) do
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{aud: "astra"}, token_type: "access", ttl: {7, :day})
+
+    token
   end
 end

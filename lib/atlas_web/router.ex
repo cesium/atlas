@@ -22,15 +22,22 @@ defmodule AtlasWeb.Router do
   scope "/v1", AtlasWeb do
     pipe_through :api
 
+    # Public routes
+
     scope "/auth" do
       post "/sign_in", AuthController, :sign_in
-      post "/refresh", AuthController, :refresh
     end
   end
 
   scope "/v1", AtlasWeb do
     pipe_through [:api, :api_auth]
-    get "/auth/me", AuthController, :me
+
+    # Authenticated routes
+
+    scope "/auth" do
+      get "/me", AuthController, :me
+      post "/refresh", AuthController, :refresh
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

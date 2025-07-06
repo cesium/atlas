@@ -70,3 +70,8 @@ config :atlas, Atlas.Accounts.Guardian,
   secret_key: "your-dev-secret-key-here-make-it-long-enough",
   ttl: {30, :days},
   allowed_drift: 2000
+
+config :guardian, Guardian.DB,
+  repo: Atlas.Repo,
+  schema_name: "guardian_tokens",
+  sweep_interval: 60
