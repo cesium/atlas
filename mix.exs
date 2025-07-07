@@ -9,7 +9,7 @@ defmodule Atlas.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
     ]
   end
 
@@ -55,7 +55,10 @@ defmodule Atlas.MixProject do
 
       # server
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.2"}
+      {:bandit, "~> 1.2"},
+
+      # swagger
+      {:phoenix_swagger, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
 

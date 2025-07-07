@@ -7,7 +7,17 @@ defmodule AtlasWeb.Router do
 
   scope "/api", AtlasWeb do
     pipe_through :api
+
+    get "/test", TestController, :index
   end
+
+  scope "/", AtlasWeb do
+    pipe_through :api
+
+    get "/swagger.json", SwaggerController, :swagger
+    get "/swagger", SwaggerController, :swagger_ui
+  end
+
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:atlas, :dev_routes) do
@@ -24,5 +34,14 @@ defmodule AtlasWeb.Router do
       live_dashboard "/dashboard", metrics: AtlasWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  def swagger_info do
+    %{
+      info: %{
+        version: "0.1.0",
+        title: "Atlas"
+      }
+    }
   end
 end
