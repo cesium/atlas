@@ -58,7 +58,7 @@ defmodule Atlas.MixProject do
       {:bandit, "~> 1.2"},
 
       # rate limiting
-      {:hammer, "~> 7.0"}
+      {:hammer, "~> 6.2.1"}
     ]
   end
 
