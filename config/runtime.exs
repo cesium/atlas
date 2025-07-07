@@ -64,7 +64,8 @@ if config_env() == :prod do
   config :guardian, Guardian.DB,
     repo: Atlas.Repo,
     schema_name: "guardian_tokens",
-    sweep_interval: 60
+    sweep_interval: 60,
+    token_types: ["refresh"]
 
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")

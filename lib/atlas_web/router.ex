@@ -5,7 +5,7 @@ defmodule AtlasWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :api_auth do
+  pipeline :auth do
     plug :accepts, ["json"]
 
     plug Guardian.Plug.Pipeline,
@@ -13,8 +13,7 @@ defmodule AtlasWeb.Router do
       error_handler: AtlasWeb.Plugs.GuardianErrorHandler,
       module: Atlas.Accounts.Guardian
 
-    plug Guardian.Plug.VerifySession
-    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.VerifyHeader, claims: %{typ: "access"}
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource
   end
@@ -30,13 +29,13 @@ defmodule AtlasWeb.Router do
   end
 
   scope "/v1", AtlasWeb do
-    pipe_through [:api, :api_auth]
+    pipe_through [:api, :auth]
 
     # Authenticated routes
 
     scope "/auth" do
       get "/me", AuthController, :me
-      post "/refresh", AuthController, :refresh
+      post "/refresh", AuthController, :refresh_token
     end
   end
 

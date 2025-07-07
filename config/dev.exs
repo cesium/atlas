@@ -74,4 +74,5 @@ config :atlas, Atlas.Accounts.Guardian,
 config :guardian, Guardian.DB,
   repo: Atlas.Repo,
   schema_name: "guardian_tokens",
-  sweep_interval: 60
+  sweep_interval: 60,
+  token_types: ["refresh"]

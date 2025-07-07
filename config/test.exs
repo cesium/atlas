@@ -32,7 +32,8 @@ config :atlas, Atlas.Accounts.Guardian,
 config :guardian, Guardian.DB,
   repo: Atlas.Repo,
   schema_name: "guardian_tokens",
-  sweep_interval: 60
+  sweep_interval: 60,
+  token_types: ["refresh"]
 
 # In test we don't send emails.
 config :atlas, Atlas.Mailer, adapter: Swoosh.Adapters.Test
