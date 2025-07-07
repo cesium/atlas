@@ -3,10 +3,18 @@ defmodule AtlasWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session  # Make sure this is here to support sessions
   end
 
   scope "/api", AtlasWeb do
     pipe_through :api
+
+    # Move user routes here - outside the dev_routes conditional
+    scope "/users" do
+      put "/:id/password", UserController, :update_password
+      put "/:id/profile", UserController, :update_profile
+      delete "/:id/account", UserController, :delete_account
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
