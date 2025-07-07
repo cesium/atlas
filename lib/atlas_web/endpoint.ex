@@ -1,5 +1,6 @@
 defmodule AtlasWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :atlas
+  alias AtlasWeb.Plugs.CorsicaConfig
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -49,7 +50,7 @@ defmodule AtlasWeb.Endpoint do
   plug Plug.Session, @session_options
 
   plug Corsica,
-    origins: &AtlasWeb.Plugs.CorsicaConfig.origins/1,
+    origins: &allowed_origins/1,
     log: [rejected: :error],
     allow_credentials: true,
     allow_headers: ["authorization", "content-type", "accept"]
