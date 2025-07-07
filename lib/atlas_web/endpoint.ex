@@ -47,5 +47,12 @@ defmodule AtlasWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  plug Corsica,
+    # FIXME: add frontend routes
+    origins: "*",
+    allow_credentials: true,
+    max_age: 600
+
   plug AtlasWeb.Router
 end
