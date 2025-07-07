@@ -18,7 +18,6 @@ defmodule AtlasWeb.Router do
     get "/swagger", SwaggerController, :swagger_ui
   end
 
-
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:atlas, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

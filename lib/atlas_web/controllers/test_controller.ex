@@ -16,14 +16,17 @@ defmodule AtlasWeb.TestController do
 
   def swagger_definitions do
     %{
-      HealthResponse: swagger_schema do
-        title("HealthCheck")
-        description("Simple response to confirm service is alive")
-        properties do
-          message(:string, "Confirmation message")
+      HealthResponse:
+        swagger_schema do
+          title("HealthCheck")
+          description("Simple response to confirm service is alive")
+
+          properties do
+            message(:string, "Confirmation message")
+          end
+
+          example(%{message: "ok"})
         end
-        example(%{message: "ok"})
-      end
     }
   end
 end

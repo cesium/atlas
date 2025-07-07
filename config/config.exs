@@ -24,12 +24,12 @@ config :atlas, AtlasWeb.Endpoint,
 
 # Configures the Swagger
 config :atlas, :phoenix_swagger,
-swagger_files: %{
-  "priv/static/swagger.json" => [
-    router: AtlasWeb.Router,
-    endpoint: AtlasWeb.Endpoint
-  ]
-}
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: AtlasWeb.Router,
+      endpoint: AtlasWeb.Endpoint
+    ]
+  }
 
 # Configures the mailer
 #
