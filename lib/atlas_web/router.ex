@@ -25,6 +25,7 @@ defmodule AtlasWeb.Router do
 
     scope "/auth" do
       post "/sign_in", AuthController, :sign_in
+      post "/refresh", AuthController, :refresh_token
     end
   end
 
@@ -35,7 +36,6 @@ defmodule AtlasWeb.Router do
 
     scope "/auth" do
       get "/me", AuthController, :me
-      post "/refresh", AuthController, :refresh_token
     end
   end
 

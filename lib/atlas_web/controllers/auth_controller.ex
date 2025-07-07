@@ -7,6 +7,8 @@ defmodule AtlasWeb.AuthController do
 
   action_fallback AtlasWeb.FallbackController
 
+  @refresh_token_days 7
+
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
       %User{} = user ->
@@ -14,9 +16,9 @@ defmodule AtlasWeb.AuthController do
         refresh_token = generate_token(user, :refresh)
 
         conn
+        |> insert_refresh_token_cookie(refresh_token)
         |> json(%{
           access_token: access_token,
-          refresh_token: refresh_token,
           user: %{
             id: user.id,
             email: user.email,
@@ -45,26 +47,52 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
-  def refresh_token(conn, %{"refresh_token" => old_refresh_token}) do
-    with {:ok, old_claims} <-
-           Guardian.decode_and_verify(old_refresh_token, %{"typ" => "refresh"}),
-         {:ok, user} <- Guardian.resource_from_claims(old_claims),
-         {:ok, _claims} <- Guardian.revoke(old_refresh_token) do
-      # Issue new access and refresh tokens
-      access_token = generate_token(user, :access)
-      new_refresh_token = generate_token(user, :refresh)
+  def refresh_token(conn, _params) do
+    case fetch_refresh_token_cookie(conn) do
+      {:ok, old_refresh_token} ->
+        with {:ok, old_claims} <-
+               Guardian.decode_and_verify(old_refresh_token, %{"typ" => "refresh"}),
+             {:ok, user} <- Guardian.resource_from_claims(old_claims),
+             {:ok, _claims} <- Guardian.revoke(old_refresh_token) do
+          access_token = generate_token(user, :access)
+          new_refresh_token = generate_token(user, :refresh)
 
-      conn
-      |> json(%{
-        access_token: access_token,
-        refresh_token: new_refresh_token
-      })
-    else
-      _ ->
+          conn
+          |> insert_refresh_token_cookie(new_refresh_token)
+          |> json(%{
+            access_token: access_token
+          })
+        else
+          _ ->
+            conn
+            |> put_status(:unauthorized)
+            |> json(%{error: "Invalid or expired refresh token"})
+        end
+
+      :error ->
         conn
         |> put_status(:unauthorized)
-        |> json(%{error: "Invalid or expired refresh token"})
+        |> json(%{error: "Refresh token not found"})
     end
+  end
+
+  defp fetch_refresh_token_cookie(conn) do
+    conn = fetch_cookies(conn, signed: ["refresh_token"])
+
+    case conn.cookies["refresh_token"] do
+      nil -> :error
+      token -> {:ok, token}
+    end
+  end
+
+  defp insert_refresh_token_cookie(conn, token) do
+    put_resp_cookie(conn, "refresh_token", token,
+      http_only: true,
+      secure: true,
+      same_site: "Strict",
+      max_age: @refresh_token_days * 24 * 60 * 60,
+      sign: true
+    )
   end
 
   defp generate_token(user, :access) do
@@ -76,7 +104,10 @@ defmodule AtlasWeb.AuthController do
 
   defp generate_token(user, :refresh) do
     {:ok, token, _claims} =
-      Guardian.encode_and_sign(user, %{aud: "astra"}, token_type: "refresh", ttl: {7, :day})
+      Guardian.encode_and_sign(user, %{aud: "astra"},
+        token_type: "refresh",
+        ttl: {@refresh_token_days, :day}
+      )
 
     token
   end
