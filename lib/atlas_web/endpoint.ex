@@ -49,10 +49,10 @@ defmodule AtlasWeb.Endpoint do
   plug Plug.Session, @session_options
 
   plug Corsica,
-    # FIXME: add frontend routes
-    origins: "*",
+    origins: &AtlasWeb.Plugs.CorsicaConfig.origins/1,
+    log: [rejected: :error],
     allow_credentials: true,
-    max_age: 600
+    allow_headers: ["authorization", "content-type", "accept"]
 
   plug AtlasWeb.Router
 end
