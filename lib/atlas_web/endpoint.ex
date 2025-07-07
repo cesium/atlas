@@ -50,7 +50,7 @@ defmodule AtlasWeb.Endpoint do
   plug Plug.Session, @session_options
 
   plug Corsica,
-    origins: &allowed_origins/1,
+    origins: &CorsicaConfig.allowed_origins/1,
     log: [rejected: :error],
     allow_credentials: true,
     allow_headers: ["authorization", "content-type", "accept"]
