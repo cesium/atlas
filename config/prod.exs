@@ -9,5 +9,9 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Config setup for Corsica
+# FIXME add url for frontend
+config :atlas_id, origins: ["http://localhost:3000"]
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
