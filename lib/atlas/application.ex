@@ -17,7 +17,9 @@ defmodule Atlas.Application do
       # Start a worker by calling: Atlas.Worker.start_link(arg)
       # {Atlas.Worker, arg},
       # Start to serve requests, typically the last entry
-      AtlasWeb.Endpoint
+      AtlasWeb.Endpoint,
+      # Start Hammer in Supervision Tree
+      {Hammer.Backend.ETS, [expiry_ms: 60_000, cleanup_interval_ms: 60_000]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
