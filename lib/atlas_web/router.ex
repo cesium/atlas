@@ -3,6 +3,7 @@ defmodule AtlasWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug AtlasWeb.Plugs.RateLimiter
   end
 
   scope "/api", AtlasWeb do
