@@ -32,12 +32,7 @@ defmodule AtlasWeb.AuthController do
             |> insert_refresh_token_cookie(refresh_token)
             |> json(%{
               access_token: access_token,
-              session_id: session.id,
-              user: %{
-                id: user.id,
-                email: user.email,
-                name: user.name
-              }
+              session_id: session.id
             })
 
           {:error, _reason} ->
@@ -136,20 +131,12 @@ defmodule AtlasWeb.AuthController do
   end
 
   defp parse_user_agent(user_agent) do
-    case UAParser.parse(user_agent) do
-      ua ->
-        %{
-          os: to_string(ua.os),
-          browser: to_string(ua.family),
-          agent: user_agent
-        }
+    ua = UAParser.parse(user_agent)
 
-      _ ->
-        %{
-          os: nil,
-          browser: nil,
-          agent: user_agent
-        }
-    end
+    %{
+      os: to_string(ua.os),
+      browser: to_string(ua.family),
+      agent: user_agent
+    }
   end
 end
