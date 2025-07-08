@@ -2,6 +2,17 @@ defmodule AtlasWeb.Plugs.AuthorizationUserTypes do
   import Plug.Conn
   import Phoenix.Controller
 
+    @moduledoc """
+  A plug that restricts route access based on user types.
+
+  Usage:
+    # In your router or controller
+    plug MyAppWeb.Plugs.RequireUserType, user_types: [:admin, :moderator]
+
+    # Or for a single user type
+    plug MyAppWeb.Plugs.RequireUserType, user_type: :admin
+  """
+
   def init(args) do
     cond do
       user_types = args[:user_types] ->
