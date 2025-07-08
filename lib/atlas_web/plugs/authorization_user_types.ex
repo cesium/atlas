@@ -1,13 +1,18 @@
 defmodule AtlasWeb.Plugs.AuthorizationUserTypes do
+  import Plug.Conn
+  import Phoenix.Controller
 
   def init(args) do
     cond do
       user_types = args[:user_types] ->
         %{user_types: user_types, on_failure: args[:on_failure] || :redirect}
+
       user_type = args[:user_type] ->
         %{user_types: [user_type], on_failure: args[:on_failure] || :redirect}
+
       true ->
         raise ArgumentError, "Must provide either :user_type or :user_types option"
+    end
   end
 
   def call(conn, %{user_types: allowed_types, on_failure: on_failure}) do
@@ -25,28 +30,28 @@ defmodule AtlasWeb.Plugs.AuthorizationUserTypes do
 
       true ->
         conn
+    end
   end
 
-  defp handle_unauthorized(conn, :redirect, reason) do
+  defp handle_unauthorized(conn, :redirect, _reason) do
     conn
-      |> redirect(to: "/")
-      |> halt()
+    |> redirect(to: "/")
+    |> halt()
   end
 
   defp handle_unauthorized(conn, :json, reason) do
     conn
-      |> json(%{error: unauthorized_message(reason)})
-      |> halt()
+    |> json(%{error: unauthorized_message(reason)})
+    |> halt()
   end
 
-  defp handle_unauthorized(conn, :halt, reason) do
+  defp handle_unauthorized(conn, :halt, _reason) do
     conn
-      |> put_status(:forbidden)
-      |> halt()
+    |> put_status(:forbidden)
+    |> halt()
   end
 
   defp unauthorized_message(:not_authenticated), do: "You must be logged in"
   defp unauthorized_message(:no_user_type), do: "User type not defined"
   defp unauthorized_message(:insufficient_permissions), do: "You don't have enough permission"
-
 end
