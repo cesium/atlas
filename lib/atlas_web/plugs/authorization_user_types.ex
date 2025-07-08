@@ -5,7 +5,7 @@ defmodule AtlasWeb.Plugs.AuthorizationUserTypes do
       user_types = args[:user_types] ->
         %{user_types: user_types, on_failure: args[:on_failure] || :redirect}
       user_type = args[:user_type] ->
-        %{user_types: [:user_type], on_failure: args[:on_failure] || :redirect}
+        %{user_types: [user_type], on_failure: args[:on_failure] || :redirect}
       true ->
         raise ArgumentError, "Must provide either :user_type or :user_types option"
   end
