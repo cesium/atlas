@@ -62,7 +62,10 @@ defmodule Atlas.MixProject do
 
       # server
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.2"}
+      {:bandit, "~> 1.2"},
+
+      # utilities
+      {:remote_ip, "~> 1.2"}
     ]
   end
 

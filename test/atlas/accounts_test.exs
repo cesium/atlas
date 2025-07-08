@@ -505,4 +505,65 @@ defmodule Atlas.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "users_sessions" do
+    alias Atlas.Accounts.UserSession
+
+    import Atlas.AccountsFixtures
+
+    @invalid_attrs %{ip: nil, user_agent: nil}
+
+    test "list_users_sessions/0 returns all users_sessions" do
+      user_session = user_session_fixture()
+      assert Accounts.list_users_sessions() == [user_session]
+    end
+
+    test "get_user_session!/1 returns the user_session with given id" do
+      user_session = user_session_fixture()
+      assert Accounts.get_user_session!(user_session.id) == user_session
+    end
+
+    test "create_user_session/1 with valid data creates a user_session" do
+      valid_attrs = %{ip: "some ip", user_agent: "some user_agent"}
+
+      assert {:ok, %UserSession{} = user_session} = Accounts.create_user_session(valid_attrs)
+      assert user_session.ip == "some ip"
+      assert user_session.user_agent == "some user_agent"
+    end
+
+    test "create_user_session/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_user_session(@invalid_attrs)
+    end
+
+    test "update_user_session/2 with valid data updates the user_session" do
+      user_session = user_session_fixture()
+      update_attrs = %{ip: "some updated ip", user_agent: "some updated user_agent"}
+
+      assert {:ok, %UserSession{} = user_session} =
+               Accounts.update_user_session(user_session, update_attrs)
+
+      assert user_session.ip == "some updated ip"
+      assert user_session.user_agent == "some updated user_agent"
+    end
+
+    test "update_user_session/2 with invalid data returns error changeset" do
+      user_session = user_session_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.update_user_session(user_session, @invalid_attrs)
+
+      assert user_session == Accounts.get_user_session!(user_session.id)
+    end
+
+    test "delete_user_session/1 deletes the user_session" do
+      user_session = user_session_fixture()
+      assert {:ok, %UserSession{}} = Accounts.delete_user_session(user_session)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_user_session!(user_session.id) end
+    end
+
+    test "change_user_session/1 returns a user_session changeset" do
+      user_session = user_session_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_user_session(user_session)
+    end
+  end
 end

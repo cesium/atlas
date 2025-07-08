@@ -3,6 +3,7 @@ defmodule AtlasWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug RemoteIp
   end
 
   pipeline :auth do

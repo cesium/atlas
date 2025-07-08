@@ -30,4 +30,19 @@ defmodule Atlas.AccountsFixtures do
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
+
+  @doc """
+  Generate a user_session.
+  """
+  def user_session_fixture(attrs \\ %{}) do
+    {:ok, user_session} =
+      attrs
+      |> Enum.into(%{
+        ip: "some ip",
+        user_agent: "some user_agent"
+      })
+      |> Atlas.Accounts.create_user_session()
+
+    user_session
+  end
 end

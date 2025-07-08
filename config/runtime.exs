@@ -63,7 +63,7 @@ if config_env() == :prod do
 
   config :guardian, Guardian.DB,
     repo: Atlas.Repo,
-    schema_name: "guardian_tokens",
+    schema_name: "sessions_tokens",
     sweep_interval: 60,
     token_types: ["refresh"]
 

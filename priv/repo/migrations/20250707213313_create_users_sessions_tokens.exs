@@ -1,8 +1,8 @@
-defmodule Atlas.Repo.Migrations.CreateGuardianDBTokensTable do
+defmodule Atlas.Repo.Migrations.CreateUsersSessionsTokens do
   use Ecto.Migration
 
   def change do
-    create table(:guardian_tokens, primary_key: false) do
+    create table(:sessions_tokens, primary_key: false) do
       add :jti, :string, primary_key: true
       add :aud, :string, primary_key: true
       add :typ, :string

@@ -12,19 +12,31 @@ defmodule AtlasWeb.AuthController do
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
       %User{} = user ->
-        access_token = generate_token(user, :access)
-        refresh_token = generate_token(user, :refresh)
+        ip = conn.remote_ip |> :inet.ntoa() |> to_string()
+        user_agent = List.first(Plug.Conn.get_req_header(conn, "user-agent"), "")
 
-        conn
-        |> insert_refresh_token_cookie(refresh_token)
-        |> json(%{
-          access_token: access_token,
-          user: %{
-            id: user.id,
-            email: user.email,
-            name: user.name
-          }
-        })
+        case Accounts.create_user_session(user, ip, user_agent) do
+          {:ok, session} ->
+            access_token = generate_token(user, session, :access)
+            refresh_token = generate_token(user, session, :refresh)
+
+            conn
+            |> insert_refresh_token_cookie(refresh_token)
+            |> json(%{
+              access_token: access_token,
+              session_id: session.id,
+              user: %{
+                id: user.id,
+                email: user.email,
+                name: user.name
+              }
+            })
+
+          {:error, _reason} ->
+            conn
+            |> put_status(:internal_server_error)
+            |> json(%{error: "Failed to create user session"})
+        end
 
       nil ->
         conn
@@ -34,7 +46,7 @@ defmodule AtlasWeb.AuthController do
   end
 
   def me(conn, _params) do
-    user = Guardian.Plug.current_resource(conn)
+    {user, _session} = Guardian.Plug.current_resource(conn)
 
     if user do
       conn
@@ -52,10 +64,10 @@ defmodule AtlasWeb.AuthController do
       {:ok, old_refresh_token} ->
         with {:ok, old_claims} <-
                Guardian.decode_and_verify(old_refresh_token, %{"typ" => "refresh"}),
-             {:ok, user} <- Guardian.resource_from_claims(old_claims),
+             {:ok, {user, session}} <- Guardian.resource_from_claims(old_claims),
              {:ok, _claims} <- Guardian.revoke(old_refresh_token) do
-          access_token = generate_token(user, :access)
-          new_refresh_token = generate_token(user, :refresh)
+          access_token = generate_token(user, session, :access)
+          new_refresh_token = generate_token(user, session, :refresh)
 
           conn
           |> insert_refresh_token_cookie(new_refresh_token)
@@ -95,16 +107,19 @@ defmodule AtlasWeb.AuthController do
     )
   end
 
-  defp generate_token(user, :access) do
+  defp generate_token(user, session, :access) do
     {:ok, token, _claims} =
-      Guardian.encode_and_sign(user, %{aud: "astra"}, token_type: "access", ttl: {15, :minute})
+      Guardian.encode_and_sign({user, session}, %{aud: "astra"},
+        token_type: "access",
+        ttl: {15, :minute}
+      )
 
     token
   end
 
-  defp generate_token(user, :refresh) do
+  defp generate_token(user, session, :refresh) do
     {:ok, token, _claims} =
-      Guardian.encode_and_sign(user, %{aud: "astra"},
+      Guardian.encode_and_sign({user, session}, %{aud: "astra"},
         token_type: "refresh",
         ttl: {@refresh_token_days, :day}
       )

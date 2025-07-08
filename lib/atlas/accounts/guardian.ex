@@ -2,11 +2,11 @@ defmodule Atlas.Accounts.Guardian do
   use Guardian, otp_app: :atlas
 
   alias Atlas.Accounts
-  alias Atlas.Accounts.User
+  alias Atlas.Accounts.{UserSession, User}
 
   @impl true
-  def subject_for_token(%User{id: id}, _claims) do
-    {:ok, to_string(id)}
+  def subject_for_token({%User{id: _user_id}, %UserSession{id: session_id}}, _claims) do
+    {:ok, session_id}
   end
 
   def subject_for_token(_, _claims) do
@@ -14,10 +14,13 @@ defmodule Atlas.Accounts.Guardian do
   end
 
   @impl true
-  def resource_from_claims(%{"sub" => id}) do
-    case Accounts.get_user(id) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
+  def resource_from_claims(%{"sub" => session_id}) do
+    case Accounts.get_user_session(session_id) do
+      nil ->
+        {:error, :not_found}
+
+      session ->
+        {:ok, {session.user, session}}
     end
   end
 
@@ -27,7 +30,9 @@ defmodule Atlas.Accounts.Guardian do
 
   @impl true
   def after_encode_and_sign(resource, claims, token, _options) do
-    with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
+    {_user, session} = resource
+
+    with {:ok, _} <- Guardian.DB.after_encode_and_sign(session.id, claims["typ"], claims, token) do
       {:ok, token}
     end
   end
