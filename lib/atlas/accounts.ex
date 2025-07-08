@@ -387,6 +387,21 @@ defmodule Atlas.Accounts do
   end
 
   @doc """
+  Returns the list of user sessions for a specific user.
+
+  ## Examples
+
+      iex> list_user_sessions(123)
+      [%UserSession{}, ...]
+
+  """
+  def list_user_sessions(user_id) do
+    UserSession
+    |> where([us], us.user_id == ^user_id)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single user_session.
 
   Raises `Ecto.NoResultsError` if the User session does not exist.

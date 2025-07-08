@@ -91,6 +91,22 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  def sessions(conn, _params) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    if user do
+      sessions = Accounts.list_user_sessions(user.id)
+
+      conn
+      |> put_view(AtlasWeb.UserSessionJSON)
+      |> render(:index, users_sessions: sessions)
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Not authenticated"})
+    end
+  end
+
   defp fetch_refresh_token_cookie(conn) do
     conn = fetch_cookies(conn, signed: ["refresh_token"])
 

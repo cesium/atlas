@@ -36,7 +36,9 @@ defmodule AtlasWeb.Router do
     # Authenticated routes
 
     scope "/auth" do
+      get "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
+      get "/sessions", AuthController, :sessions
     end
   end
 
