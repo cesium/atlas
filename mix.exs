@@ -65,7 +65,8 @@ defmodule Atlas.MixProject do
       {:bandit, "~> 1.2"},
 
       # utilities
-      {:remote_ip, "~> 1.2"}
+      {:remote_ip, "~> 1.2"},
+      {:ua_parser, "~> 1.8"}
     ]
   end
 

@@ -469,12 +469,20 @@ defmodule Atlas.Accounts do
     UserSession.changeset(user_session, attrs)
   end
 
-  def create_user_session(%User{} = user, ip \\ "", user_agent \\ "") do
+  def create_user_session(
+        %User{} = user,
+        ip \\ "",
+        user_agent \\ "",
+        user_os \\ "",
+        user_browser \\ ""
+      ) do
     %UserSession{}
     |> UserSession.changeset(%{
       user_id: user.id,
       ip: ip,
-      user_agent: user_agent
+      user_agent: user_agent,
+      user_os: user_os,
+      user_browser: user_browser
     })
     |> Repo.insert()
   end

@@ -6,6 +6,8 @@ defmodule Atlas.Repo.Migrations.CreateUsersSessions do
       add :id, :binary_id, primary_key: true
       add :ip, :string
       add :user_agent, :string
+      add :user_os, :string
+      add :user_browser, :string
       add :user_id, references(:users, on_delete: :nothing, type: :binary_id)
 
       timestamps(type: :utc_datetime)

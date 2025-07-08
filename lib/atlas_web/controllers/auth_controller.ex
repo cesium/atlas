@@ -13,9 +13,17 @@ defmodule AtlasWeb.AuthController do
     case Accounts.get_user_by_email_and_password(email, password) do
       %User{} = user ->
         ip = conn.remote_ip |> :inet.ntoa() |> to_string()
-        user_agent = List.first(Plug.Conn.get_req_header(conn, "user-agent"), "")
 
-        case Accounts.create_user_session(user, ip, user_agent) do
+        user_agent =
+          List.first(Plug.Conn.get_req_header(conn, "user-agent"), "") |> parse_user_agent()
+
+        case Accounts.create_user_session(
+               user,
+               ip,
+               user_agent.agent,
+               user_agent.os,
+               user_agent.browser
+             ) do
           {:ok, session} ->
             access_token = generate_token(user, session, :access)
             refresh_token = generate_token(user, session, :refresh)
@@ -125,5 +133,23 @@ defmodule AtlasWeb.AuthController do
       )
 
     token
+  end
+
+  defp parse_user_agent(user_agent) do
+    case UAParser.parse(user_agent) do
+      ua ->
+        %{
+          os: to_string(ua.os),
+          browser: to_string(ua.family),
+          agent: user_agent
+        }
+
+      _ ->
+        %{
+          os: nil,
+          browser: nil,
+          agent: user_agent
+        }
+    end
   end
 end

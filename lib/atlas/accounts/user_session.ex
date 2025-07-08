@@ -1,11 +1,13 @@
 defmodule Atlas.Accounts.UserSession do
   use Atlas.Schema
 
-  @optional_fields ~w(ip user_agent)a
+  @optional_fields ~w(ip user_agent user_os user_browser)a
   @required_fields ~w(user_id)a
   schema "users_sessions" do
     field :ip, :string
     field :user_agent, :string
+    field :user_os, :string
+    field :user_browser, :string
 
     belongs_to :user, Atlas.Accounts.User, type: :binary_id
 
