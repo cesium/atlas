@@ -2,7 +2,7 @@ defmodule AtlasWeb.Plugs.AuthorizationUserTypes do
   import Plug.Conn
   import Phoenix.Controller
 
-    @moduledoc """
+  @moduledoc """
   A plug that restricts route access based on user types.
 
   Usage:
