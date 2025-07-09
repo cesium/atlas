@@ -91,6 +91,29 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  def sign_out(conn, _params) do
+    {_user, session} = Guardian.Plug.current_resource(conn)
+
+    if session do
+      case Accounts.delete_user_session(session) do
+        {:ok, _} ->
+          conn
+          |> delete_refresh_token_cookie()
+          |> put_status(:no_content)
+          |> send_resp(:no_content, "")
+
+        {:error, _reason} ->
+          conn
+          |> put_status(:internal_server_error)
+          |> json(%{error: "Failed to sign out"})
+      end
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Not authenticated"})
+    end
+  end
+
   def sessions(conn, _params) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
@@ -118,6 +141,16 @@ defmodule AtlasWeb.AuthController do
 
   defp insert_refresh_token_cookie(conn, token) do
     put_resp_cookie(conn, "refresh_token", token,
+      http_only: true,
+      secure: true,
+      same_site: "Strict",
+      max_age: @refresh_token_days * 24 * 60 * 60,
+      sign: true
+    )
+  end
+
+  defp delete_refresh_token_cookie(conn) do
+    delete_resp_cookie(conn, "refresh_token",
       http_only: true,
       secure: true,
       same_site: "Strict",

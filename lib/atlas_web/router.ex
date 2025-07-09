@@ -11,7 +11,7 @@ defmodule AtlasWeb.Router do
 
     plug Guardian.Plug.Pipeline,
       otp_app: :atlas,
-      error_handler: AtlasWeb.Plugs.GuardianErrorHandler,
+      error_handler: AtlasWeb.Plugs.AuthErrorHandler,
       module: Atlas.Accounts.Guardian
 
     plug Guardian.Plug.VerifyHeader, claims: %{typ: "access"}
@@ -36,7 +36,7 @@ defmodule AtlasWeb.Router do
     # Authenticated routes
 
     scope "/auth" do
-      get "/sign_out", AuthController, :sign_out
+      post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
     end
