@@ -28,12 +28,10 @@ defmodule AtlasWeb.Router do
       post "/sign_in", AuthController, :sign_in
       post "/refresh", AuthController, :refresh_token
     end
-  end
-
-  scope "/v1", AtlasWeb do
-    pipe_through [:api, :auth]
 
     # Authenticated routes
+
+    pipe_through :auth
 
     scope "/auth" do
       post "/sign_out", AuthController, :sign_out
