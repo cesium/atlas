@@ -1,8 +1,11 @@
 defmodule Atlas.Accounts.Guardian do
+  @moduledoc """
+  Guardian implementation for application accounts.
+  """
   use Guardian, otp_app: :atlas
 
   alias Atlas.Accounts
-  alias Atlas.Accounts.{UserSession, User}
+  alias Atlas.Accounts.{User, UserSession}
 
   @impl true
   def subject_for_token({%User{id: _user_id}, %UserSession{id: session_id}}, _claims) do

@@ -299,66 +299,12 @@ defmodule Atlas.AccountsTest do
     end
 
     test "deletes all tokens for the given user", %{user: user} do
-      _ = Accounts.generate_user_session_token(user)
-
       {:ok, _} =
         Accounts.update_user_password(user, valid_user_password(), %{
           password: "new valid password"
         })
 
       refute Repo.get_by(UserToken, user_id: user.id)
-    end
-  end
-
-  describe "generate_user_session_token/1" do
-    setup do
-      %{user: user_fixture()}
-    end
-
-    test "generates a token", %{user: user} do
-      token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
-      assert user_token.context == "session"
-
-      # Creating the same token for another user should fail
-      assert_raise Ecto.ConstraintError, fn ->
-        Repo.insert!(%UserToken{
-          token: user_token.token,
-          user_id: user_fixture().id,
-          context: "session"
-        })
-      end
-    end
-  end
-
-  describe "get_user_by_session_token/1" do
-    setup do
-      user = user_fixture()
-      token = Accounts.generate_user_session_token(user)
-      %{user: user, token: token}
-    end
-
-    test "returns user by token", %{user: user, token: token} do
-      assert session_user = Accounts.get_user_by_session_token(token)
-      assert session_user.id == user.id
-    end
-
-    test "does not return user for invalid token" do
-      refute Accounts.get_user_by_session_token("oops")
-    end
-
-    test "does not return user for expired token", %{token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
-      refute Accounts.get_user_by_session_token(token)
-    end
-  end
-
-  describe "delete_user_session_token/1" do
-    test "deletes the token" do
-      user = user_fixture()
-      token = Accounts.generate_user_session_token(user)
-      assert Accounts.delete_user_session_token(token) == :ok
-      refute Accounts.get_user_by_session_token(token)
     end
   end
 
@@ -494,7 +440,6 @@ defmodule Atlas.AccountsTest do
     end
 
     test "deletes all tokens for the given user", %{user: user} do
-      _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"})
       refute Repo.get_by(UserToken, user_id: user.id)
     end
@@ -511,7 +456,7 @@ defmodule Atlas.AccountsTest do
 
     import Atlas.AccountsFixtures
 
-    @invalid_attrs %{ip: nil, user_agent: nil}
+    @invalid_attrs %{user_id: nil}
 
     test "list_users_sessions/0 returns all users_sessions" do
       user_session = user_session_fixture()
@@ -524,15 +469,29 @@ defmodule Atlas.AccountsTest do
     end
 
     test "create_user_session/1 with valid data creates a user_session" do
-      valid_attrs = %{ip: "some ip", user_agent: "some user_agent"}
+      valid_attrs = %{
+        ip: "some ip",
+        user_agent: "some user_agent",
+        user_os: "some user_os",
+        user_browser: "some user_browser"
+      }
 
-      assert {:ok, %UserSession{} = user_session} = Accounts.create_user_session(valid_attrs)
+      assert {:ok, %UserSession{} = user_session} =
+               Accounts.create_user_session(
+                 user_fixture(),
+                 valid_attrs.ip,
+                 valid_attrs.user_agent,
+                 valid_attrs.user_os,
+                 valid_attrs.user_browser
+               )
+
       assert user_session.ip == "some ip"
       assert user_session.user_agent == "some user_agent"
     end
 
     test "create_user_session/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user_session(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.create_user_session(user_fixture(), @invalid_attrs)
     end
 
     test "update_user_session/2 with valid data updates the user_session" do

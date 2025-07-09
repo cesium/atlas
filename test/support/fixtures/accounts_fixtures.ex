@@ -35,13 +35,23 @@ defmodule Atlas.AccountsFixtures do
   Generate a user_session.
   """
   def user_session_fixture(attrs \\ %{}) do
-    {:ok, user_session} =
+    attrs =
       attrs
       |> Enum.into(%{
         ip: "some ip",
-        user_agent: "some user_agent"
+        user_agent: "some user_agent",
+        user_os: "some user_os",
+        user_browser: "some user_browser"
       })
-      |> Atlas.Accounts.create_user_session()
+
+    {:ok, user_session} =
+      user_fixture()
+      |> Atlas.Accounts.create_user_session(
+        attrs.ip,
+        attrs.user_agent,
+        attrs.user_os,
+        attrs.user_browser
+      )
 
     user_session
   end

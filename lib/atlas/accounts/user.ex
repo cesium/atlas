@@ -1,4 +1,7 @@
 defmodule Atlas.Accounts.User do
+  @moduledoc """
+  Application user schema and changesets.
+  """
   use Atlas.Schema
 
   schema "users" do
@@ -8,7 +11,7 @@ defmodule Atlas.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
-    field :type, Ecto.Enum, values: [:student, :admin, :teacher]
+    field :type, Ecto.Enum, values: [:student, :admin, :professor]
 
     timestamps(type: :utc_datetime)
   end

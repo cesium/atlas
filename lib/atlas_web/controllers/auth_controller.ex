@@ -2,8 +2,7 @@ defmodule AtlasWeb.AuthController do
   use AtlasWeb, :controller
 
   alias Atlas.Accounts
-  alias Atlas.Accounts.User
-  alias Atlas.Accounts.Guardian
+  alias Atlas.Accounts.{Guardian, User}
 
   action_fallback AtlasWeb.FallbackController
 

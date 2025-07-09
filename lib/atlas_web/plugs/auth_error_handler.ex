@@ -1,4 +1,8 @@
 defmodule AtlasWeb.Plugs.AuthErrorHandler do
+  @moduledoc """
+  Error handler for Guardian authentication errors.
+  """
+
   import Plug.Conn
   alias Phoenix.Controller
 

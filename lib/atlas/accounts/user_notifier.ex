@@ -1,4 +1,9 @@
 defmodule Atlas.Accounts.UserNotifier do
+  @moduledoc """
+  Provides methods to send notifications to users, such as confirmation instructions,
+  password reset instructions, and email update instructions.
+  """
+
   import Swoosh.Email
 
   alias Atlas.Mailer

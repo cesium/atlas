@@ -5,7 +5,7 @@ defmodule Atlas.Accounts do
 
   use Atlas.Context
 
-  alias Atlas.Accounts.{User, UserToken, UserNotifier, UserSession}
+  alias Atlas.Accounts.{User, UserNotifier, UserSession, UserToken}
 
   ## Database getters
 

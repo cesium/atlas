@@ -1,4 +1,8 @@
 defmodule Atlas.Accounts.UserSession do
+  @moduledoc """
+  Represents a user session in the application.
+  """
+
   use Atlas.Schema
 
   @optional_fields ~w(ip user_agent user_os user_browser)a
