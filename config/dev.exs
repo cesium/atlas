@@ -67,4 +67,4 @@ config :swoosh, :api_client, false
 
 # Config setup for Corsica
 # FIXME add url for frontend
-config :atlas_id, origins: ["http://localhost:3000"]
+config :atlas, origins: ["http://localhost:3000"]

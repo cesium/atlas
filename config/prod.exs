@@ -11,7 +11,7 @@ config :logger, level: :info
 
 # Config setup for Corsica
 # FIXME add url for frontend
-config :atlas_id, origins: ["http://localhost:3000"]
+config :atlas, origins: ["http://localhost:3000"]
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
