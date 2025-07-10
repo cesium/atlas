@@ -7,6 +7,7 @@ defmodule AtlasWeb.AuthController do
   action_fallback AtlasWeb.FallbackController
 
   @refresh_token_days 7
+  @audience "astra"
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
@@ -160,7 +161,7 @@ defmodule AtlasWeb.AuthController do
 
   defp generate_token(user, session, :access) do
     {:ok, token, _claims} =
-      Guardian.encode_and_sign({user, session}, %{aud: "astra"},
+      Guardian.encode_and_sign({user, session}, %{aud: @audience},
         token_type: "access",
         ttl: {15, :minute}
       )
@@ -170,7 +171,7 @@ defmodule AtlasWeb.AuthController do
 
   defp generate_token(user, session, :refresh) do
     {:ok, token, _claims} =
-      Guardian.encode_and_sign({user, session}, %{aud: "astra"},
+      Guardian.encode_and_sign({user, session}, %{aud: @audience},
         token_type: "refresh",
         ttl: {@refresh_token_days, :day}
       )
