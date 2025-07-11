@@ -14,6 +14,9 @@ defmodule Atlas.Application do
       {Phoenix.PubSub, name: Atlas.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Atlas.Finch},
+      # Start the Guardian DB token sweeper server
+      # This is used to clean up expired tokens from the database
+      {Guardian.DB.Token.SweeperServer, []},
       # Start a worker by calling: Atlas.Worker.start_link(arg)
       # {Atlas.Worker, arg},
       # Start to serve requests, typically the last entry

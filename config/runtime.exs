@@ -20,6 +20,8 @@ if System.get_env("PHX_SERVER") do
   config :atlas, AtlasWeb.Endpoint, server: true
 end
 
+config :atlas, :frontend_url, System.get_env("FRONTEND_URL", "http://localhost:3000")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -48,6 +50,25 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  secret_key_guardian =
+    System.get_env("SECRET_KEY_GUARDIAN") ||
+      raise("""
+      environment variable SECRET_KEY_GUARDIAN is missing.
+      You can generate one by calling: mix guardian.gen.secret
+      """)
+
+  config :atlas, Atlas.Accounts.Guardian,
+    issuer: "atlas",
+    secret_key: secret_key_guardian,
+    ttl: {30, :days},
+    allowed_drift: 2000
+
+  config :guardian, Guardian.DB,
+    repo: Atlas.Repo,
+    schema_name: "sessions_tokens",
+    sweep_interval: 60,
+    token_types: ["refresh"]
+
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
@@ -64,6 +85,15 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  frontend_url =
+    System.get_env("FRONTEND_URL") ||
+      raise """
+      environment variable FRONTEND_URL is missing.
+      It should be the base URL of your frontend application, e.g., https://astra.cesium.pt
+      """
+
+  config :atlas, :frontend_url, frontend_url
 
   # ## SSL Support
   #
