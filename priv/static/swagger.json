@@ -4,45 +4,7 @@
     "title": "Atlas"
   },
   "host": "localhost:4000",
-  "definitions": {
-    "HealthResponse": {
-      "description": "Simple response to confirm service is alive",
-      "example": {
-        "message": "ok"
-      },
-      "properties": {
-        "message": {
-          "description": "Confirmation message",
-          "type": "string"
-        }
-      },
-      "title": "HealthCheck",
-      "type": "object"
-    }
-  },
-  "paths": {
-    "/api/test": {
-      "get": {
-        "description": "Returns a simple OK message.",
-        "operationId": "AtlasWeb.TestController.index",
-        "parameters": [],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "schema": {
-              "$ref": "#/definitions/HealthResponse"
-            }
-          }
-        },
-        "summary": "Health check",
-        "tags": [
-          "Test"
-        ]
-      }
-    }
-  },
+  "definitions": {},
+  "paths": {},
   "swagger": "2.0"
 }
