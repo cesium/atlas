@@ -9,8 +9,6 @@ defmodule AtlasWeb.Router do
 
   scope "/api", AtlasWeb do
     pipe_through :api
-
-    get "/test", TestController, :index
   end
 
   scope "/swagger" do
