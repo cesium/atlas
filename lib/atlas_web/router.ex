@@ -1,8 +1,10 @@
 defmodule AtlasWeb.Router do
   use AtlasWeb, :router
+  alias PhoenixSwagger.Plug.Validate
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug(Validate, validation_failed_status: 422)
   end
 
   scope "/api", AtlasWeb do
@@ -11,11 +13,8 @@ defmodule AtlasWeb.Router do
     get "/test", TestController, :index
   end
 
-  scope "/", AtlasWeb do
-    pipe_through :api
-
-    get "/swagger.json", SwaggerController, :swagger
-    get "/swagger", SwaggerController, :swagger_ui
+  scope "/swagger" do
+    forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :atlas, swagger_file: "swagger.json")
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

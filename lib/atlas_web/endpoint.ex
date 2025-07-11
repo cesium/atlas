@@ -23,7 +23,7 @@ defmodule AtlasWeb.Endpoint do
     at: "/",
     from: :atlas,
     gzip: false,
-    only: AtlasWeb.static_paths()
+    only: ~w(css fonts images js favicon.ico robots.txt swagger.json)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
