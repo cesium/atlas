@@ -130,6 +130,39 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  def forgot_password(conn, %{"email" => email}) do
+    if user = Accounts.get_user_by_email(email) do
+      Accounts.deliver_user_reset_password_instructions(user, &"/auth/forgot_password/#{&1}")
+    end
+
+    conn
+    |> put_status(:no_content)
+    |> send_resp(:no_content, "")
+  end
+
+  def reset_password(conn, %{
+        "token" => token,
+        "password" => new_password,
+        "password_confirmation" => new_password_confirmation
+      }) do
+    if user = Accounts.get_user_by_reset_password_token(token) do
+      with {:ok, _user} <-
+             Accounts.reset_user_password(user, %{
+               password: new_password,
+               password_confirmation: new_password_confirmation
+             }) do
+        conn
+        |> put_status(:ok)
+        |> json(%{message: "Password reset successfully"})
+      end
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Invalid or expired reset token"})
+      |> halt()
+    end
+  end
+
   defp fetch_refresh_token_cookie(conn) do
     conn = fetch_cookies(conn, signed: ["refresh_token"])
 

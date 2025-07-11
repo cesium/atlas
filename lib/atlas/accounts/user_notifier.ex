@@ -25,7 +25,7 @@ defmodule Atlas.Accounts.UserNotifier do
   @doc """
   Deliver instructions to confirm account.
   """
-  def deliver_confirmation_instructions(user, url) do
+  def deliver_confirmation_instructions(user, path) do
     deliver(user.email, "Confirmation instructions", """
 
     ==============================
@@ -34,7 +34,7 @@ defmodule Atlas.Accounts.UserNotifier do
 
     You can confirm your account by visiting the URL below:
 
-    #{url}
+    #{build_full_url(path)}
 
     If you didn't create an account with us, please ignore this.
 
@@ -45,7 +45,7 @@ defmodule Atlas.Accounts.UserNotifier do
   @doc """
   Deliver instructions to reset a user password.
   """
-  def deliver_reset_password_instructions(user, url) do
+  def deliver_reset_password_instructions(user, path) do
     deliver(user.email, "Reset password instructions", """
 
     ==============================
@@ -54,7 +54,7 @@ defmodule Atlas.Accounts.UserNotifier do
 
     You can reset your password by visiting the URL below:
 
-    #{url}
+    #{build_full_url(path)}
 
     If you didn't request this change, please ignore this.
 
@@ -65,7 +65,7 @@ defmodule Atlas.Accounts.UserNotifier do
   @doc """
   Deliver instructions to update a user email.
   """
-  def deliver_update_email_instructions(user, url) do
+  def deliver_update_email_instructions(user, path) do
     deliver(user.email, "Update email instructions", """
 
     ==============================
@@ -74,11 +74,16 @@ defmodule Atlas.Accounts.UserNotifier do
 
     You can change your email by visiting the URL below:
 
-    #{url}
+    #{build_full_url(path)}
 
     If you didn't request this change, please ignore this.
 
     ==============================
     """)
+  end
+
+  defp build_full_url(path) do
+    base_url = System.get_env("FRONTEND_URL", "localhost:3000")
+    "https://#{base_url}#{path}"
   end
 end

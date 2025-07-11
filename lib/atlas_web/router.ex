@@ -27,6 +27,8 @@ defmodule AtlasWeb.Router do
     scope "/auth" do
       post "/sign_in", AuthController, :sign_in
       post "/refresh", AuthController, :refresh_token
+      post "/forgot_password", AuthController, :forgot_password
+      post "/reset_password", AuthController, :reset_password
     end
 
     # Authenticated routes

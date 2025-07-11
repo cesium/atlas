@@ -2,8 +2,9 @@ defmodule Atlas.Accounts.UserSession do
   @moduledoc """
   Represents a user session in the application.
   """
-
   use Atlas.Schema
+  import Ecto.Query
+  alias Atlas.Accounts.UserSession
 
   @optional_fields ~w(ip user_agent user_os user_browser)a
   @required_fields ~w(user_id)a
@@ -23,5 +24,12 @@ defmodule Atlas.Accounts.UserSession do
     user_session
     |> cast(attrs, @optional_fields ++ @required_fields)
     |> validate_required(@required_fields)
+  end
+
+  @doc """
+  Gets all sessions for the given user.
+  """
+  def by_user_query(user) do
+    from s in UserSession, where: s.user_id == ^user.id
   end
 end

@@ -339,6 +339,7 @@ defmodule Atlas.Accounts do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
     |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, :all))
+    |> Ecto.Multi.delete_all(:sessions, UserSession.by_user_query(user))
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
