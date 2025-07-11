@@ -20,6 +20,8 @@ if System.get_env("PHX_SERVER") do
   config :atlas, AtlasWeb.Endpoint, server: true
 end
 
+config :atlas, :frontend_url, System.get_env("FRONTEND_URL", "http://localhost:3000")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -83,6 +85,15 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  frontend_url =
+    System.get_env("FRONTEND_URL") ||
+      raise """
+      environment variable FRONTEND_URL is missing.
+      It should be the base URL of your frontend application, e.g., https://astra.cesium.pt
+      """
+
+  config :atlas, :frontend_url, frontend_url
 
   # ## SSL Support
   #

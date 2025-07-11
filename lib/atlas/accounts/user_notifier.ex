@@ -83,7 +83,7 @@ defmodule Atlas.Accounts.UserNotifier do
   end
 
   defp build_full_url(path) do
-    base_url = System.get_env("FRONTEND_URL", "localhost:3000")
+    base_url = Application.fetch_env!(:atlas, :frontend_url)
     "https://#{base_url}#{path}"
   end
 end
