@@ -10,9 +10,9 @@ defmodule AtlasWeb.Router do
     plug :accepts, ["json"]
 
     plug Guardian.Plug.Pipeline,
-    otp_app: :atlas,
-    error_handler: AtlasWeb.Plugs.AuthErrorHandler,
-    module: Atlas.Accounts.Guardian
+      otp_app: :atlas,
+      error_handler: AtlasWeb.Plugs.AuthErrorHandler,
+      module: Atlas.Accounts.Guardian
 
     plug Guardian.Plug.VerifyHeader, claims: %{typ: "access"}
     plug Guardian.Plug.EnsureAuthenticated
@@ -62,7 +62,6 @@ defmodule AtlasWeb.Router do
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
-
 
   # Usage for bearer token authorization: "Bearer <token>"
 

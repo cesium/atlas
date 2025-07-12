@@ -228,12 +228,14 @@ defmodule AtlasWeb.AuthController do
     summary("Sign in a user")
     description("Sign in a user. Returns an access token.")
     produces("application/json")
-    tag ("Authentication")
+    tag("Authentication")
     operation_id("sign_in")
+
     parameters do
       email(:query, :string, "User email", required: true)
       password(:query, :string, "User password", required: true)
     end
+
     response(200, "Successful sign in")
     response(401, "Unauthorized")
     response(500, "Failed to create user session")
@@ -244,7 +246,7 @@ defmodule AtlasWeb.AuthController do
     summary("Refresh access token")
     description("Refresh access token with a refresh token cookie.")
     produces("application/json")
-    tag ("Authentication")
+    tag("Authentication")
     operation_id("refresh_token")
     response(200, "Successful refresh")
     response(401, "Unauthorized")
@@ -255,11 +257,13 @@ defmodule AtlasWeb.AuthController do
     summary("Request password reset")
     description("Sends password reset instructions to the user via email.")
     produces("application/json")
-    tag ("Authentication")
+    tag("Authentication")
     operation_id("forgot_password")
+
     parameters do
       email(:query, :string, "User email", required: true)
     end
+
     response(204, "No content")
     response(401, "Unauthorized")
   end
@@ -271,11 +275,13 @@ defmodule AtlasWeb.AuthController do
     produces("application/json")
     tag("Authentication")
     operation_id("reset_password")
+
     parameters do
       token(:query, :string, "Access token", required: true)
       password(:query, :string, "New password", required: true)
       password_confirmation(:query, :string, "New password confirmation", required: true)
     end
+
     response(200, "Password succesfully reset")
     response(404, "Invalid or expired reset token")
   end
@@ -290,7 +296,7 @@ defmodule AtlasWeb.AuthController do
     response(204, "No content - Signed out successfully")
     response(401, "Unauthorized")
     response(500, "Failed to sign out")
-    security [%{Bearer: []}]
+    security([%{Bearer: []}])
   end
 
   swagger_path :me do
@@ -302,7 +308,7 @@ defmodule AtlasWeb.AuthController do
     operation_id("me")
     response(200, "User returned succesfully")
     response(401, "Unauthorized")
-    security [%{Bearer: []}]
+    security([%{Bearer: []}])
   end
 
   swagger_path :sessions do
@@ -314,7 +320,6 @@ defmodule AtlasWeb.AuthController do
     operation_id("sessions")
     response(200, "Sessions succesfully returned")
     response(401, "Unauthorized")
-    security [%{Bearer: []}]
+    security([%{Bearer: []}])
   end
-
 end
