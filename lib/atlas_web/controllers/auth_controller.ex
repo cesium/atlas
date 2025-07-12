@@ -3,6 +3,7 @@ defmodule AtlasWeb.AuthController do
 
   alias Atlas.Accounts
   alias Atlas.Accounts.{Guardian, User}
+  use PhoenixSwagger
 
   action_fallback AtlasWeb.FallbackController
 
@@ -221,4 +222,49 @@ defmodule AtlasWeb.AuthController do
       agent: user_agent
     }
   end
+
+  swagger_path :sign_in do
+    post("/v1/auth/sign_in")
+    summary("Sigin in a user")
+    description("Sign in a user. Returns an access token and a refresh token.")
+    produces("application/json")
+    tag ("Authentication")
+    operation_id("sign_in")
+    parameters do
+      email(:query, :string, "User email", required: true)
+      password(:query, :string, "User password", required: true)
+    end
+    response(200, "Successful sign in")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :refresh_token do
+    post("/v1/auth/refresh")
+    summary("Refresh access token")
+    description("Refresh access token with a refresh token cookie.")
+    produces("application/json")
+    tag ("Authentication")
+    operation_id("refresh_token")
+    response(200, "Successful refresh")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :forgot_password do
+    post("/v1/auth/forgot_password")
+    summary("Request password reset")
+    description("Sends a password request to the user")
+    produces("application/json")
+    tag ("Authentication")
+    operation_id("forgot_password")
+    response(200, "Request succesfully sent")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :reset_password do
+    post("/v1/auth/reset_password")
+    summary("Reset password")
+    description("Sends a request to reset the password.")
+  end
+
+
 end

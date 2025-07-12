@@ -1,10 +1,8 @@
 defmodule AtlasWeb.Router do
   use AtlasWeb, :router
-  alias PhoenixSwagger.Plug.Validate
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug(Validate, validation_failed_status: 422)
     plug RemoteIp
   end
 
@@ -12,9 +10,9 @@ defmodule AtlasWeb.Router do
     plug :accepts, ["json"]
 
     plug Guardian.Plug.Pipeline,
-      otp_app: :atlas,
-      error_handler: AtlasWeb.Plugs.AuthErrorHandler,
-      module: Atlas.Accounts.Guardian
+    otp_app: :atlas,
+    error_handler: AtlasWeb.Plugs.AuthErrorHandler,
+    module: Atlas.Accounts.Guardian
 
     plug Guardian.Plug.VerifyHeader, claims: %{typ: "access"}
     plug Guardian.Plug.EnsureAuthenticated

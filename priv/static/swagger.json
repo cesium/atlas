@@ -5,6 +5,66 @@
   },
   "host": "localhost:4000",
   "definitions": {},
-  "paths": {},
+  "paths": {
+    "/v1/auth/refresh": {
+      "post": {
+        "description": "Refresh access token",
+        "operationId": "refresh_token",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful refresh"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Refresh access token",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/v1/auth/sign_in": {
+      "post": {
+        "description": "Sign in a user. Returns an access token and a refresh token.",
+        "operationId": "sign_in",
+        "parameters": [
+          {
+            "description": "User email",
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "User password",
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful sign in"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Sigin in a user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    }
+  },
   "swagger": "2.0"
 }
