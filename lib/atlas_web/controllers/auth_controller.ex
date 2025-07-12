@@ -3,6 +3,7 @@ defmodule AtlasWeb.AuthController do
 
   alias Atlas.Accounts
   alias Atlas.Accounts.{Guardian, User}
+  use PhoenixSwagger
 
   action_fallback AtlasWeb.FallbackController
 
@@ -220,5 +221,105 @@ defmodule AtlasWeb.AuthController do
       browser: to_string(ua.family),
       agent: user_agent
     }
+  end
+
+  swagger_path :sign_in do
+    post("/v1/auth/sign_in")
+    summary("Sign in a user")
+    description("Sign in a user. Returns an access token.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sign_in")
+
+    parameters do
+      email(:query, :string, "User email", required: true)
+      password(:query, :string, "User password", required: true)
+    end
+
+    response(200, "Successful sign in")
+    response(401, "Unauthorized")
+    response(500, "Failed to create user session")
+  end
+
+  swagger_path :refresh_token do
+    post("/v1/auth/refresh")
+    summary("Refresh access token")
+    description("Refresh access token with a refresh token cookie.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("refresh_token")
+    response(200, "Successful refresh")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :forgot_password do
+    post("/v1/auth/forgot_password")
+    summary("Request password reset")
+    description("Sends password reset instructions to the user via email.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("forgot_password")
+
+    parameters do
+      email(:query, :string, "User email", required: true)
+    end
+
+    response(204, "No content")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :reset_password do
+    post("/v1/auth/reset_password")
+    summary("Reset password")
+    description("Sends a request to reset user's password.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("reset_password")
+
+    parameters do
+      token(:query, :string, "Access token", required: true)
+      password(:query, :string, "New password", required: true)
+      password_confirmation(:query, :string, "New password confirmation", required: true)
+    end
+
+    response(200, "Password succesfully reset")
+    response(404, "Invalid or expired reset token")
+  end
+
+  swagger_path :sign_out do
+    post("/v1/auth/sign_out")
+    summary("Sign out")
+    description("Signs out the user.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sign_out")
+    response(204, "No content - Signed out successfully")
+    response(401, "Unauthorized")
+    response(500, "Failed to sign out")
+    security([%{Bearer: []}])
+  end
+
+  swagger_path :me do
+    get("/v1/auth/me")
+    summary("User in the current session")
+    description("Returns the user in the current session.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("me")
+    response(200, "User returned succesfully")
+    response(401, "Unauthorized")
+    security([%{Bearer: []}])
+  end
+
+  swagger_path :sessions do
+    get("/v1/auth/sessions")
+    summary("User sessions")
+    description("Returns all the user sessions.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sessions")
+    response(200, "Sessions succesfully returned")
+    response(401, "Unauthorized")
+    security([%{Bearer: []}])
   end
 end
