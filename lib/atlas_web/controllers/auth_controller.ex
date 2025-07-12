@@ -225,7 +225,7 @@ defmodule AtlasWeb.AuthController do
 
   swagger_path :sign_in do
     post("/v1/auth/sign_in")
-    summary("Sigin in a user")
+    summary("Sign in a user")
     description("Sign in a user. Returns an access token and a refresh token.")
     produces("application/json")
     tag ("Authentication")
@@ -236,6 +236,7 @@ defmodule AtlasWeb.AuthController do
     end
     response(200, "Successful sign in")
     response(401, "Unauthorized")
+    response(500, "Failed to create user session")
   end
 
   swagger_path :refresh_token do
@@ -252,19 +253,65 @@ defmodule AtlasWeb.AuthController do
   swagger_path :forgot_password do
     post("/v1/auth/forgot_password")
     summary("Request password reset")
-    description("Sends a password request to the user")
+    description("Sends password reset instructions to the user.")
     produces("application/json")
     tag ("Authentication")
     operation_id("forgot_password")
-    response(200, "Request succesfully sent")
+    parameters do
+      email(:query, :string, "User email", required: true)
+    end
+    response(204, "No content")
     response(401, "Unauthorized")
   end
 
   swagger_path :reset_password do
     post("/v1/auth/reset_password")
     summary("Reset password")
-    description("Sends a request to reset the password.")
+    description("Sends a request to reset user's password.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("reset_password")
+    parameters do
+      token(:query, :string, "Access token", required: true)
+      password(:query, :string, "New password", required: true)
+      password_confirmation(:query, :string, "New password confirmation", required: true)
+    end
+    response(200, "Password succesfully reset")
+    response(404, "Invalid or expired reset token")
   end
 
+  swagger_path :sign_out do
+    post("/v1/auth/sign_out")
+    summary("Sign out")
+    description("Signs out the user.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sign_out")
+    response(200, "Signed out successfully")
+    response(401, "Unauthorized")
+    response(500, "Failed to sign out")
+  end
+
+  swagger_path :me do
+    get("/v1/auth/me")
+    summary("User in the current session")
+    description("Returns the user in the current session.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("me")
+    response(200, "User returned succesfully")
+    response(401, "Unauthorized")
+  end
+
+  swagger_path :sessions do
+    get("/v1/auth/sessions")
+    summary("User sessions")
+    description("Returns the user sessions.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sessions")
+    response(200, "Sessions succesfully returned")
+    response(401, "Unauthorized")
+  end
 
 end
