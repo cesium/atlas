@@ -226,7 +226,7 @@ defmodule AtlasWeb.AuthController do
   swagger_path :sign_in do
     post("/v1/auth/sign_in")
     summary("Sign in a user")
-    description("Sign in a user. Returns an access token and a refresh token.")
+    description("Sign in a user. Returns an access token.")
     produces("application/json")
     tag ("Authentication")
     operation_id("sign_in")
@@ -253,7 +253,7 @@ defmodule AtlasWeb.AuthController do
   swagger_path :forgot_password do
     post("/v1/auth/forgot_password")
     summary("Request password reset")
-    description("Sends password reset instructions to the user.")
+    description("Sends password reset instructions to the user via email.")
     produces("application/json")
     tag ("Authentication")
     operation_id("forgot_password")
@@ -287,9 +287,10 @@ defmodule AtlasWeb.AuthController do
     produces("application/json")
     tag("Authentication")
     operation_id("sign_out")
-    response(200, "Signed out successfully")
+    response(204, "No content - Signed out successfully")
     response(401, "Unauthorized")
     response(500, "Failed to sign out")
+    security [%{Bearer: []}]
   end
 
   swagger_path :me do
@@ -301,17 +302,19 @@ defmodule AtlasWeb.AuthController do
     operation_id("me")
     response(200, "User returned succesfully")
     response(401, "Unauthorized")
+    security [%{Bearer: []}]
   end
 
   swagger_path :sessions do
     get("/v1/auth/sessions")
     summary("User sessions")
-    description("Returns the user sessions.")
+    description("Returns all the user sessions.")
     produces("application/json")
     tag("Authentication")
     operation_id("sessions")
     response(200, "Sessions succesfully returned")
     response(401, "Unauthorized")
+    security [%{Bearer: []}]
   end
 
 end

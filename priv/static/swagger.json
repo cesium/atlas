@@ -8,7 +8,7 @@
   "paths": {
     "/v1/auth/forgot_password": {
       "post": {
-        "description": "Sends password reset instructions to the user.",
+        "description": "Sends password reset instructions to the user via email.",
         "operationId": "forgot_password",
         "parameters": [
           {
@@ -52,6 +52,11 @@
             "description": "Unauthorized"
           }
         },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "User in the current session",
         "tags": [
           "Authentication"
@@ -126,7 +131,7 @@
     },
     "/v1/auth/sessions": {
       "get": {
-        "description": "Returns the user sessions.",
+        "description": "Returns all the user sessions.",
         "operationId": "sessions",
         "parameters": [],
         "produces": [
@@ -140,6 +145,11 @@
             "description": "Unauthorized"
           }
         },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "User sessions",
         "tags": [
           "Authentication"
@@ -148,7 +158,7 @@
     },
     "/v1/auth/sign_in": {
       "post": {
-        "description": "Sign in a user. Returns an access token and a refresh token.",
+        "description": "Sign in a user. Returns an access token.",
         "operationId": "sign_in",
         "parameters": [
           {
@@ -195,8 +205,8 @@
           "application/json"
         ],
         "responses": {
-          "200": {
-            "description": "Signed out successfully"
+          "204": {
+            "description": "No content - Signed out successfully"
           },
           "401": {
             "description": "Unauthorized"
@@ -205,6 +215,11 @@
             "description": "Failed to sign out"
           }
         },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Sign out",
         "tags": [
           "Authentication"
@@ -212,5 +227,12 @@
       }
     }
   },
-  "swagger": "2.0"
+  "swagger": "2.0",
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  }
 }

@@ -63,11 +63,21 @@ defmodule AtlasWeb.Router do
     end
   end
 
+
+  # Usage for bearer token authorization: "Bearer <token>"
+
   def swagger_info do
     %{
       info: %{
         version: "0.1.0",
         title: "Atlas"
+      },
+      securityDefinitions: %{
+        Bearer: %{
+          type: "apiKey",
+          name: "Authorization",
+          in: "header"
+        }
       }
     }
   end
