@@ -40,6 +40,8 @@ defmodule AtlasWeb.Router do
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
     end
+
+    post "/import_course_data", CourseController, :import_course_data
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

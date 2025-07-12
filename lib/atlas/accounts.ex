@@ -103,6 +103,24 @@ defmodule Atlas.Accounts do
   end
 
   @doc """
+  Registers a student user with a random password.
+
+  ## Examples
+
+      iex> register_student_user_with_random_password(%{name: "John Doe", email: "john.doe@example.com"})
+      {:ok, %User{}}
+
+  """
+  def register_student_user_with_random_password(attrs) do
+    random_password = :crypto.strong_rand_bytes(12) |> Base.encode64()
+    attrs = Map.put(attrs, :password, random_password) |> Map.put(:type, :student)
+
+    %User{}
+    |> User.registration_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
   ## Examples
