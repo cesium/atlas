@@ -66,5 +66,4 @@ config :phoenix, :plug_init_mode, :runtime
 config :swoosh, :api_client, false
 
 # Config setup for Corsica
-# FIXME add url for frontend
 config :atlas, :allowed_origins, "*"
