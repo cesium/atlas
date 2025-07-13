@@ -65,7 +65,7 @@ defmodule Atlas.MixProject do
       {:bandit, "~> 1.2"},
 
       # cors
-      {:corsica, "~> 2.1.3"}
+      {:corsica, "~> 2.1.3"},
 
       # utilities
       {:remote_ip, "~> 1.2"},
