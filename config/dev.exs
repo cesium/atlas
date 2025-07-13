@@ -67,3 +67,14 @@ config :swoosh, :api_client, false
 
 # Config setup for Corsica
 config :atlas, :allowed_origins, "*"
+config :atlas, Atlas.Accounts.Guardian,
+  issuer: "atlas",
+  secret_key: "your-dev-secret-key-here-make-it-long-enough",
+  ttl: {30, :days},
+  allowed_drift: 2000
+
+config :guardian, Guardian.DB,
+  repo: Atlas.Repo,
+  schema_name: "sessions_tokens",
+  sweep_interval: 60,
+  token_types: ["refresh"]

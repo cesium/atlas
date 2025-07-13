@@ -41,6 +41,13 @@ defmodule Atlas.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
 
+      # security
+      {:bcrypt_elixir, "~> 3.0"},
+
+      # auth
+      {:guardian, "~> 2.3"},
+      {:guardian_db, "~> 2.0"},
+
       # mailer
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
@@ -59,6 +66,10 @@ defmodule Atlas.MixProject do
 
       # cors
       {:corsica, "~> 2.1.3"}
+
+      # utilities
+      {:remote_ip, "~> 1.2"},
+      {:ua_parser, "~> 1.8"}
     ]
   end
 
