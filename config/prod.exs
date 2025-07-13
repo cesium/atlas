@@ -9,7 +9,6 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
-# FIXME: FRONTEND_URL is still not defined
 # Configures CORS allowed origins
 config :atlas,
        :allowed_origins,
