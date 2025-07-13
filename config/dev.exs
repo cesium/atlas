@@ -67,6 +67,7 @@ config :swoosh, :api_client, false
 
 # Config setup for Corsica
 config :atlas, :allowed_origins, "*"
+
 config :atlas, Atlas.Accounts.Guardian,
   issuer: "atlas",
   secret_key: "your-dev-secret-key-here-make-it-long-enough",
