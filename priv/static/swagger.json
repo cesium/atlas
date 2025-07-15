@@ -4,7 +4,238 @@
     "title": "Atlas"
   },
   "host": "localhost:4000",
-  "definitions": {},
+  "definitions": {
+    "User": {
+      "description": "User schema",
+      "example": {
+        "user": {
+          "email": "a114437@alunos.uminho.pt",
+          "id": "d18472e7-5251-4027-884f-58b8a3a6abe5",
+          "inserted_at": "2025-07-15T18:10:27Z",
+          "name": "Leonardo Carvalho",
+          "updated_at": "2025-07-15T18:10:27Z"
+        }
+      },
+      "properties": {
+        "email": {
+          "description": "User email",
+          "type": "string"
+        },
+        "id": {
+          "description": "User ID",
+          "type": "integer"
+        },
+        "inserted_at": {
+          "description": "Creation timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "name": {
+          "description": "User name",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Last update timestamp",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "updated_at",
+        "email",
+        "inserted_at",
+        "id"
+      ],
+      "title": "User",
+      "type": "object"
+    },
+    "SignInResponse": {
+      "description": "Response schema for successful sign in",
+      "example": {
+        "access_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTYwOCwiaWF0IjoxNzUyNjEwNzA4LCJpc3MiOiJhdGxhcyIsImp0aSI6IjYyNjM2ZWFmLTVmZGQtNGU2My05ZmI1LWQyZjYwNmQzOGUzNSIsIm5iZiI6MTc1MjYxMDcwNywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.bAF6nLXPlHH80jhueetNyC5jZQ4rXXO1MO63izQ-7x98flalF6IGxc8v3HGLSRfF7s3cXYVOteeSvUUUqbx60A",
+        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
+      },
+      "properties": {
+        "access_token": {
+          "description": "Access token",
+          "type": "string"
+        },
+        "session_id": {
+          "description": "User session ID",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "access_token",
+        "session_id"
+      ],
+      "title": "SignInResponse",
+      "type": "object"
+    },
+    "UnauthorizedResponse": {
+      "description": "Unauthorized response schema",
+      "properties": {
+        "error": {
+          "description": "Unauthorized error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "UnauthorizedResponse",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "description": "Error response schema",
+      "properties": {
+        "error": {
+          "description": "Error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "SuccessfulRefreshResponse": {
+      "description": "Response schema for successful token refresh",
+      "example": {
+        "access_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTY5NCwiaWF0IjoxNzUyNjEwNzk0LCJpc3MiOiJhdGxhcyIsImp0aSI6ImYwOTg4MDMzLTlhNDktNGUzZC04M2U5LWE3NDVkZDkwYmY5ZiIsIm5iZiI6MTc1MjYxMDc5Mywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.ztcw5nZ3cdI1v5iTU0ZHyx-xZgWukxeFpuMulhvar7iRfSubBztlggVxpVM8bD-ulmujuX1i3-ksbfSdpNYMTQ"
+      },
+      "properties": {
+        "access_token": {
+          "description": "New access token",
+          "type": "string"
+        }
+      },
+      "required": [
+        "access_token"
+      ],
+      "title": "SuccessfulRefreshResponse",
+      "type": "object"
+    },
+    "SignOutResponse": {
+      "description": "Response schema for successful sign out",
+      "example": {
+        "message": "Signed out successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful sign out",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "SignOutResponse",
+      "type": "object"
+    },
+    "UserSessionsResponse": {
+      "description": "Response schema for a list of user sessions",
+      "example": {
+        "sessions": [
+          {
+            "first_seen": "2025-07-15T20:13:41Z",
+            "id": "8fd2bef3-f1eb-4bf2-aade-f3ae80e0563d",
+            "ip": "127.0.0.1",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
+            "user_browser": "Firefox",
+            "user_os": "Linux"
+          }
+        ]
+      },
+      "properties": {
+        "sessions": {
+          "description": "List of user sessions",
+          "items": {
+            "$ref": "#/definitions/UserSession"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "sessions"
+      ],
+      "title": "UserSessionsResponse",
+      "type": "object"
+    },
+    "NoContentResponse": {
+      "description": "Response schema for no content",
+      "example": {},
+      "properties": {
+        "message": {
+          "description": "Message indicating no content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "NoContentResponse",
+      "type": "object"
+    },
+    "ResetPasswordResponse": {
+      "description": "Response schema for successful password reset",
+      "example": {
+        "message": "Password reset successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful password reset",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "ResetPasswordResponse",
+      "type": "object"
+    },
+    "UserSession": {
+      "description": "User session schema",
+      "properties": {
+        "first_seen": {
+          "description": "First seen timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "Session ID",
+          "type": "integer"
+        },
+        "ip": {
+          "description": "IP address of the session",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "User agent string",
+          "type": "string"
+        },
+        "user_browser": {
+          "description": "Browser of the user agent",
+          "type": "string"
+        },
+        "user_os": {
+          "description": "Operating system of the user agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_seen",
+        "user_os",
+        "user_browser",
+        "user_agent",
+        "ip",
+        "id"
+      ],
+      "title": "User Session",
+      "type": "object"
+    }
+  },
   "paths": {
     "/v1/auth/forgot_password": {
       "post": {
@@ -24,10 +255,16 @@
         ],
         "responses": {
           "204": {
-            "description": "No content"
+            "description": "No content",
+            "schema": {
+              "$ref": "#/definitions/NoContentResponse"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           }
         },
         "summary": "Request password reset",
@@ -46,10 +283,16 @@
         ],
         "responses": {
           "200": {
-            "description": "User returned succesfully"
+            "description": "User returned succesfully",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           }
         },
         "security": [
@@ -73,10 +316,16 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful refresh"
+            "description": "Successful refresh",
+            "schema": {
+              "$ref": "#/definitions/SuccessfulRefreshResponse"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           }
         },
         "summary": "Refresh access token",
@@ -117,10 +366,16 @@
         ],
         "responses": {
           "200": {
-            "description": "Password succesfully reset"
+            "description": "Password succesfully reset",
+            "schema": {
+              "$ref": "#/definitions/ResetPasswordResponse"
+            }
           },
           "404": {
-            "description": "Invalid or expired reset token"
+            "description": "Invalid or expired reset token",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
           }
         },
         "summary": "Reset password",
@@ -139,10 +394,16 @@
         ],
         "responses": {
           "200": {
-            "description": "Sessions succesfully returned"
+            "description": "Sessions succesfully returned",
+            "schema": {
+              "$ref": "#/definitions/UserSessionsResponse"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           }
         },
         "security": [
@@ -181,13 +442,22 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful sign in"
+            "description": "Successful sign in",
+            "schema": {
+              "$ref": "#/definitions/SignInResponse"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           },
           "500": {
-            "description": "Failed to create user session"
+            "description": "Failed to create user session",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
           }
         },
         "summary": "Sign in a user",
@@ -206,13 +476,22 @@
         ],
         "responses": {
           "204": {
-            "description": "No content - Signed out successfully"
+            "description": "No content - Signed out successfully",
+            "schema": {
+              "$ref": "#/definitions/SignOutResponse"
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedResponse"
+            }
           },
           "500": {
-            "description": "Failed to sign out"
+            "description": "Failed to sign out",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
           }
         },
         "security": [

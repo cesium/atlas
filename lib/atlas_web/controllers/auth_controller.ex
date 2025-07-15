@@ -1,14 +1,32 @@
 defmodule AtlasWeb.AuthController do
   use AtlasWeb, :controller
+  use PhoenixSwagger
 
   alias Atlas.Accounts
   alias Atlas.Accounts.{Guardian, User}
-  use PhoenixSwagger
 
   action_fallback AtlasWeb.FallbackController
 
   @refresh_token_days 7
   @audience "astra"
+
+  swagger_path :sign_in do
+    post("/v1/auth/sign_in")
+    summary("Sign in a user")
+    description("Sign in a user. Returns an access token.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sign_in")
+
+    parameters do
+      email(:query, :string, "User email", required: true)
+      password(:query, :string, "User password", required: true)
+    end
+
+    response(200, "Successful sign in", Schema.ref(:SignInResponse))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
+    response(500, "Failed to create user session", Schema.ref(:ErrorResponse))
+  end
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
@@ -49,6 +67,18 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  swagger_path :me do
+    get("/v1/auth/me")
+    summary("User in the current session")
+    description("Returns the user in the current session.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("me")
+    response(200, "User returned succesfully", Schema.ref(:User))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
+    security([%{Bearer: []}])
+  end
+
   def me(conn, _params) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
@@ -61,6 +91,17 @@ defmodule AtlasWeb.AuthController do
       |> put_status(:unauthorized)
       |> json(%{error: "Not authenticated"})
     end
+  end
+
+  swagger_path :refresh_token do
+    post("/v1/auth/refresh")
+    summary("Refresh access token")
+    description("Refresh access token with a refresh token cookie.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("refresh_token")
+    response(200, "Successful refresh", Schema.ref(:SuccessfulRefreshResponse))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
   end
 
   def refresh_token(conn, _params) do
@@ -92,6 +133,19 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  swagger_path :sign_out do
+    post("/v1/auth/sign_out")
+    summary("Sign out")
+    description("Signs out the user.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sign_out")
+    response(204, "No content - Signed out successfully", Schema.ref(:SignOutResponse))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
+    response(500, "Failed to sign out", Schema.ref(:ErrorResponse))
+    security([%{Bearer: []}])
+  end
+
   def sign_out(conn, _params) do
     {_user, session} = Guardian.Plug.current_resource(conn)
 
@@ -115,6 +169,19 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  swagger_path :sessions do
+    get("/v1/auth/sessions")
+    summary("User sessions")
+    description("Returns all the user sessions.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("sessions")
+    response(200, "Sessions succesfully returned", Schema.ref(:UserSessionsResponse))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
+
+    security([%{Bearer: []}])
+  end
+
   def sessions(conn, _params) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
@@ -131,6 +198,22 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  swagger_path :forgot_password do
+    post("/v1/auth/forgot_password")
+    summary("Request password reset")
+    description("Sends password reset instructions to the user via email.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("forgot_password")
+
+    parameters do
+      email(:query, :string, "User email", required: true)
+    end
+
+    response(204, "No content", Schema.ref(:NoContentResponse))
+    response(401, "Unauthorized", Schema.ref(:UnauthorizedResponse))
+  end
+
   def forgot_password(conn, %{"email" => email}) do
     if user = Accounts.get_user_by_email(email) do
       Accounts.deliver_user_reset_password_instructions(user, &"/auth/forgot_password/#{&1}")
@@ -139,6 +222,24 @@ defmodule AtlasWeb.AuthController do
     conn
     |> put_status(:no_content)
     |> send_resp(:no_content, "")
+  end
+
+  swagger_path :reset_password do
+    post("/v1/auth/reset_password")
+    summary("Reset password")
+    description("Sends a request to reset user's password.")
+    produces("application/json")
+    tag("Authentication")
+    operation_id("reset_password")
+
+    parameters do
+      token(:query, :string, "Access token", required: true)
+      password(:query, :string, "New password", required: true)
+      password_confirmation(:query, :string, "New password confirmation", required: true)
+    end
+
+    response(200, "Password succesfully reset", Schema.ref(:ResetPasswordResponse))
+    response(404, "Invalid or expired reset token", Schema.ref(:ErrorResponse))
   end
 
   def reset_password(conn, %{
@@ -223,103 +324,149 @@ defmodule AtlasWeb.AuthController do
     }
   end
 
-  swagger_path :sign_in do
-    post("/v1/auth/sign_in")
-    summary("Sign in a user")
-    description("Sign in a user. Returns an access token.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("sign_in")
+  def swagger_definitions do
+    %{
+      SignInResponse:
+        swagger_schema do
+          title("SignInResponse")
+          description("Response schema for successful sign in")
 
-    parameters do
-      email(:query, :string, "User email", required: true)
-      password(:query, :string, "User password", required: true)
-    end
+          properties do
+            session_id(:integer, "User session ID", required: true)
+            access_token(:string, "Access token", required: true)
+          end
 
-    response(200, "Successful sign in")
-    response(401, "Unauthorized")
-    response(500, "Failed to create user session")
-  end
+          example(%{
+            session_id: "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4",
+            access_token:
+              "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTYwOCwiaWF0IjoxNzUyNjEwNzA4LCJpc3MiOiJhdGxhcyIsImp0aSI6IjYyNjM2ZWFmLTVmZGQtNGU2My05ZmI1LWQyZjYwNmQzOGUzNSIsIm5iZiI6MTc1MjYxMDcwNywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.bAF6nLXPlHH80jhueetNyC5jZQ4rXXO1MO63izQ-7x98flalF6IGxc8v3HGLSRfF7s3cXYVOteeSvUUUqbx60A"
+          })
+        end,
+      ErrorResponse:
+        swagger_schema do
+          title("ErrorResponse")
+          description("Error response schema")
 
-  swagger_path :refresh_token do
-    post("/v1/auth/refresh")
-    summary("Refresh access token")
-    description("Refresh access token with a refresh token cookie.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("refresh_token")
-    response(200, "Successful refresh")
-    response(401, "Unauthorized")
-  end
+          properties do
+            error(:string, "Error message", required: true)
+          end
+        end,
+      UnauthorizedResponse:
+        swagger_schema do
+          title("UnauthorizedResponse")
+          description("Unauthorized response schema")
 
-  swagger_path :forgot_password do
-    post("/v1/auth/forgot_password")
-    summary("Request password reset")
-    description("Sends password reset instructions to the user via email.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("forgot_password")
+          properties do
+            error(:string, "Unauthorized error message", required: true)
+          end
+        end,
+      User:
+        swagger_schema do
+          title("User")
+          description("User schema")
 
-    parameters do
-      email(:query, :string, "User email", required: true)
-    end
+          properties do
+            id(:integer, "User ID", required: true)
+            name(:string, "User name", required: false)
+            inserted_at(:string, "Creation timestamp", format: "date-time", required: true)
+            email(:string, "User email", required: true)
+            updated_at(:string, "Last update timestamp", format: "date-time", required: true)
+          end
 
-    response(204, "No content")
-    response(401, "Unauthorized")
-  end
+          example(%{
+            user: %{
+              id: "d18472e7-5251-4027-884f-58b8a3a6abe5",
+              name: "Leonardo Carvalho",
+              inserted_at: "2025-07-15T18:10:27Z",
+              email: "a114437@alunos.uminho.pt",
+              updated_at: "2025-07-15T18:10:27Z"
+            }
+          })
+        end,
+      SuccessfulRefreshResponse:
+        swagger_schema do
+          title("SuccessfulRefreshResponse")
+          description("Response schema for successful token refresh")
 
-  swagger_path :reset_password do
-    post("/v1/auth/reset_password")
-    summary("Reset password")
-    description("Sends a request to reset user's password.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("reset_password")
+          properties do
+            access_token(:string, "New access token", required: true)
+          end
 
-    parameters do
-      token(:query, :string, "Access token", required: true)
-      password(:query, :string, "New password", required: true)
-      password_confirmation(:query, :string, "New password confirmation", required: true)
-    end
+          example(%{
+            access_token:
+              "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTY5NCwiaWF0IjoxNzUyNjEwNzk0LCJpc3MiOiJhdGxhcyIsImp0aSI6ImYwOTg4MDMzLTlhNDktNGUzZC04M2U5LWE3NDVkZDkwYmY5ZiIsIm5iZiI6MTc1MjYxMDc5Mywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.ztcw5nZ3cdI1v5iTU0ZHyx-xZgWukxeFpuMulhvar7iRfSubBztlggVxpVM8bD-ulmujuX1i3-ksbfSdpNYMTQ"
+          })
+        end,
+      SignOutResponse:
+        swagger_schema do
+          title("SignOutResponse")
+          description("Response schema for successful sign out")
 
-    response(200, "Password succesfully reset")
-    response(404, "Invalid or expired reset token")
-  end
+          properties do
+            message(:string, "Message indicating successful sign out", required: true)
+          end
 
-  swagger_path :sign_out do
-    post("/v1/auth/sign_out")
-    summary("Sign out")
-    description("Signs out the user.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("sign_out")
-    response(204, "No content - Signed out successfully")
-    response(401, "Unauthorized")
-    response(500, "Failed to sign out")
-    security([%{Bearer: []}])
-  end
+          example(%{message: "Signed out successfully"})
+        end,
+      UserSessionsResponse:
+        swagger_schema do
+          title("UserSessionsResponse")
+          description("Response schema for a list of user sessions")
 
-  swagger_path :me do
-    get("/v1/auth/me")
-    summary("User in the current session")
-    description("Returns the user in the current session.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("me")
-    response(200, "User returned succesfully")
-    response(401, "Unauthorized")
-    security([%{Bearer: []}])
-  end
+          properties do
+            sessions(Schema.array(:UserSession), "List of user sessions", required: true)
+          end
 
-  swagger_path :sessions do
-    get("/v1/auth/sessions")
-    summary("User sessions")
-    description("Returns all the user sessions.")
-    produces("application/json")
-    tag("Authentication")
-    operation_id("sessions")
-    response(200, "Sessions succesfully returned")
-    response(401, "Unauthorized")
-    security([%{Bearer: []}])
+          example(%{
+            sessions: [
+              %{
+                id: "8fd2bef3-f1eb-4bf2-aade-f3ae80e0563d",
+                ip: "127.0.0.1",
+                user_agent:
+                  "Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
+                user_browser: "Firefox",
+                user_os: "Linux",
+                first_seen: "2025-07-15T20:13:41Z"
+              }
+            ]
+          })
+        end,
+      UserSession:
+        swagger_schema do
+          title("User Session")
+          description("User session schema")
+
+          properties do
+            id(:integer, "Session ID", required: true)
+            ip(:string, "IP address of the session", required: true)
+            user_agent(:string, "User agent string", required: true)
+            user_browser(:string, "Browser of the user agent", required: true)
+            user_os(:string, "Operating system of the user agent", required: true)
+            first_seen(:string, "First seen timestamp", format: "date-time", required: true)
+          end
+        end,
+      NoContentResponse:
+        swagger_schema do
+          title("NoContentResponse")
+          description("Response schema for no content")
+
+          properties do
+            message(:string, "Message indicating no content", required: true)
+          end
+
+          example(%{})
+        end,
+      ResetPasswordResponse:
+        swagger_schema do
+          title("ResetPasswordResponse")
+          description("Response schema for successful password reset")
+
+          properties do
+            message(:string, "Message indicating successful password reset", required: true)
+          end
+
+          example(%{message: "Password reset successfully"})
+        end
+    }
   end
 end
