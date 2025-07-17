@@ -8,9 +8,11 @@ defmodule AtlasWeb.UserControllerTest do
   # Valid user attributes
   @valid_user_attrs %{
     email: "test@example.com",
-    password: "password123",
+    password: "password1234",
     gender: "male",
-    birth_date: ~D[1990-01-01]
+    birth_date: ~D[1990-01-01],
+    type: :student,
+    name: "Test User"
   }
 
   # Helper to create a test user and authenticate
@@ -35,7 +37,7 @@ defmodule AtlasWeb.UserControllerTest do
 
     test "updates user password when data is valid", %{conn: conn, user: user} do
       password_params = %{
-        "current_password" => "password123",
+        "current_password" => "password1234",
         "password" => "newpassword456"
       }
 
@@ -43,7 +45,7 @@ defmodule AtlasWeb.UserControllerTest do
       assert json_response(conn, 200)["success"] == true
 
       # Verify password was updated
-      assert {:ok, _} = Accounts.authenticate_user(user.email, "newpassword456")
+      assert %User{} = Accounts.authenticate_user(user.email, "newpassword456")
     end
 
     test "returns error when current password is incorrect", %{conn: conn, user: user} do
@@ -54,29 +56,29 @@ defmodule AtlasWeb.UserControllerTest do
 
       conn = put(conn, "/api/users/#{user.id}/password", %{"password" => password_params})
       assert json_response(conn, 422)["success"] == false
-      assert json_response(conn, 422)["errors"]["current_password"] == ["is invalid"]
+      assert json_response(conn, 422)["errors"]["current_password"] == ["is not valid"]
     end
 
     test "returns error when password is too short", %{conn: conn, user: user} do
       password_params = %{
-        "current_password" => "password123",
+        "current_password" => "password1234",
         "password" => "short"
       }
 
       conn = put(conn, "/api/users/#{user.id}/password", %{"password" => password_params})
       assert json_response(conn, 422)["success"] == false
-      assert json_response(conn, 422)["errors"]["password"] == ["should be at least 8 character(s)"]
+      assert json_response(conn, 422)["errors"]["password"] == ["should be at least 12 character(s)"]
     end
 
     test "cannot update another user's password", %{conn: conn} do
       # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password123"})
+        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
         |> Repo.insert()
 
       password_params = %{
-        "current_password" => "password123",
+        "current_password" => "password1234",
         "password" => "newpassword456"
       }
 
@@ -174,7 +176,7 @@ defmodule AtlasWeb.UserControllerTest do
       # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password123"})
+        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
         |> Repo.insert()
 
       profile_params = %{
@@ -207,7 +209,7 @@ defmodule AtlasWeb.UserControllerTest do
       # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password123"})
+        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
         |> Repo.insert()
 
       conn = delete(conn, "/api/users/#{another_user.id}/account")

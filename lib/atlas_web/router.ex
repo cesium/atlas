@@ -42,6 +42,14 @@ defmodule AtlasWeb.Router do
     end
   end
 
+  scope "/api", AtlasWeb do
+    pipe_through :api
+
+    put "/users/:id/profile", UserController, :update_profile
+    put "/users/:id/password", UserController, :update_password
+    delete "/users/:id/account", UserController, :delete_account
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:atlas, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

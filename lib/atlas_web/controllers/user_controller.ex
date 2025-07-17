@@ -102,7 +102,7 @@ defmodule AtlasWeb.UserController do
 
   defp authorize_user(conn, _opts) do
     current_user = conn.assigns[:current_user]
-    user_id = String.to_integer(conn.params["id"] || "0")
+    user_id = conn.params["id"]
 
     if current_user.id == user_id do
       conn
