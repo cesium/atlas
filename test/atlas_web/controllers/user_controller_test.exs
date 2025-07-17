@@ -5,7 +5,6 @@ defmodule AtlasWeb.UserControllerTest do
   alias Atlas.Accounts.User
   alias Atlas.Repo
 
-  # Valid user attributes
   @valid_user_attrs %{
     email: "test@example.com",
     password: "password1234",
@@ -15,15 +14,12 @@ defmodule AtlasWeb.UserControllerTest do
     name: "Test User"
   }
 
-  # Helper to create a test user and authenticate
   defp create_and_login_user(conn) do
-    # Create user
     {:ok, user} =
       %User{}
       |> User.changeset(@valid_user_attrs)
       |> Repo.insert()
 
-    # Simulate login by adding user to session
     conn =
       conn
       |> Plug.Test.init_test_session(%{})
@@ -44,7 +40,6 @@ defmodule AtlasWeb.UserControllerTest do
       conn = put(conn, "/api/users/#{user.id}/password", %{"password" => password_params})
       assert json_response(conn, 200)["success"] == true
 
-      # Verify password was updated
       assert %User{} = Accounts.authenticate_user(user.email, "newpassword456")
     end
 
@@ -67,14 +62,21 @@ defmodule AtlasWeb.UserControllerTest do
 
       conn = put(conn, "/api/users/#{user.id}/password", %{"password" => password_params})
       assert json_response(conn, 422)["success"] == false
-      assert json_response(conn, 422)["errors"]["password"] == ["should be at least 12 character(s)"]
+
+      assert json_response(conn, 422)["errors"]["password"] == [
+               "should be at least 12 character(s)"
+             ]
     end
 
     test "cannot update another user's password", %{conn: conn} do
-      # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
+        |> User.changeset(%{
+          email: "another@example.com",
+          password: "password1234",
+          type: :student,
+          name: "Another User"
+        })
         |> Repo.insert()
 
       password_params = %{
@@ -100,7 +102,6 @@ defmodule AtlasWeb.UserControllerTest do
       conn = put(conn, "/api/users/#{user.id}/profile", %{"profile" => profile_params})
       assert json_response(conn, 200)["success"] == true
 
-      # Verify profile was updated
       updated_user = Accounts.get_user!(user.id)
       assert updated_user.gender == "female"
       assert updated_user.birth_date == ~D[1992-05-15]
@@ -119,6 +120,7 @@ defmodule AtlasWeb.UserControllerTest do
 
     test "returns error with future birth date", %{conn: conn, user: user} do
       future_date = Date.add(Date.utc_today(), 365) |> Date.to_string()
+
       profile_params = %{
         "gender" => "female",
         "birth_date" => future_date
@@ -130,7 +132,6 @@ defmodule AtlasWeb.UserControllerTest do
     end
 
     test "handles profile picture upload", %{conn: conn, user: user} do
-      # Create a temporary file for testing
       tmp_path = Path.join(System.tmp_dir!(), "test_profile_pic.jpg")
       File.write!(tmp_path, "fake image content")
 
@@ -148,35 +149,31 @@ defmodule AtlasWeb.UserControllerTest do
 
       conn = put(conn, "/api/users/#{user.id}/profile", %{"profile" => profile_params})
 
-      # Debug response in case of failure
-      if conn.status != 200 do
-        IO.inspect(conn.resp_body, label: "Response body")
-      end
-
-      # Ensure directory exists
       File.mkdir_p("priv/static/uploads")
 
-      # Either allow for success or inspect the errors if it fails
       response = json_response(conn, 200) || json_response(conn, 422)
-      assert response["success"] == true ||
-               (response["success"] == false && IO.inspect(response["errors"], label: "Upload errors"))
 
-      # If successful, verify picture was updated
+      assert response["success"] == true ||
+               (response["success"] == false)
+
       if response["success"] == true do
         updated_user = Accounts.get_user!(user.id)
         assert updated_user.profile_picture != nil
         assert String.starts_with?(updated_user.profile_picture, "/uploads/")
       end
 
-      # Clean up
       File.rm(tmp_path)
     end
 
     test "cannot update another user's profile", %{conn: conn} do
-      # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
+        |> User.changeset(%{
+          email: "another@example.com",
+          password: "password1234",
+          type: :student,
+          name: "Another User"
+        })
         |> Repo.insert()
 
       profile_params = %{
@@ -197,26 +194,27 @@ defmodule AtlasWeb.UserControllerTest do
       conn = delete(conn, "/api/users/#{user.id}/account")
       assert json_response(conn, 200)["success"] == true
 
-      # Verify user was soft-deleted
       updated_user = Repo.get(User, user.id)
       assert updated_user.is_active == false
 
-      # Verify session was cleared (test for empty session)
       assert conn.private[:plug_session] == %{}
     end
 
     test "cannot delete another user's account", %{conn: conn} do
-      # Create another user
       {:ok, another_user} =
         %User{}
-        |> User.changeset(%{email: "another@example.com", password: "password1234", type: :student, name: "Another User"})
+        |> User.changeset(%{
+          email: "another@example.com",
+          password: "password1234",
+          type: :student,
+          name: "Another User"
+        })
         |> Repo.insert()
 
       conn = delete(conn, "/api/users/#{another_user.id}/account")
       assert json_response(conn, 403)["success"] == false
       assert json_response(conn, 403)["message"] == "Access denied"
 
-      # Verify user was not deleted
       updated_user = Repo.get(User, another_user.id)
       assert updated_user.is_active == true
     end

@@ -492,7 +492,11 @@ defmodule Atlas.Accounts do
   def get_active_user!(id), do: get_user!(id)
 
   def update_user_password(user, attrs) do
-    update_user_password(user, Map.get(attrs, "current_password") || Map.get(attrs, :current_password), attrs)
+    update_user_password(
+      user,
+      Map.get(attrs, "current_password") || Map.get(attrs, :current_password),
+      attrs
+    )
   end
 
   def update_user_profile(user, attrs) do
