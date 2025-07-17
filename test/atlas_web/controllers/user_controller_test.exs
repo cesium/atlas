@@ -154,7 +154,7 @@ defmodule AtlasWeb.UserControllerTest do
       response = json_response(conn, 200) || json_response(conn, 422)
 
       assert response["success"] == true ||
-               (response["success"] == false)
+               response["success"] == false
 
       if response["success"] == true do
         updated_user = Accounts.get_user!(user.id)
