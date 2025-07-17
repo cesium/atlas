@@ -173,8 +173,11 @@ defmodule Atlas.Accounts.User do
   end
 
   def profile_changeset(user, attrs) do
+    fields = [:name, :email, :type, :gender, :birth_date]
+    fields = if Map.has_key?(attrs, "profile_picture"), do: fields ++ [:profile_picture], else: fields
+
     user
-    |> cast(attrs, [:name, :email, :type, :gender, :birth_date, :profile_picture])
+    |> cast(attrs, fields)
     |> validate_required([:name, :email])
     |> validate_inclusion(:gender, ["male", "female", "other"])
     |> validate_change(:birth_date, fn :birth_date, date ->
