@@ -4,10 +4,8 @@ defmodule AtlasWeb.UserController do
   alias Atlas.Accounts
   alias AtlasWeb.Auth
 
-  # Plug to ensure user is authenticated
   plug :authenticate_user when action in [:update_password, :update_profile, :delete_account]
 
-  # Plug to ensure user can only modify their own data
   plug :authorize_user when action in [:update_password, :update_profile, :delete_account]
 
   def update_password(conn, %{"password" => password_params}) do
@@ -15,7 +13,6 @@ defmodule AtlasWeb.UserController do
 
     case Accounts.update_user_password(current_user, password_params) do
       {:ok, _user} ->
-        # Remove put_flash
         conn
         |> json(%{success: true, message: "Password updated successfully"})
 
@@ -33,7 +30,6 @@ defmodule AtlasWeb.UserController do
   def update_profile(conn, %{"profile" => profile_params}) do
     current_user = conn.assigns[:current_user]
 
-    # Handle file upload for profile picture
     profile_params = handle_profile_picture_upload(profile_params)
 
     case Accounts.update_user_profile(current_user, profile_params) do
@@ -85,7 +81,6 @@ defmodule AtlasWeb.UserController do
     end
   end
 
-  # Private functions
 
   defp authenticate_user(conn, _opts) do
     case Auth.get_current_user(conn) do
@@ -117,8 +112,6 @@ defmodule AtlasWeb.UserController do
   defp handle_profile_picture_upload(params) do
     case params["profile_picture"] do
       %Plug.Upload{} = upload ->
-        # Here you would implement your file upload logic
-        # For example, upload to AWS S3, local storage, etc.
         case upload_file(upload) do
           {:ok, file_url} ->
             Map.put(params, "profile_picture", file_url)
@@ -133,8 +126,6 @@ defmodule AtlasWeb.UserController do
   end
 
   defp upload_file(%Plug.Upload{filename: filename, path: path}) do
-    # Implement your file upload logic here
-    # This is a placeholder implementation
     extension = Path.extname(filename)
     new_filename = "#{Ecto.UUID.generate()}#{extension}"
     destination = Path.join(["priv", "static", "uploads", new_filename])

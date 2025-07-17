@@ -7,8 +7,6 @@ defmodule AtlasWeb.Auth do
   alias Atlas.Accounts
 
   def get_current_user(conn) do
-    # This assumes you're using a session-based authentication
-    # Adjust according to your authentication method (JWT, Guardian, etc.)
     user_id = get_session(conn, :user_id)
 
     case user_id do

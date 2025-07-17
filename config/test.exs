@@ -51,5 +51,5 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
-# Add this to your test config
+# test config
 config :bcrypt_elixir, log_rounds: 4
