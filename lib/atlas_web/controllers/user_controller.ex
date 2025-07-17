@@ -116,8 +116,11 @@ defmodule AtlasWeb.UserController do
             Map.put(params, "profile_picture", file_url)
 
           {:error, _} ->
-            params
+            Map.delete(params, "profile_picture")
         end
+
+      nil ->
+        Map.delete(params, "profile_picture")
 
       _ ->
         params
