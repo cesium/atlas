@@ -3,17 +3,42 @@ defmodule AtlasWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug :fetch_session  # Make sure this is here to support sessions
+    plug RemoteIp
   end
 
-  scope "/api", AtlasWeb do
+  pipeline :auth do
+    plug :accepts, ["json"]
+
+    plug Guardian.Plug.Pipeline,
+      otp_app: :atlas,
+      error_handler: AtlasWeb.Plugs.AuthErrorHandler,
+      module: Atlas.Accounts.Guardian
+
+    plug Guardian.Plug.VerifyHeader, claims: %{typ: "access"}
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+  end
+
+  scope "/v1", AtlasWeb do
     pipe_through :api
 
-    # Move user routes here - outside the dev_routes conditional
-    scope "/users" do
-      put "/:id/password", UserController, :update_password
-      put "/:id/profile", UserController, :update_profile
-      delete "/:id/account", UserController, :delete_account
+    # Public routes
+
+    scope "/auth" do
+      post "/sign_in", AuthController, :sign_in
+      post "/refresh", AuthController, :refresh_token
+      post "/forgot_password", AuthController, :forgot_password
+      post "/reset_password", AuthController, :reset_password
+    end
+
+    # Authenticated routes
+
+    pipe_through :auth
+
+    scope "/auth" do
+      post "/sign_out", AuthController, :sign_out
+      get "/me", AuthController, :me
+      get "/sessions", AuthController, :sessions
     end
   end
 

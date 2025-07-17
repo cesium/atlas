@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :bcrypt_elixir, :log_rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -19,6 +22,18 @@ config :atlas, AtlasWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "v6DII6ih4LfA0e8erY+yaf7xvhGTQI3PvX+CyaDOigUWPqgo5xs12Y98gcJ/08PN",
   server: false
+
+config :atlas, Atlas.Accounts.Guardian,
+  issuer: "atlas",
+  secret_key: "test-secret-key-for-testing-purposes-only",
+  ttl: {1, :hour},
+  allowed_drift: 2000
+
+config :guardian, Guardian.DB,
+  repo: Atlas.Repo,
+  schema_name: "sessions_tokens",
+  sweep_interval: 60,
+  token_types: ["refresh"]
 
 # In test we don't send emails.
 config :atlas, Atlas.Mailer, adapter: Swoosh.Adapters.Test
