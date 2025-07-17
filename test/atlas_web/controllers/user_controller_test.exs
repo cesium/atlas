@@ -135,6 +135,9 @@ defmodule AtlasWeb.UserControllerTest do
       tmp_path = Path.join(System.tmp_dir!(), "test_profile_pic.jpg")
       File.write!(tmp_path, "fake image content")
 
+      # Garante que o diretório existe antes do upload
+      File.mkdir_p("priv/static/uploads")
+
       upload = %Plug.Upload{
         path: tmp_path,
         filename: "test_profile_pic.jpg",
@@ -148,8 +151,6 @@ defmodule AtlasWeb.UserControllerTest do
       }
 
       conn = put(conn, "/api/users/#{user.id}/profile", %{"profile" => profile_params})
-
-      File.mkdir_p("priv/static/uploads")
 
       response = json_response(conn, 200) || json_response(conn, 422)
 
