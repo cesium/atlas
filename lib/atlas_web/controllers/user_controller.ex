@@ -81,7 +81,6 @@ defmodule AtlasWeb.UserController do
     end
   end
 
-
   defp authenticate_user(conn, _opts) do
     case Auth.get_current_user(conn) do
       nil ->
