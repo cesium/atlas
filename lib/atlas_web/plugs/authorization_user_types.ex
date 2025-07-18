@@ -16,14 +16,14 @@ defmodule AtlasWeb.Plugs.UserRequires do
 
   def init(args) do
     cond do
-      user_types = args[:user_types] ->
-        %{user_types: user_types}
+      Keyword.has_key?(args, :user_types) ->
+        %{user_types: Keyword.get(args, :user_types)}
 
-      user_type = args[:user_type] ->
-        %{user_types: [user_type]}
+      Keyword.has_key?(args, :user_type) ->
+        %{user_types: Keyword.get(args, :user_type)}
 
       true ->
-        raise ArgumentError, "Must provide either :user_type or :user_types option"
+        raise ArgumentError, "You must provide either the :user_type or :user_types option"
     end
   end
 
@@ -31,12 +31,10 @@ defmodule AtlasWeb.Plugs.UserRequires do
     {user, _session} = Guardian.Plug.current_resource(conn)
     user_type = user.type
 
-    case user_type_allowed?(user_type, allowed_types) do
-      true ->
+    if user_type_allowed?(user_type, allowed_types) do
         conn
-
-      false ->
-        handle_unauthorized(conn, user, allowed_types)
+    else
+        handle_unauthorized(conn)
     end
 
     conn
@@ -46,13 +44,11 @@ defmodule AtlasWeb.Plugs.UserRequires do
     user_type in allowed_types
   end
 
-  def handle_unauthorized(conn, user, allowed_types) do
+  def handle_unauthorized(conn) do
     conn
     |> put_status(:forbidden)
     |> json(%{
-      error: "Unauthorized access",
-      user_type: user.type,
-      allowed_types: allowed_types
+      error: "Unauthorized"
     })
     |> halt()
   end
