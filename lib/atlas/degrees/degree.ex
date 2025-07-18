@@ -1,4 +1,7 @@
-defmodule Atlas.University.Degree do
+defmodule Atlas.Degrees.Degree do
+  @moduledoc """
+  University degree associated with students.
+  """
   use Atlas.Schema
 
   @required_fields ~w(name code)a

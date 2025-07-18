@@ -1,7 +1,7 @@
-defmodule Atlas.UniversityFixtures do
+defmodule Atlas.DegreesFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Atlas.University` context.
+  entities via the `Atlas.Degrees` context.
   """
 
   @doc """
@@ -13,7 +13,7 @@ defmodule Atlas.UniversityFixtures do
       |> Enum.into(%{
         name: "some name"
       })
-      |> Atlas.University.create_degree()
+      |> Atlas.Degrees.create_degree()
 
     degree
   end

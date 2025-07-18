@@ -1,59 +1,59 @@
-defmodule Atlas.UniversityTest do
+defmodule Atlas.DegreesTest do
   use Atlas.DataCase
 
-  alias Atlas.University
+  alias Atlas.Degrees
 
   describe "degrees" do
-    alias Atlas.University.Degree
+    alias Atlas.Degrees.Degree
 
-    import Atlas.UniversityFixtures
+    import Atlas.DegreesFixtures
 
     @invalid_attrs %{name: nil}
 
     test "list_degrees/0 returns all degrees" do
       degree = degree_fixture()
-      assert University.list_degrees() == [degree]
+      assert Degrees.list_degrees() == [degree]
     end
 
     test "get_degree!/1 returns the degree with given id" do
       degree = degree_fixture()
-      assert University.get_degree!(degree.id) == degree
+      assert Degrees.get_degree!(degree.id) == degree
     end
 
     test "create_degree/1 with valid data creates a degree" do
       valid_attrs = %{name: "some name"}
 
-      assert {:ok, %Degree{} = degree} = University.create_degree(valid_attrs)
+      assert {:ok, %Degree{} = degree} = Degrees.create_degree(valid_attrs)
       assert degree.name == "some name"
     end
 
     test "create_degree/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = University.create_degree(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Degrees.create_degree(@invalid_attrs)
     end
 
     test "update_degree/2 with valid data updates the degree" do
       degree = degree_fixture()
       update_attrs = %{name: "some updated name"}
 
-      assert {:ok, %Degree{} = degree} = University.update_degree(degree, update_attrs)
+      assert {:ok, %Degree{} = degree} = Degrees.update_degree(degree, update_attrs)
       assert degree.name == "some updated name"
     end
 
     test "update_degree/2 with invalid data returns error changeset" do
       degree = degree_fixture()
-      assert {:error, %Ecto.Changeset{}} = University.update_degree(degree, @invalid_attrs)
-      assert degree == University.get_degree!(degree.id)
+      assert {:error, %Ecto.Changeset{}} = Degrees.update_degree(degree, @invalid_attrs)
+      assert degree == Degrees.get_degree!(degree.id)
     end
 
     test "delete_degree/1 deletes the degree" do
       degree = degree_fixture()
-      assert {:ok, %Degree{}} = University.delete_degree(degree)
-      assert_raise Ecto.NoResultsError, fn -> University.get_degree!(degree.id) end
+      assert {:ok, %Degree{}} = Degrees.delete_degree(degree)
+      assert_raise Ecto.NoResultsError, fn -> Degrees.get_degree!(degree.id) end
     end
 
     test "change_degree/1 returns a degree changeset" do
       degree = degree_fixture()
-      assert %Ecto.Changeset{} = University.change_degree(degree)
+      assert %Ecto.Changeset{} = Degrees.change_degree(degree)
     end
   end
 end

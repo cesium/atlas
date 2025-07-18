@@ -1,5 +1,5 @@
 defmodule AtlasWeb.CourseController do
-  alias Atlas.{Accounts, University}
+  alias Atlas.{Accounts, Degrees}
 
   use AtlasWeb, :controller
 
@@ -19,10 +19,10 @@ defmodule AtlasWeb.CourseController do
 
           # Create the degree if it doesn't exist
 
-          degree = Atlas.University.get_degree_by_code(degree_code)
+          degree = Atlas.Degrees.get_degree_by_code(degree_code)
 
           if !degree do
-            degree = University.create_degree(%{name: degree_name, code: degree_code})
+            degree = Degrees.create_degree(%{name: degree_name, code: degree_code})
           end
 
           student_number = Enum.at(row, 11)
