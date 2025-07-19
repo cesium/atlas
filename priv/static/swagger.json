@@ -5,6 +5,163 @@
   },
   "host": "localhost:4000",
   "definitions": {
+    "UserSession": {
+      "description": "User session schema",
+      "properties": {
+        "first_seen": {
+          "description": "First seen timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "Session ID",
+          "type": "integer"
+        },
+        "ip": {
+          "description": "IP address of the session",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "User agent string",
+          "type": "string"
+        },
+        "user_browser": {
+          "description": "Browser of the user agent",
+          "type": "string"
+        },
+        "user_os": {
+          "description": "Operating system of the user agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_seen",
+        "user_os",
+        "user_browser",
+        "user_agent",
+        "ip",
+        "id"
+      ],
+      "title": "User Session",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "description": "Error response schema",
+      "properties": {
+        "error": {
+          "description": "Error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "NoContentResponse": {
+      "description": "Response schema for no content",
+      "example": {},
+      "properties": {
+        "message": {
+          "description": "Message indicating no content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "NoContentResponse",
+      "type": "object"
+    },
+    "ResetPasswordResponse": {
+      "description": "Response schema for successful password reset",
+      "example": {
+        "message": "Password reset successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful password reset",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "ResetPasswordResponse",
+      "type": "object"
+    },
+    "SignInResponse": {
+      "description": "Response schema for successful sign in",
+      "example": {
+        "access_token": "xXxXxXxXxXxX",
+        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
+      },
+      "properties": {
+        "access_token": {
+          "description": "Access token",
+          "type": "string"
+        },
+        "session_id": {
+          "description": "User session ID",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "access_token",
+        "session_id"
+      ],
+      "title": "SignInResponse",
+      "type": "object"
+    },
+    "SignOutResponse": {
+      "description": "Response schema for successful sign out",
+      "example": {
+        "message": "Signed out successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful sign out",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "SignOutResponse",
+      "type": "object"
+    },
+    "SuccessfulRefreshResponse": {
+      "description": "Response schema for successful token refresh",
+      "example": {
+        "access_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTY5NCwiaWF0IjoxNzUyNjEwNzk0LCJpc3MiOiJhdGxhcyIsImp0aSI6ImYwOTg4MDMzLTlhNDktNGUzZC04M2U5LWE3NDVkZDkwYmY5ZiIsIm5iZiI6MTc1MjYxMDc5Mywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.ztcw5nZ3cdI1v5iTU0ZHyx-xZgWukxeFpuMulhvar7iRfSubBztlggVxpVM8bD-ulmujuX1i3-ksbfSdpNYMTQ"
+      },
+      "properties": {
+        "access_token": {
+          "description": "New access token",
+          "type": "string"
+        }
+      },
+      "required": [
+        "access_token"
+      ],
+      "title": "SuccessfulRefreshResponse",
+      "type": "object"
+    },
+    "UnauthorizedResponse": {
+      "description": "Unauthorized response schema",
+      "properties": {
+        "error": {
+          "description": "Unauthorized error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "UnauthorizedResponse",
+      "type": "object"
+    },
     "User": {
       "description": "User schema",
       "example": {
@@ -49,91 +206,6 @@
       "title": "User",
       "type": "object"
     },
-    "SignInResponse": {
-      "description": "Response schema for successful sign in",
-      "example": {
-        "access_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTYwOCwiaWF0IjoxNzUyNjEwNzA4LCJpc3MiOiJhdGxhcyIsImp0aSI6IjYyNjM2ZWFmLTVmZGQtNGU2My05ZmI1LWQyZjYwNmQzOGUzNSIsIm5iZiI6MTc1MjYxMDcwNywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.bAF6nLXPlHH80jhueetNyC5jZQ4rXXO1MO63izQ-7x98flalF6IGxc8v3HGLSRfF7s3cXYVOteeSvUUUqbx60A",
-        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
-      },
-      "properties": {
-        "access_token": {
-          "description": "Access token",
-          "type": "string"
-        },
-        "session_id": {
-          "description": "User session ID",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "access_token",
-        "session_id"
-      ],
-      "title": "SignInResponse",
-      "type": "object"
-    },
-    "UnauthorizedResponse": {
-      "description": "Unauthorized response schema",
-      "properties": {
-        "error": {
-          "description": "Unauthorized error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "UnauthorizedResponse",
-      "type": "object"
-    },
-    "ErrorResponse": {
-      "description": "Error response schema",
-      "properties": {
-        "error": {
-          "description": "Error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "ErrorResponse",
-      "type": "object"
-    },
-    "SuccessfulRefreshResponse": {
-      "description": "Response schema for successful token refresh",
-      "example": {
-        "access_token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTY5NCwiaWF0IjoxNzUyNjEwNzk0LCJpc3MiOiJhdGxhcyIsImp0aSI6ImYwOTg4MDMzLTlhNDktNGUzZC04M2U5LWE3NDVkZDkwYmY5ZiIsIm5iZiI6MTc1MjYxMDc5Mywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.ztcw5nZ3cdI1v5iTU0ZHyx-xZgWukxeFpuMulhvar7iRfSubBztlggVxpVM8bD-ulmujuX1i3-ksbfSdpNYMTQ"
-      },
-      "properties": {
-        "access_token": {
-          "description": "New access token",
-          "type": "string"
-        }
-      },
-      "required": [
-        "access_token"
-      ],
-      "title": "SuccessfulRefreshResponse",
-      "type": "object"
-    },
-    "SignOutResponse": {
-      "description": "Response schema for successful sign out",
-      "example": {
-        "message": "Signed out successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful sign out",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "SignOutResponse",
-      "type": "object"
-    },
     "UserSessionsResponse": {
       "description": "Response schema for a list of user sessions",
       "example": {
@@ -161,78 +233,6 @@
         "sessions"
       ],
       "title": "UserSessionsResponse",
-      "type": "object"
-    },
-    "NoContentResponse": {
-      "description": "Response schema for no content",
-      "example": {},
-      "properties": {
-        "message": {
-          "description": "Message indicating no content",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "NoContentResponse",
-      "type": "object"
-    },
-    "ResetPasswordResponse": {
-      "description": "Response schema for successful password reset",
-      "example": {
-        "message": "Password reset successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful password reset",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "ResetPasswordResponse",
-      "type": "object"
-    },
-    "UserSession": {
-      "description": "User session schema",
-      "properties": {
-        "first_seen": {
-          "description": "First seen timestamp",
-          "format": "date-time",
-          "type": "string"
-        },
-        "id": {
-          "description": "Session ID",
-          "type": "integer"
-        },
-        "ip": {
-          "description": "IP address of the session",
-          "type": "string"
-        },
-        "user_agent": {
-          "description": "User agent string",
-          "type": "string"
-        },
-        "user_browser": {
-          "description": "Browser of the user agent",
-          "type": "string"
-        },
-        "user_os": {
-          "description": "Operating system of the user agent",
-          "type": "string"
-        }
-      },
-      "required": [
-        "first_seen",
-        "user_os",
-        "user_browser",
-        "user_agent",
-        "ip",
-        "id"
-      ],
-      "title": "User Session",
       "type": "object"
     }
   },
