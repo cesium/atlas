@@ -339,7 +339,7 @@ defmodule AtlasWeb.AuthController do
           example(%{
             session_id: "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4",
             access_token:
-              "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTYwOCwiaWF0IjoxNzUyNjEwNzA4LCJpc3MiOiJhdGxhcyIsImp0aSI6IjYyNjM2ZWFmLTVmZGQtNGU2My05ZmI1LWQyZjYwNmQzOGUzNSIsIm5iZiI6MTc1MjYxMDcwNywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.bAF6nLXPlHH80jhueetNyC5jZQ4rXXO1MO63izQ-7x98flalF6IGxc8v3HGLSRfF7s3cXYVOteeSvUUUqbx60A"
+              "xXxXxXxXxXxX"
           })
         end,
       ErrorResponse:
