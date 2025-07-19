@@ -338,8 +338,7 @@ defmodule AtlasWeb.AuthController do
 
           example(%{
             session_id: "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4",
-            access_token:
-              "xXxXxXxXxXxX"
+            access_token: "xXxXxXxXxXxX"
           })
         end,
       ErrorResponse:
