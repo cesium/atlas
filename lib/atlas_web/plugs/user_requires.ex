@@ -20,7 +20,7 @@ defmodule AtlasWeb.Plugs.UserRequires do
         %{user_types: Keyword.get(args, :user_types)}
 
       Keyword.has_key?(args, :user_type) ->
-        %{user_types: Keyword.get(args, :user_type)}
+        %{user_types: [Keyword.get(args, :user_type)]}
 
       true ->
         raise ArgumentError, "You must provide either the :user_type or :user_types option"
@@ -32,12 +32,10 @@ defmodule AtlasWeb.Plugs.UserRequires do
     user_type = user.type
 
     if user_type_allowed?(user_type, allowed_types) do
-        conn
+      conn
     else
-        handle_unauthorized(conn)
+      handle_unauthorized(conn)
     end
-
-    conn
   end
 
   def user_type_allowed?(user_type, allowed_types) do
