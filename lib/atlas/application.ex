@@ -16,7 +16,7 @@ defmodule Atlas.Application do
       {Finch, name: Atlas.Finch},
       # Start the Guardian DB token sweeper server
       # This is used to clean up expired tokens from the database
-      {Guardian.DB.Token.SweeperServer, []},
+      {Guardian.DB.Sweeper, []},
       # Start a worker by calling: Atlas.Worker.start_link(arg)
       # {Atlas.Worker, arg},
       # Start to serve requests, typically the last entry
