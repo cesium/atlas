@@ -5,9 +5,12 @@ defmodule Atlas.Degrees.Degree do
   use Atlas.Schema
 
   @required_fields ~w(name code)a
+
   schema "degrees" do
     field :code, :string
     field :name, :string
+
+    has_many :students, Atlas.University.Student
 
     timestamps(type: :utc_datetime)
   end
