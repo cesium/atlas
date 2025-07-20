@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:17.5
+    container_name: atlas_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_HOST: ${DB_HOST:-localhost}
+      POSTGRES_DB: atlas_stg
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  web:
+    container_name: atlas_web
+    environment:
+      MIX_ENV: prod
+      DATABASE_URL: ecto://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@db/atlas_stg
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-your-dev-secret-key-here-make-it-long-enough}
+      SECRET_KEY_GUARDIAN: ${SECRET_KEY_GUARDIAN:-your-dev-secret-key-here-make-it-long-enough}
+      PHX_HOST: ${PHX_HOST:-localhost}
+      FRONTEND_URL: ${FRONTEND_URL:-localhost}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
