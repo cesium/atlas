@@ -19,6 +19,10 @@ defmodule AtlasWeb.Router do
     plug Guardian.Plug.LoadResource
   end
 
+  scope "/", AtlasWeb do
+    get "/", PageController, :index
+  end
+
   scope "/v1", AtlasWeb do
     pipe_through :api
 
