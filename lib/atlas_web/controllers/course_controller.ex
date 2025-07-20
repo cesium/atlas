@@ -19,24 +19,34 @@ defmodule AtlasWeb.CourseController do
 
           # Create the degree if it doesn't exist
 
-          degree = Atlas.Degrees.get_degree_by_code(degree_code)
-
-          if !degree do
-            degree = Degrees.create_degree(%{name: degree_name, code: degree_code})
-          end
+          degree =
+            Atlas.Degrees.get_degree_by_code(degree_code) ||
+              case Degrees.create_degree(%{name: degree_name, code: degree_code}) do
+                {:ok, created_degree} -> created_degree
+                {:error, _changeset} -> nil
+              end
 
           student_number = Enum.at(row, 11)
           name = Enum.at(row, 12)
           email = Enum.at(row, 13)
+          special_status = Enum.at(row, 15)
 
           # Create the account if it doesn't exist
 
-          user = Accounts.get_user_by_email(email)
-
-          if !user do
-            user =
-              Accounts.register_student_user_with_random_password(%{name: name, email: email})
-          end
+          user =
+            Accounts.get_user_by_email(email) ||
+              case Accounts.register_student_user_with_random_password(%{
+                     name: name,
+                     email: email,
+                     student: %{
+                       number: student_number,
+                       degree_id: degree.id,
+                       special_status: special_status
+                     }
+                   }) do
+                {:ok, user} -> user
+                {:error, _changeset} -> nil
+              end
         end
 
       {:error, reason} ->

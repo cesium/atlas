@@ -6,6 +6,7 @@ defmodule Atlas.Accounts do
   use Atlas.Context
 
   alias Atlas.Accounts.{User, UserNotifier, UserSession, UserToken}
+  alias Atlas.University.Student
 
   ## Database getters
 
@@ -103,6 +104,33 @@ defmodule Atlas.Accounts do
   end
 
   @doc """
+  Registers a student user.
+
+  ## Examples
+
+      iex> register_student_user(%{name: "John Doe", email: "john.doe@example.com"})
+      {:ok, %User{}}
+
+      iex> register_student_user(%{name: "John Doe", email: "invalid_email"})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def register_student_user(attrs) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :user,
+      User.registration_changeset(
+        %User{},
+        attrs |> Map.put(:type, :student) |> Map.delete(:student)
+      )
+    )
+    |> Ecto.Multi.insert(:student, fn %{user: user} ->
+      Student.changeset(%Student{}, Map.put(attrs.student, :user_id, user.id))
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
   Registers a student user with a random password.
 
   ## Examples
@@ -113,11 +141,7 @@ defmodule Atlas.Accounts do
   """
   def register_student_user_with_random_password(attrs) do
     random_password = :crypto.strong_rand_bytes(12) |> Base.encode64()
-    attrs = Map.put(attrs, :password, random_password) |> Map.put(:type, :student)
-
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    register_student_user(Map.put(attrs, :password, random_password))
   end
 
   @doc """
