@@ -46,7 +46,7 @@ defmodule Atlas.MixProject do
 
       # auth
       {:guardian, "~> 2.3"},
-      {:guardian_db, "~> 2.0"},
+      {:guardian_db, "~> 3.0"},
 
       # mailer
       {:swoosh, "~> 1.5"},

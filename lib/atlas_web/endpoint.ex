@@ -48,11 +48,7 @@ defmodule AtlasWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
 
-  plug Corsica,
-    origins: Application.compile_env(:atlas, :allowed_origins),
-    log: [rejected: :error],
-    allow_credentials: true,
-    allow_headers: ["authorization", "content-type", "accept"]
+  plug AtlasWeb.CorsPlug
 
   plug AtlasWeb.Router
 end
