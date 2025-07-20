@@ -64,6 +64,9 @@ defmodule Atlas.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
 
+      # cors
+      {:corsica, "~> 2.1.3"},
+
       # utilities
       {:remote_ip, "~> 1.2"},
       {:ua_parser, "~> 1.8"}

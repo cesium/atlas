@@ -89,6 +89,8 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
+EXPOSE 4000
+
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
   CMD curl -f http://localhost:4000/ || exit 1
 
