@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: atlas_stg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
   web:
