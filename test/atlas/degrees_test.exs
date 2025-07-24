@@ -56,4 +56,62 @@ defmodule Atlas.DegreesTest do
       assert %Ecto.Changeset{} = Degrees.change_degree(degree)
     end
   end
+
+  describe "courses" do
+    alias Atlas.Degrees.Course
+
+    import Atlas.DegreesFixtures
+
+    @invalid_attrs %{name: nil, year: nil, semester: nil}
+
+    test "list_courses/0 returns all courses" do
+      course = course_fixture()
+      assert Degrees.list_courses() == [course]
+    end
+
+    test "get_course!/1 returns the course with given id" do
+      course = course_fixture()
+      assert Degrees.get_course!(course.id) == course
+    end
+
+    test "create_course/1 with valid data creates a course" do
+      valid_attrs = %{name: "some name", year: 42, semester: 42}
+
+      assert {:ok, %Course{} = course} = Degrees.create_course(valid_attrs)
+      assert course.name == "some name"
+      assert course.year == 42
+      assert course.semester == 42
+    end
+
+    test "create_course/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Degrees.create_course(@invalid_attrs)
+    end
+
+    test "update_course/2 with valid data updates the course" do
+      course = course_fixture()
+      update_attrs = %{name: "some updated name", year: 43, semester: 43}
+
+      assert {:ok, %Course{} = course} = Degrees.update_course(course, update_attrs)
+      assert course.name == "some updated name"
+      assert course.year == 43
+      assert course.semester == 43
+    end
+
+    test "update_course/2 with invalid data returns error changeset" do
+      course = course_fixture()
+      assert {:error, %Ecto.Changeset{}} = Degrees.update_course(course, @invalid_attrs)
+      assert course == Degrees.get_course!(course.id)
+    end
+
+    test "delete_course/1 deletes the course" do
+      course = course_fixture()
+      assert {:ok, %Course{}} = Degrees.delete_course(course)
+      assert_raise Ecto.NoResultsError, fn -> Degrees.get_course!(course.id) end
+    end
+
+    test "change_course/1 returns a course changeset" do
+      course = course_fixture()
+      assert %Ecto.Changeset{} = Degrees.change_course(course)
+    end
+  end
 end

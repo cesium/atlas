@@ -47,6 +47,62 @@ defmodule AtlasWeb.CourseController do
                 {:ok, user} -> user
                 {:error, _changeset} -> nil
               end
+
+          # Create the course if it doesn't exist
+
+          if Enum.at(row, 8) != "" do
+            course_code = Enum.at(row, 7)
+            course_name = Enum.at(row, 8)
+            year = Enum.at(row, 6) |> round()
+
+            case String.at(course_code, 2) |> Integer.parse() do
+              {_, _} ->
+                # Regular course
+                semester =
+                  if String.at(course_code, 3) |> String.to_integer() |> rem(2) == 0,
+                    do: 2,
+                    else: 1
+
+                course =
+                  get_or_create_course(%{
+                    code: course_code,
+                    name: course_name,
+                    year: year,
+                    semester: semester,
+                    degree_id: degree.id
+                  })
+
+              _ ->
+                # Has parent course (Opção UMinho)
+
+                parent_course_code = Enum.at(row, 9)
+                parent_course_name = Enum.at(row, 10)
+
+                semester =
+                  if String.at(parent_course_code, 3) |> String.to_integer() |> rem(2) == 0,
+                    do: 2,
+                    else: 1
+
+                parent_course =
+                  get_or_create_course(%{
+                    code: parent_course_code,
+                    name: parent_course_name,
+                    year: year,
+                    semester: semester,
+                    degree_id: degree.id
+                  })
+
+                course =
+                  get_or_create_course(%{
+                    code: course_code,
+                    name: course_name,
+                    year: year,
+                    semester: semester,
+                    degree_id: degree.id,
+                    parent_course_id: parent_course.id
+                  })
+            end
+          end
         end
 
       {:error, reason} ->
@@ -58,5 +114,18 @@ defmodule AtlasWeb.CourseController do
     conn
     |> put_status(:ok)
     |> json(%{message: "Course data import initiated"})
+  end
+
+  defp get_or_create_course(attrs) do
+    case Degrees.get_course_by_code(attrs.code) do
+      nil ->
+        case Degrees.create_course(attrs) do
+          {:ok, course} -> course
+          {:error, _changeset} -> nil
+        end
+
+      course ->
+        course
+    end
   end
 end

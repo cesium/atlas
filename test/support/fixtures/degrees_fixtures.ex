@@ -17,4 +17,20 @@ defmodule Atlas.DegreesFixtures do
 
     degree
   end
+
+  @doc """
+  Generate a course.
+  """
+  def course_fixture(attrs \\ %{}) do
+    {:ok, course} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        semester: 42,
+        year: 42
+      })
+      |> Atlas.Degrees.create_course()
+
+    course
+  end
 end
