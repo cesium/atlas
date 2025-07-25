@@ -392,8 +392,7 @@ defmodule AtlasWeb.AuthController do
           end
 
           example(%{
-            access_token:
-              "xXxXxXxXxXxX"
+            access_token: "xXxXxXxXxXxX"
           })
         end,
       SignOutResponse:
