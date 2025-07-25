@@ -393,7 +393,7 @@ defmodule AtlasWeb.AuthController do
 
           example(%{
             access_token:
-              "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhc3RyYSIsImV4cCI6MTc1MjYxMTY5NCwiaWF0IjoxNzUyNjEwNzk0LCJpc3MiOiJhdGxhcyIsImp0aSI6ImYwOTg4MDMzLTlhNDktNGUzZC04M2U5LWE3NDVkZDkwYmY5ZiIsIm5iZiI6MTc1MjYxMDc5Mywic3ViIjoiZTEzODdjYWUtYWMxZC00YWViLThlMTMtZmYxYjNkZDE1Y2E0IiwidHlwIjoiYWNjZXNzIn0.ztcw5nZ3cdI1v5iTU0ZHyx-xZgWukxeFpuMulhvar7iRfSubBztlggVxpVM8bD-ulmujuX1i3-ksbfSdpNYMTQ"
+              "xXxXxXxXxXxX"
           })
         end,
       SignOutResponse:
