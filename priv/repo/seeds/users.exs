@@ -43,7 +43,6 @@ defmodule Atlas.Repo.Seeds.Accounts do
     for i <- 1..count do
       first_name = Enum.random(@first_names)
       last_names = Enum.take_random(@last_names, 3) |> Enum.join(" ")
-      |> Enum.join(" ")
       full_name = "#{first_name} #{last_names}"
       email = "professor#{i}@atlas.pt"
 
