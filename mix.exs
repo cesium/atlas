@@ -69,7 +69,10 @@ defmodule Atlas.MixProject do
 
       # utilities
       {:remote_ip, "~> 1.2"},
-      {:ua_parser, "~> 1.8"}
+      {:ua_parser, "~> 1.8"},
+
+      # swagger
+      {:phoenix_swagger, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
 
