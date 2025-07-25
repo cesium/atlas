@@ -23,7 +23,7 @@ defmodule Atlas.Repo.Seeds.Accounts do
   defp seed_students(count) do
     for i <- 1..count do
       first_name = Enum.random(@first_names)
-      last_names =                    Enum.take_random(@last_names, 3)
+      last_names = Enum.take_random(@last_names, 3) |> Enum.join(" ")
       full_name = "#{first_name} #{last_names}"
       student_number = random_student_number()
       email = "#{student_number |> String.downcase()}@alunos.uminho.pt"
@@ -42,7 +42,7 @@ defmodule Atlas.Repo.Seeds.Accounts do
   defp seed_teachers(count) do
     for i <- 1..count do
       first_name = Enum.random(@first_names)
-      last_names = Enum.take_random(@last_names, 3)
+      last_names = Enum.take_random(@last_names, 3) |> Enum.join(" ")
       |> Enum.join(" ")
       full_name = "#{first_name} #{last_names}"
       email = "professor#{i}@atlas.pt"
@@ -74,6 +74,11 @@ defmodule Atlas.Repo.Seeds.Accounts do
 
       create_user(admin, "admin", i)
     end
+  end
+
+  defp random_student_number do
+    number = Enum.random(9000..12000)
+    "a#{number}"
   end
 
   defp create_user(attrs, role, id) do
