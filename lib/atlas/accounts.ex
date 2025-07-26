@@ -507,6 +507,28 @@ defmodule Atlas.Accounts do
   end
 
   @doc """
+  Gets the language string for a given user.
+
+  Returns `nil` if no preference is set.
+
+  ## Examples
+
+      iex> get_user_language(1)
+      "pt-PT"
+
+      iex> get_user_language(999)
+      nil
+  """
+  def get_user_language(user_id) do
+    Repo.one(
+      from up in UserPreference,
+        where: up.user_id == ^user_id,
+        select: up.language,
+        limit: 1
+    )
+  end
+
+  @doc """
   Sets the language preference for a given user.
 
   If the preference exists, it updates only the language field.
