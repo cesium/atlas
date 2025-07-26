@@ -5,7 +5,7 @@ defmodule Atlas.Accounts do
 
   use Atlas.Context
 
-  alias Atlas.Accounts.{User, UserNotifier, UserSession, UserToken}
+  alias Atlas.Accounts.{User, UserNotifier, UserPreference, UserSession, UserToken}
 
   ## Database getters
 
@@ -487,5 +487,44 @@ defmodule Atlas.Accounts do
   def delete_user_session(%UserSession{} = user_session) do
     Guardian.DB.revoke_all(user_session.id)
     Repo.delete(user_session)
+  end
+
+  ## User Preference
+
+  @doc """
+  Gets the language preference for a given user.
+
+  ## Examples
+
+      iex> get_user_preference(1)
+      %UserPreference{}
+
+      iex> get_user_preference(999)
+      nil
+  """
+  def get_user_preference(user_id) do
+    Repo.get_by(UserPreference, user_id: user_id)
+  end
+
+  @doc """
+  Sets the language preference for a given user.
+
+  If the preference exists, it replaces it.
+
+  ## Examples
+
+      iex> set_user_language(1, "pt-PT")
+      {:ok, %UserPreference{}}
+
+      iex> set_user_language(1, "invalid")
+      {:error, %Ecto.Changeset{}}
+  """
+  def set_user_language(user_id, language) do
+    %UserPreference{}
+    |> UserPreference.changeset(%{user_id: user_id, language: language})
+    |> Repo.insert(
+      on_conflict: :replace_all,
+      conflict_target: :user_id
+    )
   end
 end
