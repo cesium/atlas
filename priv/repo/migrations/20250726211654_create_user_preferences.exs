@@ -12,7 +12,7 @@ defmodule Atlas.Repo.Migrations.CreateUserPreferences do
     create unique_index(:user_preferences, [:user_id])
 
     create constraint(:user_preferences, :language_must_be_valid,
-      check: "language IN ('pt-PT', 'en-US')"
-    )
+             check: "language IN ('pt-PT', 'en-US')"
+           )
   end
 end

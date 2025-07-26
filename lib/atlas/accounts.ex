@@ -509,7 +509,7 @@ defmodule Atlas.Accounts do
   @doc """
   Sets the language preference for a given user.
 
-  If the preference exists, it replaces it.
+  If the preference exists, it updates only the language field.
 
   ## Examples
 
@@ -523,7 +523,7 @@ defmodule Atlas.Accounts do
     %UserPreference{}
     |> UserPreference.changeset(%{user_id: user_id, language: language})
     |> Repo.insert(
-      on_conflict: :replace_all,
+      on_conflict: [set: [language: language]],
       conflict_target: :user_id
     )
   end
