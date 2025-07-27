@@ -1,131 +1,167 @@
 defmodule AtlasWeb.CourseController do
-  alias Atlas.{Accounts, Degrees}
-
   use AtlasWeb, :controller
+
+  alias Atlas.{Accounts, Degrees, University}
+  alias Plug.Upload
 
   action_fallback AtlasWeb.FallbackController
 
-  def import_course_data(conn, %{"file" => %Plug.Upload{} = file}) do
-    file_path = file.path
+  def import_course_data(conn, %{"file" => %Upload{path: file_path}}) do
+    with {:ok, package} <- XlsxReader.open(file_path),
+         [sheet | _] <- XlsxReader.sheet_names(package),
+         {:ok, rows} <- XlsxReader.sheet(package, sheet) do
+      rows
+      |> Enum.drop(7)
+      |> Enum.each(&import_row/1)
 
-    case XlsxReader.open(file_path) do
-      {:ok, package} ->
-        sheets = XlsxReader.sheet_names(package)
-        {:ok, rows} = XlsxReader.sheet(package, List.first(sheets))
-
-        for row <- Enum.drop(rows, 7) do
-          degree_code = Enum.at(row, 3)
-          degree_name = Enum.at(row, 4)
-
-          # Create the degree if it doesn't exist
-
-          degree =
-            Atlas.Degrees.get_degree_by_code(degree_code) ||
-              case Degrees.create_degree(%{name: degree_name, code: degree_code}) do
-                {:ok, created_degree} -> created_degree
-                {:error, _changeset} -> nil
-              end
-
-          student_number = Enum.at(row, 11)
-          name = Enum.at(row, 12)
-          email = Enum.at(row, 13)
-          special_status = Enum.at(row, 15)
-
-          # Create the account if it doesn't exist
-
-          user =
-            Accounts.get_user_by_email(email) ||
-              case Accounts.register_student_user_with_random_password(%{
-                     name: name,
-                     email: email,
-                     student: %{
-                       number: student_number,
-                       degree_id: degree.id,
-                       special_status: special_status
-                     }
-                   }) do
-                {:ok, user} -> user
-                {:error, _changeset} -> nil
-              end
-
-          # Create the course if it doesn't exist
-
-          if Enum.at(row, 8) != "" do
-            course_code = Enum.at(row, 7)
-            course_name = Enum.at(row, 8)
-            year = Enum.at(row, 6) |> round()
-
-            case String.at(course_code, 2) |> Integer.parse() do
-              {_, _} ->
-                # Regular course
-                semester =
-                  if String.at(course_code, 3) |> String.to_integer() |> rem(2) == 0,
-                    do: 2,
-                    else: 1
-
-                course =
-                  get_or_create_course(%{
-                    code: course_code,
-                    name: course_name,
-                    year: year,
-                    semester: semester,
-                    degree_id: degree.id
-                  })
-
-              _ ->
-                # Has parent course (Opção UMinho)
-
-                parent_course_code = Enum.at(row, 9)
-                parent_course_name = Enum.at(row, 10)
-
-                semester =
-                  if String.at(parent_course_code, 3) |> String.to_integer() |> rem(2) == 0,
-                    do: 2,
-                    else: 1
-
-                parent_course =
-                  get_or_create_course(%{
-                    code: parent_course_code,
-                    name: parent_course_name,
-                    year: year,
-                    semester: semester,
-                    degree_id: degree.id
-                  })
-
-                course =
-                  get_or_create_course(%{
-                    code: course_code,
-                    name: course_name,
-                    year: year,
-                    semester: semester,
-                    degree_id: degree.id,
-                    parent_course_id: parent_course.id
-                  })
-            end
-          end
-        end
-
+      json(conn, %{message: "Course data import initiated"})
+    else
       {:error, reason} ->
         conn
         |> put_status(:bad_request)
         |> json(%{error: "Failed to read the Excel file: #{reason}"})
     end
+  end
 
-    conn
-    |> put_status(:ok)
-    |> json(%{message: "Course data import initiated"})
+  defp import_row(row) do
+    %{
+      degree_code: degree_code,
+      degree_name: degree_name,
+      student_number: student_number,
+      name: name,
+      email: email,
+      special_status: special_status,
+      course_code: course_code,
+      course_name: course_name,
+      parent_code: parent_code,
+      parent_name: parent_name,
+      year: year
+    } = parse_row(row)
+
+    degree = ensure_degree(degree_code, degree_name)
+
+    user = ensure_user(email, name, student_number, special_status, degree)
+
+    course =
+      if course_name != "" do
+        import_course(%{
+          code: course_code,
+          name: course_name,
+          parent_code: parent_code,
+          parent_name: parent_name,
+          year: year,
+          degree: degree
+        })
+      end
+
+    import_enrollment(course, user.student)
+  end
+
+  defp parse_row(row) do
+    %{
+      degree_code: Enum.at(row, 3),
+      degree_name: Enum.at(row, 4),
+      year: Enum.at(row, 6) |> round(),
+      course_code: Enum.at(row, 7),
+      course_name: Enum.at(row, 8),
+      parent_code: Enum.at(row, 9),
+      parent_name: Enum.at(row, 10),
+      student_number: Enum.at(row, 11),
+      name: Enum.at(row, 12),
+      email: Enum.at(row, 13),
+      special_status: Enum.at(row, 15)
+    }
+  end
+
+  defp ensure_degree(code, name) do
+    Degrees.get_degree_by_code(code) ||
+      case Degrees.create_degree(%{name: name, code: code}) do
+        {:ok, degree} -> degree
+        {:error, _} -> nil
+      end
+  end
+
+  defp ensure_user(email, name, student_number, special_status, degree) do
+    Accounts.get_user_by_email(email, preloads: [:student]) ||
+      case Accounts.register_student_user_with_random_password(%{
+             name: name,
+             email: email,
+             student: %{
+               number: student_number,
+               degree_id: degree.id,
+               special_status: special_status
+             }
+           }) do
+        {:ok, user} -> user
+        {:error, _} -> nil
+      end
+  end
+
+  defp import_course(%{code: code, name: name, parent_code: "", year: year, degree: degree}) do
+    semester = get_semester(code)
+
+    get_or_create_course(%{
+      code: code,
+      name: name,
+      year: year,
+      semester: semester,
+      degree_id: degree.id
+    })
+  end
+
+  defp import_course(%{
+         code: code,
+         name: name,
+         parent_code: parent_code,
+         parent_name: parent_name,
+         year: year,
+         degree: degree
+       }) do
+    semester = get_semester(parent_code)
+
+    parent_course =
+      case String.at(code, 2) |> Integer.parse() do
+        {_, _} ->
+          nil
+
+        _ ->
+          get_or_create_course(%{
+            code: parent_code,
+            name: parent_name,
+            year: year,
+            semester: semester,
+            degree_id: degree.id
+          })
+      end
+
+    get_or_create_course(%{
+      code: code,
+      name: name,
+      year: year,
+      semester: semester,
+      degree_id: degree.id,
+      parent_course_id: parent_course && parent_course.id
+    })
+  end
+
+  defp import_enrollment(course, student) do
+    if course && student do
+      University.enroll_student_in_course(student, course)
+    end
+  end
+
+  defp get_semester(code) do
+    case String.at(code, 3) |> Integer.parse() do
+      {n, _} -> if rem(n, 2) == 0, do: 2, else: 1
+      _ -> 1
+    end
   end
 
   defp get_or_create_course(attrs) do
-    case Degrees.get_course_by_code(attrs.code) do
-      nil ->
-        case Degrees.create_course(attrs) do
-          {:ok, course} -> course
-          {:error, _changeset} -> nil
-        end
-
-      course ->
-        course
-    end
+    Degrees.get_course_by_code(attrs.code) ||
+      case Degrees.create_course(attrs) do
+        {:ok, course} -> course
+        {:error, _} -> nil
+      end
   end
 end

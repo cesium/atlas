@@ -15,6 +15,10 @@ defmodule Atlas.University.Student do
     belongs_to :user, Atlas.Accounts.User
     belongs_to :degree, Atlas.Degrees.Degree
 
+    many_to_many :courses, Atlas.Degrees.Course,
+      join_through: Atlas.University.Enrollment,
+      on_replace: :delete
+
     timestamps(type: :utc_datetime)
   end
 

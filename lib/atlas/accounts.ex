@@ -26,8 +26,10 @@ defmodule Atlas.Accounts do
       nil
 
   """
-  def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+  def get_user_by_email(email, opts \\ []) when is_binary(email) do
+    User
+    |> apply_filters(opts)
+    |> Repo.get_by(email: email)
   end
 
   @doc """

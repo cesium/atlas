@@ -19,4 +19,16 @@ defmodule Atlas.UniversityFixtures do
 
     student
   end
+
+  @doc """
+  Generate a enrollment.
+  """
+  def enrollment_fixture(attrs \\ %{}) do
+    {:ok, enrollment} =
+      attrs
+      |> Enum.into(%{})
+      |> Atlas.University.create_enrollment()
+
+    enrollment
+  end
 end

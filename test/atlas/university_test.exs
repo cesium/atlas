@@ -69,4 +69,60 @@ defmodule Atlas.UniversityTest do
       assert %Ecto.Changeset{} = University.change_student(student)
     end
   end
+
+  describe "enrollments" do
+    alias Atlas.University.Enrollment
+
+    import Atlas.UniversityFixtures
+
+    @invalid_attrs %{}
+
+    test "list_enrollments/0 returns all enrollments" do
+      enrollment = enrollment_fixture()
+      assert University.list_enrollments() == [enrollment]
+    end
+
+    test "get_enrollment!/1 returns the enrollment with given id" do
+      enrollment = enrollment_fixture()
+      assert University.get_enrollment!(enrollment.id) == enrollment
+    end
+
+    test "create_enrollment/1 with valid data creates a enrollment" do
+      valid_attrs = %{}
+
+      assert {:ok, %Enrollment{} = enrollment} = University.create_enrollment(valid_attrs)
+    end
+
+    test "create_enrollment/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = University.create_enrollment(@invalid_attrs)
+    end
+
+    test "update_enrollment/2 with valid data updates the enrollment" do
+      enrollment = enrollment_fixture()
+      update_attrs = %{}
+
+      assert {:ok, %Enrollment{} = enrollment} =
+               University.update_enrollment(enrollment, update_attrs)
+    end
+
+    test "update_enrollment/2 with invalid data returns error changeset" do
+      enrollment = enrollment_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               University.update_enrollment(enrollment, @invalid_attrs)
+
+      assert enrollment == University.get_enrollment!(enrollment.id)
+    end
+
+    test "delete_enrollment/1 deletes the enrollment" do
+      enrollment = enrollment_fixture()
+      assert {:ok, %Enrollment{}} = University.delete_enrollment(enrollment)
+      assert_raise Ecto.NoResultsError, fn -> University.get_enrollment!(enrollment.id) end
+    end
+
+    test "change_enrollment/1 returns a enrollment changeset" do
+      enrollment = enrollment_fixture()
+      assert %Ecto.Changeset{} = University.change_enrollment(enrollment)
+    end
+  end
 end
