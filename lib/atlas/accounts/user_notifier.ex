@@ -4,22 +4,17 @@ defmodule Atlas.Accounts.UserNotifier do
   password reset instructions, and email update instructions.
   """
 
-  import Swoosh.Email
-
-  alias Atlas.Mailer
-
-  # Delivers the email using the application mailer.
+  alias Atlas.Workers.EmailWorker
+  # Enqueue the email using Oban
   defp deliver(recipient, subject, body) do
-    email =
-      new()
-      |> to(recipient)
-      |> from({"Atlas", "contact@example.com"})
-      |> subject(subject)
-      |> text_body(body)
+    job = %{
+      "to" => recipient,
+      "subject" => subject,
+      "body" => body
+    }
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
-    end
+    Oban.insert!(EmailWorker.new(job))
+    {:ok, :enqueued}
   end
 
   @doc """
