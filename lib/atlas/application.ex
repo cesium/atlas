@@ -5,6 +5,10 @@ defmodule Atlas.Application do
 
   use Application
 
+  defp oban_config do
+    Application.fetch_env!(:atlas, Oban)
+  end
+
   @impl true
   def start(_type, _args) do
     children = [
@@ -15,10 +19,9 @@ defmodule Atlas.Application do
       # Start the Finch HTTP client for sending emails
       {Finch, name: Atlas.Finch},
       # Start the Guardian DB token sweeper server
-      # This is used to clean up expired tokens from the database
       {Guardian.DB.Sweeper, []},
-      # Start a worker by calling: Atlas.Worker.start_link(arg)
-      # {Atlas.Worker, arg},
+      # Start Oban for background jobs
+      {Oban, oban_config()},
       # Start to serve requests, typically the last entry
       AtlasWeb.Endpoint
     ]
