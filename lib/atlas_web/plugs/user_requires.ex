@@ -8,10 +8,10 @@ defmodule AtlasWeb.Plugs.UserRequires do
 
   Usage:
     # In your router or controller
-    plug MyAppWeb.Plugs.UserRequires, user_types: [:admin, :moderator]
+    plug AtlasWeb.Plugs.UserRequires, user_types: [:admin, :moderator]
 
     # Or for a single user type
-    plug MyAppWeb.Plugs.UserRequires, user_type: :admin
+    plug AtlasWeb.Plugs.UserRequires, user_type: :admin
   """
 
   def init(args) do
