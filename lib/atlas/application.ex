@@ -17,6 +17,8 @@ defmodule Atlas.Application do
       # Start the Guardian DB token sweeper server
       # This is used to clean up expired tokens from the database
       {Guardian.DB.Sweeper, []},
+      # Start the Oban queue
+      {Oban, Application.fetch_env!(:atlas, Oban)},
       # Start a worker by calling: Atlas.Worker.start_link(arg)
       # {Atlas.Worker, arg},
       # Start to serve requests, typically the last entry
