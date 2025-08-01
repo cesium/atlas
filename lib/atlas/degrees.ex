@@ -2,11 +2,9 @@ defmodule Atlas.Degrees do
   @moduledoc """
   The Degrees context.
   """
+  use Atlas.Context
 
-  import Ecto.Query, warn: false
-  alias Atlas.Repo
-
-  alias Atlas.Degrees.{Degree, Course}
+  alias Atlas.Degrees.{Course, Degree}
 
   @doc """
   Returns the list of degrees.

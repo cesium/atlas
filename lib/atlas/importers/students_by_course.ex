@@ -14,7 +14,7 @@ defmodule Atlas.Importers.StudentsByCourse do
     end
   end
 
-   defp import_row(row) do
+  defp import_row(row) do
     %{
       degree_code: degree_code,
       degree_name: degree_name,

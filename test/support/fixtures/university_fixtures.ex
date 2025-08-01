@@ -4,6 +4,8 @@ defmodule Atlas.UniversityFixtures do
   entities via the `Atlas.University` context.
   """
 
+  import Atlas.DegreesFixtures
+
   @doc """
   Generate a student.
   """
@@ -13,7 +15,8 @@ defmodule Atlas.UniversityFixtures do
       |> Enum.into(%{
         degree_year: 42,
         number: "some number",
-        special_status: "some special_status"
+        special_status: "some special_status",
+        degree_id: degree_fixture().id
       })
       |> Atlas.University.create_student()
 
@@ -26,7 +29,10 @@ defmodule Atlas.UniversityFixtures do
   def enrollment_fixture(attrs \\ %{}) do
     {:ok, enrollment} =
       attrs
-      |> Enum.into(%{})
+      |> Enum.into(%{
+        student_id: student_fixture().id,
+        course_id: course_fixture(%{code: "some code"}).id
+      })
       |> Atlas.University.create_enrollment()
 
     enrollment

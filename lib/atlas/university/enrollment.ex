@@ -1,4 +1,7 @@
 defmodule Atlas.University.Enrollment do
+  @moduledoc """
+  Student enrollment in courses.
+  """
   use Atlas.Schema
 
   @required_fields ~w(student_id course_id)a

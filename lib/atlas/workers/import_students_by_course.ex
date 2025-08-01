@@ -2,7 +2,7 @@ defmodule Atlas.Workers.ImportStudentsByCourse do
   @moduledoc """
   Worker to import students by course.
   """
-  use Oban.Worker, queue: :import
+  use Oban.Worker, queue: :imports
 
   alias Atlas.Importers.StudentsByCourse
 

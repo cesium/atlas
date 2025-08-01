@@ -1,4 +1,7 @@
 defmodule Atlas.Degrees.Course do
+  @moduledoc """
+  Courses offered in a degree program.
+  """
   use Atlas.Schema
 
   @required_fields ~w(name code year semester degree_id)a

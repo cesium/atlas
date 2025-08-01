@@ -11,6 +11,7 @@ defmodule Atlas.DegreesFixtures do
     {:ok, degree} =
       attrs
       |> Enum.into(%{
+        code: "code",
         name: "some name"
       })
       |> Atlas.Degrees.create_degree()
@@ -25,9 +26,11 @@ defmodule Atlas.DegreesFixtures do
     {:ok, course} =
       attrs
       |> Enum.into(%{
+        code: "code",
         name: "some name",
-        semester: 42,
-        year: 42
+        semester: 1,
+        year: 1,
+        degree_id: degree_fixture(%{code: "some code"}).id
       })
       |> Atlas.Degrees.create_course()
 

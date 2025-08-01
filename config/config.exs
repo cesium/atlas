@@ -43,8 +43,9 @@ config :phoenix, :json_library, Jason
 config :atlas, Oban,
   engine: Oban.Engines.Basic,
   repo: Atlas.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [default: 10]
+  queues: [
+    imports: 5
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

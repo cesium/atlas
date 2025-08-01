@@ -6,6 +6,7 @@ defmodule Atlas.University do
   use Atlas.Context
 
   alias Atlas.University.{Enrollment, Student}
+  alias Atlas.Workers
 
   @doc """
   Returns the list of students.
@@ -210,5 +211,24 @@ defmodule Atlas.University do
     %Enrollment{}
     |> Enrollment.changeset(%{student_id: student.id, course_id: course.id})
     |> Repo.insert()
+  end
+
+  @doc """
+  Queues a job to import students by course from an Excel file.
+
+  ## Examples
+
+      iex> queue_import_students_by_course(file_path, user)
+      {:ok, %Oban.Job{}}
+
+      iex> queue_import_students_by_course(file_path, user)
+      {:error, reason}
+  """
+  def queue_import_students_by_course(file_path, user) do
+    Oban.insert(
+      Workers.ImportStudentsByCourse.new(%{"file_path" => file_path},
+        meta: %{user_id: user.id, type: :import_students_by_course}
+      )
+    )
   end
 end

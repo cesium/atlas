@@ -21,7 +21,7 @@ defmodule Atlas.DegreesTest do
     end
 
     test "create_degree/1 with valid data creates a degree" do
-      valid_attrs = %{name: "some name"}
+      valid_attrs = %{name: "some name", code: "code"}
 
       assert {:ok, %Degree{} = degree} = Degrees.create_degree(valid_attrs)
       assert degree.name == "some name"
@@ -62,7 +62,7 @@ defmodule Atlas.DegreesTest do
 
     import Atlas.DegreesFixtures
 
-    @invalid_attrs %{name: nil, year: nil, semester: nil}
+    @invalid_attrs %{code: nil, name: nil, year: nil, semester: nil}
 
     test "list_courses/0 returns all courses" do
       course = course_fixture()
@@ -75,12 +75,19 @@ defmodule Atlas.DegreesTest do
     end
 
     test "create_course/1 with valid data creates a course" do
-      valid_attrs = %{name: "some name", year: 42, semester: 42}
+      valid_attrs = %{
+        code: "code",
+        name: "some name",
+        year: 1,
+        semester: 1,
+        degree_id: degree_fixture().id
+      }
 
       assert {:ok, %Course{} = course} = Degrees.create_course(valid_attrs)
+      assert course.code == "code"
       assert course.name == "some name"
-      assert course.year == 42
-      assert course.semester == 42
+      assert course.year == 1
+      assert course.semester == 1
     end
 
     test "create_course/1 with invalid data returns error changeset" do
@@ -89,9 +96,10 @@ defmodule Atlas.DegreesTest do
 
     test "update_course/2 with valid data updates the course" do
       course = course_fixture()
-      update_attrs = %{name: "some updated name", year: 43, semester: 43}
+      update_attrs = %{code: "code", name: "some updated name", year: 43, semester: 43}
 
       assert {:ok, %Course{} = course} = Degrees.update_course(course, update_attrs)
+      assert course.code == "code"
       assert course.name == "some updated name"
       assert course.year == 43
       assert course.semester == 43
