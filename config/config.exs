@@ -22,6 +22,15 @@ config :atlas, AtlasWeb.Endpoint,
   pubsub_server: Atlas.PubSub,
   live_view: [signing_salt: "Gt4Lm9lT"]
 
+# Configures the Swagger
+config :atlas, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: AtlasWeb.Router,
+      endpoint: AtlasWeb.Endpoint
+    ]
+  }
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
@@ -38,6 +47,9 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# Use Jason for JSON parsing in Phoenix Swagger
+config :phoenix_swagger, json_library: Jason
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

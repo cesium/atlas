@@ -46,6 +46,10 @@ defmodule AtlasWeb.Router do
     end
   end
 
+  scope "/swagger" do
+    forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :atlas, swagger_file: "swagger.json")
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:atlas, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
@@ -61,5 +65,23 @@ defmodule AtlasWeb.Router do
       live_dashboard "/dashboard", metrics: AtlasWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  # Usage for bearer token authorization: "Bearer <token>"
+
+  def swagger_info do
+    %{
+      info: %{
+        version: "0.1.0",
+        title: "Atlas"
+      },
+      securityDefinitions: %{
+        Bearer: %{
+          type: "apiKey",
+          name: "Authorization",
+          in: "header"
+        }
+      }
+    }
   end
 end
