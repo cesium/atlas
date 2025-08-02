@@ -52,6 +52,9 @@ defmodule Atlas.MixProject do
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
 
+      # job processing
+      {:oban, "~> 2.17"},
+
       # tools
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
 

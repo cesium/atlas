@@ -26,8 +26,9 @@ defmodule Atlas.AccountsFixtures do
   end
 
   def extract_user_token(fun) do
-    {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
+    fun.(fn token -> "[TOKEN]#{token}[TOKEN]" end)
+    {:email, email_struct} = Swoosh.TestAssertions.assert_email_sent()
+    [_, token | _] = String.split(email_struct.text_body, "[TOKEN]")
     token
   end
 
