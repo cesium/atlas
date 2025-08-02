@@ -95,6 +95,9 @@ if config_env() == :prod do
 
   config :atlas, :frontend_url, frontend_url
 
+  # Configures CORS allowed origins
+  config :atlas, :allowed_origins, frontend_url
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
