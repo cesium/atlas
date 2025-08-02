@@ -44,6 +44,15 @@ defmodule AtlasWeb.Router do
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
     end
+
+    scope "/jobs" do
+      get "/", JobController, :index
+      get "/:id", JobController, :show
+    end
+
+    scope "/import" do
+      post "/students_by_course", ImportController, :students_by_course
+    end
   end
 
   scope "/swagger" do

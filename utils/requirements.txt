@@ -1,0 +1,2 @@
+xlsxwriter==3.2.5
+faker==0.7.4

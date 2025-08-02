@@ -43,6 +43,7 @@ defmodule Atlas.MixProject do
 
       # security
       {:bcrypt_elixir, "~> 3.0"},
+      {:corsica, "~> 2.1.3"},
 
       # auth
       {:guardian, "~> 2.3"},
@@ -54,6 +55,8 @@ defmodule Atlas.MixProject do
 
       # tools
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:xlsx_reader, "~> 0.8.8"},
+      {:igniter, "~> 0.5", only: [:dev]},
 
       # monitoring
       {:telemetry_metrics, "~> 1.0"},
@@ -64,8 +67,8 @@ defmodule Atlas.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
 
-      # cors
-      {:corsica, "~> 2.1.3"},
+      # jobs
+      {:oban, "~> 2.19"},
 
       # utilities
       {:remote_ip, "~> 1.2"},

@@ -4,6 +4,8 @@ defmodule Atlas.Accounts.User do
   """
   use Atlas.Schema
 
+  alias Atlas.University
+
   schema "users" do
     field :name, :string
     field :email, :string
@@ -12,6 +14,8 @@ defmodule Atlas.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
     field :type, Ecto.Enum, values: [:student, :admin, :professor]
+
+    has_one :student, University.Student, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

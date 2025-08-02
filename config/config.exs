@@ -48,7 +48,15 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Use Jason for JSON parsing in Phoenix Swagger
+# Configures Oban for background job processing
+config :atlas, Oban,
+  engine: Oban.Engines.Basic,
+  repo: Atlas.Repo,
+  queues: [
+    imports: 5
+  ]
+
+  # Use Jason for JSON parsing in Phoenix Swagger
 config :phoenix_swagger, json_library: Jason
 
 # Import environment specific config. This must remain at the bottom
