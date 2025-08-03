@@ -5,6 +5,25 @@
   },
   "host": "localhost:4000",
   "definitions": {
+    "SuccessfulImport": {
+      "description": "Response for a successful import",
+      "properties": {
+        "job_id": {
+          "description": "ID of the import job",
+          "type": "string"
+        },
+        "message": {
+          "description": "Status message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "job_id"
+      ],
+      "title": "SuccessfulImport",
+      "type": "object"
+    },
     "User": {
       "description": "User schema",
       "example": {
@@ -47,6 +66,46 @@
         "id"
       ],
       "title": "User",
+      "type": "object"
+    },
+    "UserSession": {
+      "description": "User session schema",
+      "properties": {
+        "first_seen": {
+          "description": "First seen timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "Session ID",
+          "type": "integer"
+        },
+        "ip": {
+          "description": "IP address of the session",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "User agent string",
+          "type": "string"
+        },
+        "user_browser": {
+          "description": "Browser of the user agent",
+          "type": "string"
+        },
+        "user_os": {
+          "description": "Operating system of the user agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_seen",
+        "user_os",
+        "user_browser",
+        "user_agent",
+        "ip",
+        "id"
+      ],
+      "title": "User Session",
       "type": "object"
     },
     "SignInResponse": {
@@ -195,44 +254,76 @@
       "title": "ResetPasswordResponse",
       "type": "object"
     },
-    "UserSession": {
-      "description": "User session schema",
+    "JobsResponse": {
+      "description": "Response containing a list of jobs",
       "properties": {
-        "first_seen": {
-          "description": "First seen timestamp",
+        "jobs": {
+          "description": "List of jobs",
+          "items": {
+            "$ref": "#/definitions/Job"
+          },
+          "type": "array"
+        }
+      },
+      "title": "JobsResponse",
+      "type": "object"
+    },
+    "JobResponse": {
+      "description": "Response containing a single job",
+      "properties": {
+        "job": {
+          "$ref": "#/definitions/Job",
+          "description": "Details of the job"
+        }
+      },
+      "title": "JobResponse",
+      "type": "object"
+    },
+    "Job": {
+      "description": "A job in the system",
+      "properties": {
+        "attempted_at": {
+          "description": "Timestamp when the job was attempted",
+          "format": "date-time",
+          "type": "string"
+        },
+        "completed_at": {
+          "description": "Timestamp when the job was completed",
           "format": "date-time",
           "type": "string"
         },
         "id": {
-          "description": "Session ID",
+          "description": "ID of the job",
           "type": "integer"
         },
-        "ip": {
-          "description": "IP address of the session",
+        "inserted_at": {
+          "description": "Timestamp when the job was created",
+          "format": "date-time",
           "type": "string"
         },
-        "user_agent": {
-          "description": "User agent string",
+        "state": {
+          "description": "Status of the job",
           "type": "string"
         },
-        "user_browser": {
-          "description": "Browser of the user agent",
+        "type": {
+          "description": "Type of the job",
           "type": "string"
         },
-        "user_os": {
-          "description": "Operating system of the user agent",
+        "user_id": {
+          "description": "ID of the user who created the job",
           "type": "string"
         }
       },
       "required": [
-        "first_seen",
-        "user_os",
-        "user_browser",
-        "user_agent",
-        "ip",
+        "completed_at",
+        "attempted_at",
+        "inserted_at",
+        "user_id",
+        "state",
+        "type",
         "id"
       ],
-      "title": "User Session",
+      "title": "Job",
       "type": "object"
     }
   },
@@ -502,6 +593,103 @@
         "summary": "Sign out",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/v1/import/students_by_courses": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "description": "Uploads an Excel file to import students by courses.",
+        "operationId": "AtlasWeb.ImportController.students_by_courses",
+        "parameters": [
+          {
+            "description": "Excel file containing students and courses",
+            "in": "formData",
+            "name": "file",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import job queued successfully.",
+            "schema": {
+              "$ref": "#/definitions/SuccessfulImport"
+            }
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Import students by courses",
+        "tags": [
+          "Import"
+        ]
+      }
+    },
+    "/v1/jobs": {
+      "get": {
+        "description": "Returns a list of all jobs in the system.",
+        "operationId": "AtlasWeb.JobController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Jobs successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/JobsResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "List all jobs",
+        "tags": [
+          "Job"
+        ]
+      }
+    },
+    "/v1/jobs/{id}": {
+      "get": {
+        "description": "Returns details of a specific job.",
+        "operationId": "AtlasWeb.JobController.show",
+        "parameters": [
+          {
+            "description": "ID of the job",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/JobResponse"
+            }
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get a job by ID",
+        "tags": [
+          "Job"
         ]
       }
     }
