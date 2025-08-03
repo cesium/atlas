@@ -9,6 +9,7 @@ defmodule Atlas.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      compilers: Mix.compilers() ++ [:phoenix_swagger],
       deps: deps()
     ]
   end
@@ -75,7 +76,7 @@ defmodule Atlas.MixProject do
       {:ua_parser, "~> 1.8"},
 
       # swagger
-      {:phoenix_swagger, "~> 0.8", only: [:dev, :test], runtime: false}
+      {:phoenix_swagger, "~> 0.8", runtime: false}
     ]
   end
 
