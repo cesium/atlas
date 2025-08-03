@@ -6,10 +6,10 @@ defmodule AtlasWeb.ImportController do
 
   action_fallback AtlasWeb.FallbackController
 
-  def students_by_course(conn, %{"file" => %Upload{path: file_path}}) do
+  def students_by_courses(conn, %{"file" => %Upload{path: file_path}}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
-    case University.queue_import_students_by_course(file_path, user) do
+    case University.queue_import_students_by_courses(file_path, user) do
       {:ok, job} ->
         json(conn, %{job_id: job.id, message: "Import job queued successfully."})
 

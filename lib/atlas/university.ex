@@ -214,20 +214,20 @@ defmodule Atlas.University do
   end
 
   @doc """
-  Queues a job to import students by course from an Excel file.
+  Queues a job to import students by courses from an Excel file.
 
   ## Examples
 
-      iex> queue_import_students_by_course(file_path, user)
+      iex> queue_import_students_by_courses(file_path, user)
       {:ok, %Oban.Job{}}
 
-      iex> queue_import_students_by_course(file_path, user)
+      iex> queue_import_students_by_courses(file_path, user)
       {:error, reason}
   """
-  def queue_import_students_by_course(file_path, user) do
+  def queue_import_students_by_courses(file_path, user) do
     Oban.insert(
-      Workers.ImportStudentsByCourse.new(%{"file_path" => file_path},
-        meta: %{user_id: user.id, type: :import_students_by_course}
+      Workers.ImportStudentsByCourses.new(%{"file_path" => file_path},
+        meta: %{user_id: user.id, type: :import_students_by_courses}
       )
     )
   end

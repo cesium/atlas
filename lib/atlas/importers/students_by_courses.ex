@@ -1,4 +1,4 @@
-defmodule Atlas.Importers.StudentsByCourse do
+defmodule Atlas.Importers.StudentsByCourses do
   @moduledoc """
   Import students by course.
   """

@@ -56,7 +56,7 @@ config :atlas, Oban,
     imports: 5
   ]
 
-  # Use Jason for JSON parsing in Phoenix Swagger
+# Use Jason for JSON parsing in Phoenix Swagger
 config :phoenix_swagger, json_library: Jason
 
 # Import environment specific config. This must remain at the bottom

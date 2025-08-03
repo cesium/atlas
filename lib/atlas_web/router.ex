@@ -51,7 +51,7 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/import" do
-      post "/students_by_course", ImportController, :students_by_course
+      post "/students_by_courses", ImportController, :students_by_courses
     end
   end
 
