@@ -1,0 +1,386 @@
+{
+    "name": "Licenciatura em Engenharia Informática",
+    "code": "J3",
+    "school": {
+        "name": "Escola de Engenharia",
+        "code": "240"
+    },
+    "courses": [
+        {
+            "code": "J301N1",
+            "name": "Álgebra Linear para Engenharia",
+            "year": 1,
+            "semester": 1
+        },
+        {
+            "code": "J301N2",
+            "name": "Cálculo para Engenharia",
+            "year": 1,
+            "semester": 1
+        },
+        {
+            "code": "J301N3",
+            "name": "Tópicos de Matemática Discreta",
+            "year": 1,
+            "semester": 1
+        },
+        {
+            "code": "J301N4",
+            "name": "Programação Funcional",
+            "year": 1,
+            "semester": 1
+        },
+        {
+            "code": "J301N6",
+            "name": "Laboratórios de Informática I",
+            "year": 1,
+            "semester": 1
+        },
+        {
+            "code": "J302N1",
+            "name": "Sistemas de Computação",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J302N2",
+            "name": "Análise Matemática para Engenharia",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J302N3",
+            "name": "Lógica",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J302N4",
+            "name": "Elementos de Probabilidades e Teoria de Números",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J302N5",
+            "name": "Programação Imperativa",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J302N6",
+            "name": "Laboratórios de Informática II",
+            "year": 1,
+            "semester": 2
+        },
+        {
+            "code": "J301N5",
+            "name": "Opção UMinho",
+            "year": 1,
+            "semester": 1,
+            "courses": [
+                 {
+                    "code": "J3U004",
+                    "name": "Matemática das Coisas",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U020",
+                    "name": "Educação, Cidadania e Direitos Humanos",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U028",
+                    "name": "Inglês Académico",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U090",
+                    "name": "Desporto e Saúde",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U170",
+                    "name": "Cidadania Digital",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U171",
+                    "name": "Sustentabilidade Ambiental, Social e Económica",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U238",
+                    "name": "Literacia Fotográfica da Física à Mensagem",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U239",
+                    "name": "Substâncias que Mudaram o Mundo",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U240",
+                    "name": "Tópicos de Astronomia e Cosmologia",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U253",
+                    "name": "Introdução à Língua e Cultura Russa",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U255",
+                    "name": "Bilinguismo",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U274",
+                    "name": "Democracia Plena, Responsabilidade e Estado de Direito",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U275",
+                    "name": "Direito Laboral",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U277",
+                    "name": "Temas de Direito da Igualdade e Não Discriminação",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U288",
+                    "name": "Futuros: Arquitetura e Ficção Científica",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U294",
+                    "name": "Arte e Feminismo",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U799",
+                    "name": "Preparando a Geração Z para Além das Tecnologias",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79J",
+                    "name": "Desporto e Saúde",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79L",
+                    "name": "Gestão de Ativos",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79O",
+                    "name": "Ambiente e Energia",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79Q",
+                    "name": "Informação e Direito",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79T",
+                    "name": "Liderança e Empreendedorismo",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "J3U79W",
+                    "name": "Matemática das Coisas",
+                    "year": 1,
+                    "semester": 1
+                }
+            ]
+        },
+        {
+            "code": "J303N1",
+            "name": "Laboratórios de Informática III",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J303N2",
+            "name": "Estatística Aplicada",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J303N3",
+            "name": "Física Moderna",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J303N4",
+            "name": "Arquitetura de Computadores",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J303N5",
+            "name": "Fundamentos de Comunicação de Dados",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J303N6",
+            "name": "Algoritmos e Complexidade",
+            "year": 2,
+            "semester": 1
+        },
+        {
+            "code": "J304N1",
+            "name": "Sistemas Operativos",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J304N2",
+            "name": "Programação Orientada aos Objetos",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J304N3",
+            "name": "Bases de Dados",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J304N4",
+            "name": "Métodos Numéricos e Otimização não Linear",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J304N5",
+            "name": "Investigação Operacional",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J304N6",
+            "name": "Redes de Computadores",
+            "year": 2,
+            "semester": 2
+        },
+        {
+            "code": "J305N1",
+            "name": "Cálculo de Programas",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J305N2",
+            "name": "Desenvolvimento de Sistemas de Software",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J305N3",
+            "name": "Inteligência Artificial",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J305N4",
+            "name": "Sistemas Distribuídos",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J305N5",
+            "name": "Comunicações por Computador",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J305N6",
+            "name": "Laboratórios de Informática IV",
+            "year": 3,
+            "semester": 1
+        },
+        {
+            "code": "J306N4",
+            "name": "Processamento de Linguagens",
+            "year": 3,
+            "semester": 2
+        },
+        {
+            "code": "J306N5",
+            "name": "Aprendizagem e Decisão Inteligentes",
+            "year": 3,
+            "semester": 2
+        },
+        {
+            "code": "J306N1",
+            "name": "Interface Pessoa-Máquina",
+            "year": 3,
+            "semester": 2
+        },
+        {
+            "code": "J306N2",
+            "name": "Computação Gráfica",
+            "year": 3,
+            "semester": 2
+        },
+        {
+            "code": "J306N3",
+            "name": "Segurança de Sistemas Informáticos",
+            "year": 3,
+            "semester": 2
+        },
+        {
+            "code": "J306N6",
+            "name": "Opção",
+            "year": 3,
+            "semester": 2,
+            "courses": [
+                {
+                    "code": "J306N8",
+                    "name": "Engenharia Web",
+                    "year": 3,
+                    "semester": 2
+                },
+                {
+                    "code": "J306N7",
+                    "name": "Análise e Teste de Software",
+                    "year": 3,
+                    "semester": 2
+                },
+                {
+                    "code": "J306N9",
+                    "name": "Análise de Projetos",
+                    "year": 3,
+                    "semester": 2
+                }
+            ]
+        }
+    ]
+}
