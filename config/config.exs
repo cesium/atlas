@@ -53,7 +53,7 @@ config :atlas, Oban,
   engine: Oban.Engines.Basic,
   repo: Atlas.Repo,
   queues: [
-    imports: 5
+    imports: 1
   ]
 
 # Use Jason for JSON parsing in Phoenix Swagger
