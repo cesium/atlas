@@ -28,7 +28,8 @@ defmodule AtlasWeb.UserJSON do
       email: user.email,
       name: user.name,
       inserted_at: user.inserted_at,
-      updated_at: user.updated_at
+      updated_at: user.updated_at,
+      type: user.type
     }
   end
 end

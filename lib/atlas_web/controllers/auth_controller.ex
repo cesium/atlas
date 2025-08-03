@@ -370,6 +370,7 @@ defmodule AtlasWeb.AuthController do
             inserted_at(:string, "Creation timestamp", format: "date-time", required: true)
             email(:string, "User email", required: true)
             updated_at(:string, "Last update timestamp", format: "date-time", required: true)
+            type(:string, "User type", required: true)
           end
 
           example(%{
