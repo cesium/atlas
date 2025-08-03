@@ -19,6 +19,10 @@ defmodule AtlasWeb.Router do
     plug Guardian.Plug.LoadResource
   end
 
+  pipeline :is_at_least_professor do
+    plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin]
+  end
+
   scope "/", AtlasWeb do
     get "/", PageController, :index
   end
@@ -45,6 +49,8 @@ defmodule AtlasWeb.Router do
       get "/sessions", AuthController, :sessions
     end
 
+    pipe_through :is_at_least_professor
+
     scope "/jobs" do
       get "/", JobController, :index
       get "/:id", JobController, :show
@@ -56,7 +62,7 @@ defmodule AtlasWeb.Router do
   end
 
   scope "/swagger" do
-    forward("/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :atlas, swagger_file: "swagger.json")
+    forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :atlas, swagger_file: "swagger.json"
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
