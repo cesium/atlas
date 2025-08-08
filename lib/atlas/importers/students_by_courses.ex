@@ -77,7 +77,6 @@ defmodule Atlas.Importers.StudentsByCourses do
       case Accounts.register_student_user_with_random_password(%{
              name: name,
              email: email,
-             confirmed_at: DateTime.utc_now(),
              student: %{
                number: student_number,
                degree_id: degree.id,

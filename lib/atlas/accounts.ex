@@ -126,6 +126,12 @@ defmodule Atlas.Accounts do
         attrs |> Map.put(:type, :student) |> Map.delete(:student)
       )
     )
+    |> Ecto.Multi.update(
+      :confirm_user,
+      fn %{user: user} ->
+        User.confirm_changeset(user)
+      end
+    )
     |> Ecto.Multi.insert(:student, fn %{user: user} ->
       Student.changeset(%Student{}, Map.put(attrs.student, :user_id, user.id))
     end)
