@@ -538,4 +538,30 @@ defmodule Atlas.Accounts do
     Guardian.DB.revoke_all(user_session.id)
     Repo.delete(user_session)
   end
+
+  def get_active_user!(id), do: get_user!(id)
+
+  def update_user_password(user, attrs) do
+    update_user_password(
+      user,
+      Map.get(attrs, "current_password") || Map.get(attrs, :current_password),
+      attrs
+    )
+  end
+
+  def update_user_profile(user, attrs) do
+    user
+    |> User.profile_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_user_account(user) do
+    user
+    |> Ecto.Changeset.change(is_active: false)
+    |> Repo.update()
+  end
+
+  def authenticate_user(email, password) do
+    get_user_by_email_and_password(email, password)
+  end
 end

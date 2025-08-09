@@ -14,6 +14,10 @@ defmodule Atlas.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
     field :type, Ecto.Enum, values: [:student, :admin, :professor]
+    field :is_active, :boolean, default: true
+    field :gender, :string
+    field :birth_date, :date
+    field :profile_picture, :string
 
     has_one :student, University.Student, on_delete: :delete_all
 
@@ -166,5 +170,28 @@ defmodule Atlas.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def changeset(user, attrs) do
+    registration_changeset(user, attrs)
+  end
+
+  def profile_changeset(user, attrs) do
+    fields = [:name, :email, :type, :gender, :birth_date]
+
+    fields =
+      if Map.has_key?(attrs, "profile_picture"), do: fields ++ [:profile_picture], else: fields
+
+    user
+    |> cast(attrs, fields)
+    |> validate_required([:name, :email])
+    |> validate_inclusion(:gender, ["male", "female", "other"])
+    |> validate_change(:birth_date, fn :birth_date, date ->
+      if date && Date.compare(date, Date.utc_today()) == :gt do
+        [birth_date: "cannot be in the future"]
+      else
+        []
+      end
+    end)
   end
 end
