@@ -6,6 +6,7 @@ defmodule Atlas.Accounts do
   use Atlas.Context
 
   alias Atlas.Accounts.{User, UserNotifier, UserSession, UserToken}
+  alias Atlas.University.Student
 
   ## Database getters
 
@@ -25,8 +26,10 @@ defmodule Atlas.Accounts do
       nil
 
   """
-  def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+  def get_user_by_email(email, opts \\ []) when is_binary(email) do
+    User
+    |> apply_filters(opts)
+    |> Repo.get_by(email: email)
   end
 
   @doc """
@@ -100,6 +103,53 @@ defmodule Atlas.Accounts do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Registers a student user.
+
+  ## Examples
+
+      iex> register_student_user(%{name: "John Doe", email: "john.doe@example.com"})
+      {:ok, %User{}}
+
+      iex> register_student_user(%{name: "John Doe", email: "invalid_email"})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def register_student_user(attrs) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(
+      :user,
+      User.registration_changeset(
+        %User{},
+        attrs |> Map.put(:type, :student) |> Map.delete(:student)
+      )
+    )
+    |> Ecto.Multi.update(
+      :confirm_user,
+      fn %{user: user} ->
+        User.confirm_changeset(user)
+      end
+    )
+    |> Ecto.Multi.insert(:student, fn %{user: user} ->
+      Student.changeset(%Student{}, Map.put(attrs.student, :user_id, user.id))
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
+  Registers a student user with a random password.
+
+  ## Examples
+
+      iex> register_student_user_with_random_password(%{name: "John Doe", email: "john.doe@example.com"})
+      {:ok, %User{}}
+
+  """
+  def register_student_user_with_random_password(attrs) do
+    random_password = :crypto.strong_rand_bytes(12) |> Base.encode64()
+    register_student_user(Map.put(attrs, :password, random_password))
   end
 
   @doc """
