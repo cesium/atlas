@@ -1,7 +1,7 @@
 defmodule Atlas.DegreesFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Atlas.Degrees` context.
+  entities via the `Atlas.University.Degrees` context.
   """
 
   @doc """
@@ -14,7 +14,7 @@ defmodule Atlas.DegreesFixtures do
         code: "code",
         name: "some name"
       })
-      |> Atlas.Degrees.create_degree()
+      |> Atlas.University.Degrees.create_degree()
 
     degree
   end
@@ -32,7 +32,7 @@ defmodule Atlas.DegreesFixtures do
         year: 1,
         degree_id: degree_fixture(%{code: "some code"}).id
       })
-      |> Atlas.Degrees.create_course()
+      |> Atlas.University.Degrees.Courses.create_course()
 
     course
   end

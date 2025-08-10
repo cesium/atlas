@@ -1,4 +1,4 @@
-defmodule Atlas.Degrees.Degree do
+defmodule Atlas.University.Degrees.Degree do
   @moduledoc """
   University degree associated with students.
   """
