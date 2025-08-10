@@ -2,7 +2,9 @@ defmodule Atlas.Importers.StudentsByCourses do
   @moduledoc """
   Import students by course.
   """
-  alias Atlas.{Accounts, Degrees, University}
+  alias Atlas.{Accounts, University}
+  alias University.Degrees
+  alias Degrees.Courses
 
   def import_from_excel_file(file_path) do
     with {:ok, package} <- XlsxReader.open(file_path),
@@ -149,8 +151,8 @@ defmodule Atlas.Importers.StudentsByCourses do
   end
 
   defp get_or_create_course(attrs) do
-    Degrees.get_course_by_code(attrs.code) ||
-      case Degrees.create_course(attrs) do
+    Courses.get_course_by_code(attrs.code) ||
+      case Courses.create_course(attrs) do
         {:ok, course} -> course
         {:error, _} -> nil
       end

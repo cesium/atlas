@@ -1,4 +1,4 @@
-defmodule Atlas.Degrees.Course do
+defmodule Atlas.University.Degrees.Courses.Course do
   @moduledoc """
   Courses offered in a degree program.
   """
@@ -14,7 +14,7 @@ defmodule Atlas.Degrees.Course do
     field :semester, :integer
     field :parent_course_id, :binary_id
 
-    belongs_to :degree, Atlas.Degrees.Degree
+    belongs_to :degree, Atlas.University.Degrees.Degree
 
     many_to_many :students, Atlas.University.Student,
       join_through: Atlas.University.Enrollment,

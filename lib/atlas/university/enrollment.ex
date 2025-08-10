@@ -7,7 +7,7 @@ defmodule Atlas.University.Enrollment do
   @required_fields ~w(student_id course_id)a
   schema "enrollments" do
     belongs_to :student, Atlas.University.Student
-    belongs_to :course, Atlas.Degrees.Course
+    belongs_to :course, Atlas.University.Degrees.Courses.Course
 
     timestamps(type: :utc_datetime)
   end
