@@ -488,4 +488,26 @@ defmodule Atlas.Accounts do
     Guardian.DB.revoke_all(user_session.id)
     Repo.delete(user_session)
   end
+
+  @doc """
+  Updates an user's avatar.
+  """
+
+  def update_user_avatar(%User{} = user, attrs) do
+    user
+    |> User.avatar_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Gets the avatar url.
+
+  ## Examples
+    ... (not tested yet)
+  """
+
+  def get_user_avatar_url(%User{} = user) do
+    Atlas.Uploaders.UserAvatar.url({user.avatar, user})
+  end
+
 end

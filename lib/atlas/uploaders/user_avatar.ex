@@ -4,8 +4,6 @@ defmodule Atlas.Uploaders.UserAvatar do
   """
   use Atlas.Uploader
 
-  alias Atlas.Accounts.User
-
   @versions [:original]
   @extension_whitelist ~w(.jpg .jpeg .png)
 
@@ -19,8 +17,8 @@ defmodule Atlas.Uploaders.UserAvatar do
     end
   end
 
-  def storage_dir(_, {_file, %User{} = user}) do
-    "uploads/user/avatars/#{user.id}"
+  def storage_dir(_version, {_file, %{id: user_id}}) do
+    "uploads/user/avatars/#{user_id}"
   end
 
   def filename(version, _) do
