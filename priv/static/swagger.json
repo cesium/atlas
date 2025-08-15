@@ -5,161 +5,51 @@
   },
   "host": "localhost:4000",
   "definitions": {
-    "UserSession": {
-      "description": "User session schema",
+    "Job": {
+      "description": "A job in the system",
       "properties": {
-        "first_seen": {
-          "description": "First seen timestamp",
+        "attempted_at": {
+          "description": "Timestamp when the job was attempted",
+          "format": "date-time",
+          "type": "string"
+        },
+        "completed_at": {
+          "description": "Timestamp when the job was completed",
           "format": "date-time",
           "type": "string"
         },
         "id": {
-          "description": "Session ID",
+          "description": "ID of the job",
           "type": "integer"
         },
-        "ip": {
-          "description": "IP address of the session",
+        "inserted_at": {
+          "description": "Timestamp when the job was created",
+          "format": "date-time",
           "type": "string"
         },
-        "user_agent": {
-          "description": "User agent string",
+        "state": {
+          "description": "Status of the job",
           "type": "string"
         },
-        "user_browser": {
-          "description": "Browser of the user agent",
+        "type": {
+          "description": "Type of the job",
           "type": "string"
         },
-        "user_os": {
-          "description": "Operating system of the user agent",
+        "user_id": {
+          "description": "ID of the user who created the job",
           "type": "string"
         }
       },
       "required": [
-        "first_seen",
-        "user_os",
-        "user_browser",
-        "user_agent",
-        "ip",
+        "completed_at",
+        "attempted_at",
+        "inserted_at",
+        "user_id",
+        "state",
+        "type",
         "id"
       ],
-      "title": "User Session",
-      "type": "object"
-    },
-    "ErrorResponse": {
-      "description": "Error response schema",
-      "properties": {
-        "error": {
-          "description": "Error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "ErrorResponse",
-      "type": "object"
-    },
-    "NoContentResponse": {
-      "description": "Response schema for no content",
-      "example": {},
-      "properties": {
-        "message": {
-          "description": "Message indicating no content",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "NoContentResponse",
-      "type": "object"
-    },
-    "ResetPasswordResponse": {
-      "description": "Response schema for successful password reset",
-      "example": {
-        "message": "Password reset successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful password reset",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "ResetPasswordResponse",
-      "type": "object"
-    },
-    "SignInResponse": {
-      "description": "Response schema for successful sign in",
-      "example": {
-        "access_token": "xXxXxXxXxXxX",
-        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
-      },
-      "properties": {
-        "access_token": {
-          "description": "Access token",
-          "type": "string"
-        },
-        "session_id": {
-          "description": "User session ID",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "access_token",
-        "session_id"
-      ],
-      "title": "SignInResponse",
-      "type": "object"
-    },
-    "SignOutResponse": {
-      "description": "Response schema for successful sign out",
-      "example": {
-        "message": "Signed out successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful sign out",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "SignOutResponse",
-      "type": "object"
-    },
-    "SuccessfulRefreshResponse": {
-      "description": "Response schema for successful token refresh",
-      "example": {
-        "access_token": "xXxXxXxXxXxX"
-      },
-      "properties": {
-        "access_token": {
-          "description": "New access token",
-          "type": "string"
-        }
-      },
-      "required": [
-        "access_token"
-      ],
-      "title": "SuccessfulRefreshResponse",
-      "type": "object"
-    },
-    "UnauthorizedResponse": {
-      "description": "Unauthorized response schema",
-      "properties": {
-        "error": {
-          "description": "Unauthorized error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "UnauthorizedResponse",
+      "title": "Job",
       "type": "object"
     },
     "User": {
@@ -211,6 +101,134 @@
       "title": "User",
       "type": "object"
     },
+    "UserSession": {
+      "description": "User session schema",
+      "properties": {
+        "first_seen": {
+          "description": "First seen timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "Session ID",
+          "type": "integer"
+        },
+        "ip": {
+          "description": "IP address of the session",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "User agent string",
+          "type": "string"
+        },
+        "user_browser": {
+          "description": "Browser of the user agent",
+          "type": "string"
+        },
+        "user_os": {
+          "description": "Operating system of the user agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_seen",
+        "user_os",
+        "user_browser",
+        "user_agent",
+        "ip",
+        "id"
+      ],
+      "title": "User Session",
+      "type": "object"
+    },
+    "SignInResponse": {
+      "description": "Response schema for successful sign in",
+      "example": {
+        "access_token": "xXxXxXxXxXxX",
+        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
+      },
+      "properties": {
+        "access_token": {
+          "description": "Access token",
+          "type": "string"
+        },
+        "session_id": {
+          "description": "User session ID",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "access_token",
+        "session_id"
+      ],
+      "title": "SignInResponse",
+      "type": "object"
+    },
+    "UnauthorizedResponse": {
+      "description": "Unauthorized response schema",
+      "properties": {
+        "error": {
+          "description": "Unauthorized error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "UnauthorizedResponse",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "description": "Error response schema",
+      "example": {
+        "error": "Language parameter is required"
+      },
+      "properties": {
+        "error": {
+          "description": "Error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "SuccessfulRefreshResponse": {
+      "description": "Response schema for successful token refresh",
+      "example": {
+        "access_token": "xXxXxXxXxXxX"
+      },
+      "properties": {
+        "access_token": {
+          "description": "New access token",
+          "type": "string"
+        }
+      },
+      "required": [
+        "access_token"
+      ],
+      "title": "SuccessfulRefreshResponse",
+      "type": "object"
+    },
+    "SignOutResponse": {
+      "description": "Response schema for successful sign out",
+      "example": {
+        "message": "Signed out successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful sign out",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "SignOutResponse",
+      "type": "object"
+    },
     "UserSessionsResponse": {
       "description": "Response schema for a list of user sessions",
       "example": {
@@ -240,76 +258,36 @@
       "title": "UserSessionsResponse",
       "type": "object"
     },
-    "Job": {
-      "description": "A job in the system",
+    "NoContentResponse": {
+      "description": "Response schema for no content",
+      "example": {},
       "properties": {
-        "attempted_at": {
-          "description": "Timestamp when the job was attempted",
-          "format": "date-time",
-          "type": "string"
-        },
-        "completed_at": {
-          "description": "Timestamp when the job was completed",
-          "format": "date-time",
-          "type": "string"
-        },
-        "id": {
-          "description": "ID of the job",
-          "type": "integer"
-        },
-        "inserted_at": {
-          "description": "Timestamp when the job was created",
-          "format": "date-time",
-          "type": "string"
-        },
-        "state": {
-          "description": "Status of the job",
-          "type": "string"
-        },
-        "type": {
-          "description": "Type of the job",
-          "type": "string"
-        },
-        "user_id": {
-          "description": "ID of the user who created the job",
+        "message": {
+          "description": "Message indicating no content",
           "type": "string"
         }
       },
       "required": [
-        "completed_at",
-        "attempted_at",
-        "inserted_at",
-        "user_id",
-        "state",
-        "type",
-        "id"
+        "message"
       ],
-      "title": "Job",
+      "title": "NoContentResponse",
       "type": "object"
     },
-    "JobResponse": {
-      "description": "Response containing a single job",
+    "ResetPasswordResponse": {
+      "description": "Response schema for successful password reset",
+      "example": {
+        "message": "Password reset successfully"
+      },
       "properties": {
-        "job": {
-          "$ref": "#/definitions/Job",
-          "description": "Details of the job"
+        "message": {
+          "description": "Message indicating successful password reset",
+          "type": "string"
         }
       },
-      "title": "JobResponse",
-      "type": "object"
-    },
-    "JobsResponse": {
-      "description": "Response containing a list of jobs",
-      "properties": {
-        "jobs": {
-          "description": "List of jobs",
-          "items": {
-            "$ref": "#/definitions/Job"
-          },
-          "type": "array"
-        }
-      },
-      "title": "JobsResponse",
+      "required": [
+        "message"
+      ],
+      "title": "ResetPasswordResponse",
       "type": "object"
     },
     "SuccessfulImport": {
@@ -330,9 +308,126 @@
       ],
       "title": "SuccessfulImport",
       "type": "object"
+    },
+    "JobsResponse": {
+      "description": "Response containing a list of jobs",
+      "properties": {
+        "jobs": {
+          "description": "List of jobs",
+          "items": {
+            "$ref": "#/definitions/Job"
+          },
+          "type": "array"
+        }
+      },
+      "title": "JobsResponse",
+      "type": "object"
+    },
+    "JobResponse": {
+      "description": "Response containing a single job",
+      "properties": {
+        "job": {
+          "$ref": "#/definitions/Job",
+          "description": "Details of the job"
+        }
+      },
+      "title": "JobResponse",
+      "type": "object"
+    },
+    "LanguageResponse": {
+      "description": "Response schema for language preference",
+      "example": {
+        "language": "en-US"
+      },
+      "properties": {
+        "language": {
+          "description": "Current language preference",
+          "enum": [
+            "pt-PT",
+            "en-US"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "language"
+      ],
+      "title": "LanguageResponse",
+      "type": "object"
+    },
+    "LanguageRequest": {
+      "description": "Request schema for updating language preference",
+      "example": {
+        "language": "en-US"
+      },
+      "properties": {
+        "language": {
+          "description": "Language",
+          "enum": [
+            "pt-PT",
+            "en-US"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "language"
+      ],
+      "title": "LanguageRequest",
+      "type": "object"
+    },
+    "AvailableLanguagesResponse": {
+      "description": "Response schema for available languages",
+      "example": {
+        "languages": [
+          "pt-PT",
+          "en-US"
+        ]
+      },
+      "properties": {
+        "languages": {
+          "description": "List of supported language codes",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "languages"
+      ],
+      "title": "AvailableLanguagesResponse",
+      "type": "object"
     }
   },
   "paths": {
+    "/v1/auth/available_languages": {
+      "post": {
+        "description": "Returns a list of all supported languages.",
+        "operationId": "available_languages",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Available languages returned successfully",
+            "schema": {
+              "$ref": "#/definitions/AvailableLanguagesResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get available languages",
+        "tags": [
+          "Preferences"
+        ]
+      }
+    },
     "/v1/auth/forgot_password": {
       "post": {
         "description": "Sends password reset instructions to the user via email.",
@@ -366,6 +461,77 @@
         "summary": "Request password reset",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/v1/auth/language": {
+      "get": {
+        "description": "Returns the current language preference for the authenticated user.",
+        "operationId": "get_language",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Language preference returned successfully",
+            "schema": {
+              "$ref": "#/definitions/LanguageResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get user language preference",
+        "tags": [
+          "Preferences"
+        ]
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Updates the language preference for the authenticated user.",
+        "operationId": "update_language",
+        "parameters": [
+          {
+            "description": "Language preference to set",
+            "in": "body",
+            "name": "language_request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LanguageRequest"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Language preference updated successfully",
+            "schema": {
+              "$ref": "#/definitions/LanguageResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing language parameter",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Update user language preference",
+        "tags": [
+          "Preferences"
         ]
       }
     },

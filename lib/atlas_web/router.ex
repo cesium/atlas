@@ -44,6 +44,9 @@ defmodule AtlasWeb.Router do
     pipe_through :auth
 
     scope "/auth" do
+      get "/language", PreferencesController, :get_language
+      post "/language", PreferencesController, :update_language
+      post "/available_languages", PreferencesController, :available_languages
       post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions

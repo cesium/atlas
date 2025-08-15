@@ -6,15 +6,12 @@ defmodule Atlas.Accounts.UserPreference do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
-
   @languages ~w(pt-PT en-US)
 
   schema "user_preferences" do
     field :language, :string
 
-    belongs_to :user, Atlas.Accounts.User
+    belongs_to :user, Atlas.Accounts.User, type: :binary_id
 
     timestamps()
   end
