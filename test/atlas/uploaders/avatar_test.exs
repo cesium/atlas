@@ -1,8 +1,8 @@
 defmodule Atlas.AvatarTest do
   use AtlasWeb.ConnCase
 
-  alias AtlasWeb.UserController
   alias Atlas.AccountsFixtures
+  alias AtlasWeb.UserController
 
   setup do
     user = AccountsFixtures.user_fixture(%{type: :student})

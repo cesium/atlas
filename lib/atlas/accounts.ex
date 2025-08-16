@@ -7,6 +7,7 @@ defmodule Atlas.Accounts do
 
   alias Atlas.Accounts.{User, UserNotifier, UserPreference, UserSession, UserToken}
   alias Atlas.University.Student
+  alias Atlas.Uploaders.UserAvatar
 
   ## Database getters
 
@@ -618,7 +619,7 @@ defmodule Atlas.Accounts do
   """
 
   def get_user_avatar_url(%User{} = user) do
-    Atlas.Uploaders.UserAvatar.url({user.avatar, user})
+    UserAvatar.url({user.avatar, user})
   end
 
   @doc """
@@ -627,7 +628,7 @@ defmodule Atlas.Accounts do
 
   def remove_user_avatar(%User{} = user) do
     if user.avatar do
-      Atlas.Uploaders.UserAvatar.delete({user.avatar, user})
+      UserAvatar.delete({user.avatar, user})
     end
 
     user
