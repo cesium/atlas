@@ -7,6 +7,7 @@ defmodule Atlas.AvatarTest do
   setup do
     user = AccountsFixtures.user_fixture(%{type: :student})
     conn = authenticated_conn(%{type: :student})
+
     %{
       user: user,
       conn: conn
@@ -23,7 +24,9 @@ defmodule Atlas.AvatarTest do
 
       conn = UserController.upload_avatar(conn, %{"id" => user.id, "avatar" => upload})
       assert conn.status == 200
-      assert %{"status" => "success", "message" => "Avatar uploaded successfully"} = Jason.decode!(conn.resp_body)
+
+      assert %{"status" => "success", "message" => "Avatar uploaded successfully"} =
+               Jason.decode!(conn.resp_body)
     end
   end
 
@@ -37,7 +40,9 @@ defmodule Atlas.AvatarTest do
 
       conn = UserController.upload_avatar(conn, %{"id" => user.id, "avatar" => upload})
       assert conn.status == 422
-      assert %{"status" => "error", "message" => "Avatar validation failed"} = Jason.decode!(conn.resp_body)
+
+      assert %{"status" => "error", "message" => "Avatar validation failed"} =
+               Jason.decode!(conn.resp_body)
     end
   end
 end

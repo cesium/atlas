@@ -621,4 +621,17 @@ defmodule Atlas.Accounts do
     Atlas.Uploaders.UserAvatar.url({user.avatar, user})
   end
 
+  @doc """
+  Deletes a user's avatar.
+  """
+
+  def remove_user_avatar(%User{} = user) do
+    if user.avatar do
+      Atlas.Uploaders.UserAvatar.delete({user.avatar, user})
+    end
+
+    user
+    |> User.avatar_changeset(%{avatar: nil})
+    |> Repo.update()
+  end
 end

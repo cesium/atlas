@@ -177,5 +177,4 @@ defmodule Atlas.Accounts.User do
     user
     |> cast_attachments(attrs, [:avatar])
   end
-
 end

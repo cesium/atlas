@@ -383,6 +383,46 @@
       ],
       "title": "Avatar Data",
       "type": "object"
+    },
+    "AvatarDeleteSuccess": {
+      "description": "Successful avatar deletion response",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/DeleteData"
+        },
+        "message": {
+          "description": "Success message",
+          "example": "Avatar deleted successfully",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "success",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "data"
+      ],
+      "title": "Successful Avatar Deletion",
+      "type": "object"
+    },
+    "DeleteData": {
+      "description": "Avatar deletion data",
+      "properties": {
+        "user_id": {
+          "description": "User UUID",
+          "example": "xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_id"
+      ],
+      "title": "Delete Data",
+      "type": "object"
     }
   },
   "securityDefinitions": {
@@ -759,6 +799,45 @@
       }
     },
     "/v1/users/{id}/avatar": {
+      "delete": {
+        "description": "Delete the avatar image for a specific user",
+        "operationId": "AtlasWeb.UserController.delete_avatar",
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AvatarDeleteSuccess"
+            }
+          },
+          "422": {
+            "description": "Deletion failed",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete user avatar",
+        "tags": [
+          "Uploaders"
+        ]
+      },
       "post": {
         "consumes": [
           "multipart/form-data"

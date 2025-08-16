@@ -7,7 +7,6 @@ defmodule Atlas.Uploaders.UserAvatar do
   @versions [:original]
   @extension_whitelist ~w(.jpg .jpeg .png)
 
-
   def validate({file, _}) do
     file_extension = file.file_name |> Path.extname() |> String.downcase()
 
@@ -33,5 +32,4 @@ defmodule Atlas.Uploaders.UserAvatar do
   # def default_url(version, scope) do
   #   "/images/avatars/default_#{version}.png"
   # end
-
 end
