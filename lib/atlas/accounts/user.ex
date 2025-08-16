@@ -5,6 +5,8 @@ defmodule Atlas.Accounts.User do
   use Atlas.Schema
   use Waffle.Ecto.Schema
 
+  alias Atlas.University
+
   schema "users" do
     field :name, :string
     field :email, :string
@@ -14,6 +16,8 @@ defmodule Atlas.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :type, Ecto.Enum, values: [:student, :admin, :professor]
     field :avatar, Atlas.Uploaders.UserAvatar.Type
+
+    has_one :student, University.Student, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
