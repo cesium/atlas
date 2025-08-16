@@ -332,6 +332,13 @@
       "type": "object"
     }
   },
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  },
   "paths": {
     "/v1/auth/forgot_password": {
       "post": {
@@ -697,13 +704,6 @@
           "Job"
         ]
       }
-    }
-  },
-  "securityDefinitions": {
-    "Bearer": {
-      "in": "header",
-      "name": "Authorization",
-      "type": "apiKey"
     }
   },
   "swagger": "2.0"
