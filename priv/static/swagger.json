@@ -5,163 +5,6 @@
   },
   "host": "localhost:4000",
   "definitions": {
-    "UserSession": {
-      "description": "User session schema",
-      "properties": {
-        "first_seen": {
-          "description": "First seen timestamp",
-          "format": "date-time",
-          "type": "string"
-        },
-        "id": {
-          "description": "Session ID",
-          "type": "integer"
-        },
-        "ip": {
-          "description": "IP address of the session",
-          "type": "string"
-        },
-        "user_agent": {
-          "description": "User agent string",
-          "type": "string"
-        },
-        "user_browser": {
-          "description": "Browser of the user agent",
-          "type": "string"
-        },
-        "user_os": {
-          "description": "Operating system of the user agent",
-          "type": "string"
-        }
-      },
-      "required": [
-        "first_seen",
-        "user_os",
-        "user_browser",
-        "user_agent",
-        "ip",
-        "id"
-      ],
-      "title": "User Session",
-      "type": "object"
-    },
-    "ErrorResponse": {
-      "description": "Error response schema",
-      "properties": {
-        "error": {
-          "description": "Error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "ErrorResponse",
-      "type": "object"
-    },
-    "NoContentResponse": {
-      "description": "Response schema for no content",
-      "example": {},
-      "properties": {
-        "message": {
-          "description": "Message indicating no content",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "NoContentResponse",
-      "type": "object"
-    },
-    "ResetPasswordResponse": {
-      "description": "Response schema for successful password reset",
-      "example": {
-        "message": "Password reset successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful password reset",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "ResetPasswordResponse",
-      "type": "object"
-    },
-    "SignInResponse": {
-      "description": "Response schema for successful sign in",
-      "example": {
-        "access_token": "xXxXxXxXxXxX",
-        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
-      },
-      "properties": {
-        "access_token": {
-          "description": "Access token",
-          "type": "string"
-        },
-        "session_id": {
-          "description": "User session ID",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "access_token",
-        "session_id"
-      ],
-      "title": "SignInResponse",
-      "type": "object"
-    },
-    "SignOutResponse": {
-      "description": "Response schema for successful sign out",
-      "example": {
-        "message": "Signed out successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful sign out",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "SignOutResponse",
-      "type": "object"
-    },
-    "SuccessfulRefreshResponse": {
-      "description": "Response schema for successful token refresh",
-      "example": {
-        "access_token": "xXxXxXxXxXxX"
-      },
-      "properties": {
-        "access_token": {
-          "description": "New access token",
-          "type": "string"
-        }
-      },
-      "required": [
-        "access_token"
-      ],
-      "title": "SuccessfulRefreshResponse",
-      "type": "object"
-    },
-    "UnauthorizedResponse": {
-      "description": "Unauthorized response schema",
-      "properties": {
-        "error": {
-          "description": "Unauthorized error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "UnauthorizedResponse",
-      "type": "object"
-    },
     "User": {
       "description": "User schema",
       "example": {
@@ -211,6 +54,121 @@
       "title": "User",
       "type": "object"
     },
+    "UserSession": {
+      "description": "User session schema",
+      "properties": {
+        "first_seen": {
+          "description": "First seen timestamp",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "Session ID",
+          "type": "integer"
+        },
+        "ip": {
+          "description": "IP address of the session",
+          "type": "string"
+        },
+        "user_agent": {
+          "description": "User agent string",
+          "type": "string"
+        },
+        "user_browser": {
+          "description": "Browser of the user agent",
+          "type": "string"
+        },
+        "user_os": {
+          "description": "Operating system of the user agent",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_seen",
+        "user_os",
+        "user_browser",
+        "user_agent",
+        "ip",
+        "id"
+      ],
+      "title": "User Session",
+      "type": "object"
+    },
+    "SignOutResponse": {
+      "description": "Response schema for successful sign out",
+      "example": {
+        "message": "Signed out successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful sign out",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "SignOutResponse",
+      "type": "object"
+    },
+    "UnauthorizedResponse": {
+      "description": "Unauthorized response schema",
+      "properties": {
+        "error": {
+          "description": "Unauthorized error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "UnauthorizedResponse",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "description": "Error response format",
+      "properties": {
+        "message": {
+          "description": "Error message",
+          "example": "User not found",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "error",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message"
+      ],
+      "title": "Error Response",
+      "type": "object"
+    },
+    "SignInResponse": {
+      "description": "Response schema for successful sign in",
+      "example": {
+        "access_token": "xXxXxXxXxXxX",
+        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
+      },
+      "properties": {
+        "access_token": {
+          "description": "Access token",
+          "type": "string"
+        },
+        "session_id": {
+          "description": "User session ID",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "access_token",
+        "session_id"
+      ],
+      "title": "SignInResponse",
+      "type": "object"
+    },
     "UserSessionsResponse": {
       "description": "Response schema for a list of user sessions",
       "example": {
@@ -238,6 +196,141 @@
         "sessions"
       ],
       "title": "UserSessionsResponse",
+      "type": "object"
+    },
+    "ResetPasswordResponse": {
+      "description": "Response schema for successful password reset",
+      "example": {
+        "message": "Password reset successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful password reset",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "ResetPasswordResponse",
+      "type": "object"
+    },
+    "SuccessfulRefreshResponse": {
+      "description": "Response schema for successful token refresh",
+      "example": {
+        "access_token": "xXxXxXxXxXxX"
+      },
+      "properties": {
+        "access_token": {
+          "description": "New access token",
+          "type": "string"
+        }
+      },
+      "required": [
+        "access_token"
+      ],
+      "title": "SuccessfulRefreshResponse",
+      "type": "object"
+    },
+    "NoContentResponse": {
+      "description": "Response schema for no content",
+      "example": {},
+      "properties": {
+        "message": {
+          "description": "Message indicating no content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "NoContentResponse",
+      "type": "object"
+    },
+    "AvatarUploadSuccess": {
+      "description": "Successful avatar upload response",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/AvatarData"
+        },
+        "message": {
+          "description": "Success message",
+          "example": "Avatar uploaded successfully",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "success",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "data"
+      ],
+      "title": "Avatar Upload Success Response",
+      "type": "object"
+    },
+    "AvatarDeleteSuccess": {
+      "description": "Successful avatar deletion response",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/DeleteData"
+        },
+        "message": {
+          "description": "Success message",
+          "example": "Avatar deleted successfully",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "success",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "data"
+      ],
+      "title": "Successful Avatar Deletion",
+      "type": "object"
+    },
+    "AvatarData": {
+      "description": "Avatar upload data",
+      "properties": {
+        "avatar_url": {
+          "description": "URL of the uploaded avatar",
+          "example": "/this/is/an/xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx/example.jpg",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "User UUID",
+          "example": "xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "type": "string"
+        }
+      },
+      "required": [
+        "avatar_url",
+        "user_id"
+      ],
+      "title": "Avatar Data",
+      "type": "object"
+    },
+    "DeleteData": {
+      "description": "Avatar deletion data",
+      "properties": {
+        "user_id": {
+          "description": "User UUID",
+          "example": "xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_id"
+      ],
+      "title": "Delete Data",
       "type": "object"
     },
     "Job": {
@@ -695,6 +788,96 @@
         "summary": "Get a job by ID",
         "tags": [
           "Job"
+        ]
+      }
+    },
+    "/v1/users/{id}/avatar": {
+      "delete": {
+        "description": "Delete the avatar image for a specific user",
+        "operationId": "AtlasWeb.UserController.delete_avatar",
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AvatarDeleteSuccess"
+            }
+          },
+          "422": {
+            "description": "Deletion failed",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete user avatar",
+        "tags": [
+          "Uploaders"
+        ]
+      },
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "description": "Upload an avatar image for a specific user",
+        "operationId": "AtlasWeb.UserController.upload_avatar",
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Avatar image file",
+            "in": "formData",
+            "name": "avatar",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AvatarUploadSuccess"
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Upload user avatar",
+        "tags": [
+          "Uploaders"
         ]
       }
     }

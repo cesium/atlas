@@ -43,6 +43,9 @@ defmodule AtlasWeb.Router do
 
     pipe_through :auth
 
+    post "/users/:id/avatar", UserController, :upload_avatar
+    delete "/users/:id/avatar", UserController, :delete_avatar
+
     scope "/auth" do
       post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
