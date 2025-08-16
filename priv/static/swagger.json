@@ -179,17 +179,24 @@
       "type": "object"
     },
     "ErrorResponse": {
-      "description": "Error response schema",
+      "description": "Error response format",
       "properties": {
-        "error": {
+        "message": {
           "description": "Error message",
+          "example": "User not found",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "error",
           "type": "string"
         }
       },
       "required": [
-        "error"
+        "status",
+        "message"
       ],
-      "title": "ErrorResponse",
+      "title": "Error Response",
       "type": "object"
     },
     "SuccessfulRefreshResponse": {
@@ -329,6 +336,52 @@
         }
       },
       "title": "JobResponse",
+      "type": "object"
+    },
+    "AvatarUploadSuccess": {
+      "description": "Successful avatar upload response",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/AvatarData"
+        },
+        "message": {
+          "description": "Success message",
+          "example": "Avatar uploaded successfully",
+          "type": "string"
+        },
+        "status": {
+          "description": "Response status",
+          "example": "success",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "data"
+      ],
+      "title": "Avatar Upload Success Response",
+      "type": "object"
+    },
+    "AvatarData": {
+      "description": "Avatar upload data",
+      "properties": {
+        "avatar_url": {
+          "description": "URL of the uploaded avatar",
+          "example": "/this/is/an/xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx/example.jpg",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "User UUID",
+          "example": "xXxXxXxX-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "type": "string"
+        }
+      },
+      "required": [
+        "avatar_url",
+        "user_id"
+      ],
+      "title": "Avatar Data",
       "type": "object"
     }
   },
@@ -702,6 +755,57 @@
         "summary": "Get a job by ID",
         "tags": [
           "Job"
+        ]
+      }
+    },
+    "/v1/users/{id}/avatar": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "description": "Upload an avatar image for a specific user",
+        "operationId": "AtlasWeb.UserController.upload_avatar",
+        "parameters": [
+          {
+            "description": "User ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Avatar image file",
+            "in": "formData",
+            "name": "avatar",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/AvatarUploadSuccess"
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Upload user avatar",
+        "tags": [
+          "Uploaders"
         ]
       }
     }
