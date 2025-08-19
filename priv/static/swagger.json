@@ -5,53 +5,6 @@
   },
   "host": "localhost:4000",
   "definitions": {
-    "Job": {
-      "description": "A job in the system",
-      "properties": {
-        "attempted_at": {
-          "description": "Timestamp when the job was attempted",
-          "format": "date-time",
-          "type": "string"
-        },
-        "completed_at": {
-          "description": "Timestamp when the job was completed",
-          "format": "date-time",
-          "type": "string"
-        },
-        "id": {
-          "description": "ID of the job",
-          "type": "integer"
-        },
-        "inserted_at": {
-          "description": "Timestamp when the job was created",
-          "format": "date-time",
-          "type": "string"
-        },
-        "state": {
-          "description": "Status of the job",
-          "type": "string"
-        },
-        "type": {
-          "description": "Type of the job",
-          "type": "string"
-        },
-        "user_id": {
-          "description": "ID of the user who created the job",
-          "type": "string"
-        }
-      },
-      "required": [
-        "completed_at",
-        "attempted_at",
-        "inserted_at",
-        "user_id",
-        "state",
-        "type",
-        "id"
-      ],
-      "title": "Job",
-      "type": "object"
-    },
     "User": {
       "description": "User schema",
       "example": {
@@ -141,6 +94,53 @@
       "title": "User Session",
       "type": "object"
     },
+    "Job": {
+      "description": "A job in the system",
+      "properties": {
+        "attempted_at": {
+          "description": "Timestamp when the job was attempted",
+          "format": "date-time",
+          "type": "string"
+        },
+        "completed_at": {
+          "description": "Timestamp when the job was completed",
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "description": "ID of the job",
+          "type": "integer"
+        },
+        "inserted_at": {
+          "description": "Timestamp when the job was created",
+          "format": "date-time",
+          "type": "string"
+        },
+        "state": {
+          "description": "Status of the job",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of the job",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "ID of the user who created the job",
+          "type": "string"
+        }
+      },
+      "required": [
+        "completed_at",
+        "attempted_at",
+        "inserted_at",
+        "user_id",
+        "state",
+        "type",
+        "id"
+      ],
+      "title": "Job",
+      "type": "object"
+    },
     "SignInResponse": {
       "description": "Response schema for successful sign in",
       "example": {
@@ -180,9 +180,6 @@
     },
     "ErrorResponse": {
       "description": "Error response schema",
-      "example": {
-        "error": "Language parameter is required"
-      },
       "properties": {
         "error": {
           "description": "Error message",
@@ -333,101 +330,16 @@
       },
       "title": "JobResponse",
       "type": "object"
-    },
-    "LanguageResponse": {
-      "description": "Response schema for language preference",
-      "example": {
-        "language": "en-US"
-      },
-      "properties": {
-        "language": {
-          "description": "Current language preference",
-          "enum": [
-            "pt-PT",
-            "en-US"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "language"
-      ],
-      "title": "LanguageResponse",
-      "type": "object"
-    },
-    "LanguageRequest": {
-      "description": "Request schema for updating language preference",
-      "example": {
-        "language": "en-US"
-      },
-      "properties": {
-        "language": {
-          "description": "Language",
-          "enum": [
-            "pt-PT",
-            "en-US"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "language"
-      ],
-      "title": "LanguageRequest",
-      "type": "object"
-    },
-    "AvailableLanguagesResponse": {
-      "description": "Response schema for available languages",
-      "example": {
-        "languages": [
-          "pt-PT",
-          "en-US"
-        ]
-      },
-      "properties": {
-        "languages": {
-          "description": "List of supported language codes",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "languages"
-      ],
-      "title": "AvailableLanguagesResponse",
-      "type": "object"
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
     }
   },
   "paths": {
-    "/v1/auth/available_languages": {
-      "post": {
-        "description": "Returns a list of all supported languages.",
-        "operationId": "available_languages",
-        "parameters": [],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Available languages returned successfully",
-            "schema": {
-              "$ref": "#/definitions/AvailableLanguagesResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "Get available languages",
-        "tags": [
-          "Preferences"
-        ]
-      }
-    },
     "/v1/auth/forgot_password": {
       "post": {
         "description": "Sends password reset instructions to the user via email.",
@@ -461,77 +373,6 @@
         "summary": "Request password reset",
         "tags": [
           "Authentication"
-        ]
-      }
-    },
-    "/v1/auth/language": {
-      "get": {
-        "description": "Returns the current language preference for the authenticated user.",
-        "operationId": "get_language",
-        "parameters": [],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Language preference returned successfully",
-            "schema": {
-              "$ref": "#/definitions/LanguageResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "Get user language preference",
-        "tags": [
-          "Preferences"
-        ]
-      },
-      "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "description": "Updates the language preference for the authenticated user.",
-        "operationId": "update_language",
-        "parameters": [
-          {
-            "description": "Language preference to set",
-            "in": "body",
-            "name": "language_request",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/LanguageRequest"
-            }
-          }
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Language preference updated successfully",
-            "schema": {
-              "$ref": "#/definitions/LanguageResponse"
-            }
-          },
-          "400": {
-            "description": "Bad request - Missing language parameter",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "Update user language preference",
-        "tags": [
-          "Preferences"
         ]
       }
     },
@@ -865,12 +706,5 @@
       }
     }
   },
-  "swagger": "2.0",
-  "securityDefinitions": {
-    "Bearer": {
-      "in": "header",
-      "name": "Authorization",
-      "type": "apiKey"
-    }
-  }
+  "swagger": "2.0"
 }

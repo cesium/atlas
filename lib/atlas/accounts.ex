@@ -99,10 +99,17 @@ defmodule Atlas.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs))
+    |> create_default_preferences_multi()
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+      {:error, :preferences, changeset, _} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -539,64 +546,69 @@ defmodule Atlas.Accounts do
     Repo.delete(user_session)
   end
 
-  ## User Preference
+  ## User Preferences
 
   @doc """
-  Gets the language preference for a given user.
+  Gets the set of preferences of a given user.
 
   ## Examples
 
-      iex> get_user_preference(1)
+      iex> get_user_preferences(1)
       %UserPreference{}
 
-      iex> get_user_preference(999)
+      iex> get_user_preferences(999)
       nil
   """
-  def get_user_preference(user_id) do
+  def get_user_preferences(user_id) do
     Repo.get_by(UserPreference, user_id: user_id)
   end
 
   @doc """
-  Gets the language string for a given user.
-
-  Returns `nil` if no preference is set.
+  Gets a given preference from the user preferences.
 
   ## Examples
 
-      iex> get_user_language(1)
-      "pt-PT"
+      iex> get_user_preference(1, "language")
+      "en-US"
 
-      iex> get_user_language(999)
+      iex> get_user_preference(1, "void")
       nil
   """
-  def get_user_language(user_id) do
-    Repo.one(
-      from up in UserPreference,
-        where: up.user_id == ^user_id,
-        select: up.language,
-        limit: 1
-    )
+  def get_user_preference(user_id, preference) do
+    preferences = get_user_preferences(user_id)
+    Map.get(preferences, String.to_atom(preference), nil)
   end
 
   @doc """
-  Sets the language preference for a given user.
-
-  If the preference exists, it updates only the language field.
+  Sets a given preference for a user.
 
   ## Examples
 
-      iex> set_user_language(1, "pt-PT")
+      iex> set_user_preference(1, "language", "en-US")
       {:ok, %UserPreference{}}
 
-      iex> set_user_language(1, "invalid")
+      iex> set_user_preference(1, "void", "none")
       {:error, %Ecto.Changeset{}}
   """
-  def set_user_language(user_id, language) do
+  def set_user_preference(user_id, preference, value) do
+    preference = String.to_atom(preference)
+    attrs = %{preference => value, user_id: user_id}
+
     %UserPreference{}
-    |> UserPreference.changeset(%{user_id: user_id, language: language})
+    |> UserPreference.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set: [language: language]],
+      on_conflict: [set:  [{preference, value}]],
       conflict_target: :user_id
     )
+  end
+
+  defp create_default_preferences_multi(multi) do
+    Ecto.Multi.insert(multi, :preferences, fn %{user: user} ->
+      %UserPreference{}
+      |> UserPreference.changeset(%{
+        user_id: user.id,
+        language: "en-US"
+      })
+    end)
   end
 end
