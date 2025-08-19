@@ -597,7 +597,7 @@ defmodule Atlas.Accounts do
     %UserPreference{}
     |> UserPreference.changeset(attrs)
     |> Repo.insert(
-      on_conflict: [set:  [{preference, value}]],
+      on_conflict: [set: [{preference, value}]],
       conflict_target: :user_id
     )
   end

@@ -34,7 +34,11 @@ defmodule Atlas.PreferencesTest do
 
   describe "update_preference/2" do
     test "updates the specific preference", %{authenticated_conn: conn} do
-      conn = PreferencesController.update_preference(conn, %{"preference" => "language", "value" => "pt-PT"})
+      conn =
+        PreferencesController.update_preference(conn, %{
+          "preference" => "language",
+          "value" => "pt-PT"
+        })
 
       response = json_response(conn, 200)
       assert response["status"] == "success"
