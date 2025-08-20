@@ -16,6 +16,7 @@ defmodule Atlas.Repo.Migrations.CreateCourses do
 
     create index(:courses, [:degree_id])
     create index(:courses, [:parent_course_id])
+    create index(:courses, [:code])
     create unique_index(:courses, [:code, :year, :semester])
   end
 end

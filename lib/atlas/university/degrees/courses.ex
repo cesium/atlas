@@ -114,4 +114,42 @@ defmodule Atlas.University.Degrees.Courses do
   def change_course(%Course{} = course, attrs \\ %{}) do
     Course.changeset(course, attrs)
   end
+
+  @doc """
+  Gets the semester from the course code.
+
+  ## Examples
+
+      iex> get_semester_from_code("J301N1")
+      1
+
+      iex> get_semester_from_code("J302N1")
+      2
+
+  """
+  def get_semester_from_code(code) do
+    case String.at(code, 3) |> Integer.parse() do
+      {n, _} -> if rem(n, 2) == 0, do: 2, else: 1
+      _ -> 1
+    end
+  end
+
+  @doc """
+  Gets the year from the course code.
+
+  ## Examples
+
+      iex> get_year_from_code("J302N1")
+      1
+
+      iex> get_year_from_code("J303N1")
+      2
+
+  """
+  def get_year_from_code(code) do
+    case String.at(code, 3) |> Integer.parse() do
+      {n, _} -> ceil(n / 2.0)
+      _ -> 1
+    end
+  end
 end

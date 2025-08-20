@@ -91,7 +91,7 @@ defmodule Atlas.Importers.StudentsByCourses do
   end
 
   defp import_course(%{code: code, name: name, parent_code: "", year: year, degree: degree}) do
-    semester = get_semester(code)
+    semester = Courses.get_semester_from_code(code)
 
     get_or_create_course(%{
       code: code,
@@ -110,7 +110,7 @@ defmodule Atlas.Importers.StudentsByCourses do
          year: year,
          degree: degree
        }) do
-    semester = get_semester(parent_code)
+    semester = Courses.get_semester_from_code(parent_code)
 
     parent_course =
       case String.at(code, 2) |> Integer.parse() do
@@ -140,13 +140,6 @@ defmodule Atlas.Importers.StudentsByCourses do
   defp import_enrollment(course, student) do
     if course && student do
       University.enroll_student_in_course(student, course)
-    end
-  end
-
-  defp get_semester(code) do
-    case String.at(code, 3) |> Integer.parse() do
-      {n, _} -> if rem(n, 2) == 0, do: 2, else: 1
-      _ -> 1
     end
   end
 

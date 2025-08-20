@@ -58,6 +58,7 @@ defmodule Atlas.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:xlsx_reader, "~> 0.8.8"},
       {:igniter, "~> 0.5", only: [:dev]},
+      {:csv, "~> 3.2"},
 
       # monitoring
       {:telemetry_metrics, "~> 1.0"},

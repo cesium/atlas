@@ -4,15 +4,16 @@ defmodule Atlas.University.Degrees.Courses.Course do
   """
   use Atlas.Schema
 
-  @required_fields ~w(name code year semester degree_id)a
-  @optional_fields ~w(parent_course_id)a
+  @required_fields ~w(name code year semester)a
+  @optional_fields ~w(parent_course_id degree_id)a
 
   schema "courses" do
     field :name, :string
     field :code, :string
     field :year, :integer
     field :semester, :integer
-    field :parent_course_id, :binary_id
+
+    belongs_to :course, Atlas.University.Degrees.Courses.Course, foreign_key: :parent_course_id
 
     belongs_to :degree, Atlas.University.Degrees.Degree
 
