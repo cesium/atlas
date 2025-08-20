@@ -14,9 +14,9 @@ defmodule Atlas.Repo.Seeds.Accounts do
     end
   end
 
-  def seed_users(students \\ 100, teachers \\ 15, admins \\ 15) do
+  def seed_users(students \\ 100, professors \\ 15, admins \\ 15) do
     seed_students(students)
-    seed_teachers(teachers)
+    seed_professors(professors)
     seed_admins(admins)
   end
 
@@ -39,21 +39,21 @@ defmodule Atlas.Repo.Seeds.Accounts do
     end
   end
 
-  defp seed_teachers(count) do
+  defp seed_professors(count) do
     for i <- 1..count do
       first_name = Enum.random(@first_names)
       last_names = Enum.take_random(@last_names, 3) |> Enum.join(" ")
       full_name = "#{first_name} #{last_names}"
       email = "professor#{i}@atlas.pt"
 
-      teacher = %{
+      professor = %{
         name: full_name,
         email: email,
         password: "password1234",
         type: :professor
       }
 
-      create_user(teacher, "professor", i)
+      create_user(professor, "professor", i)
     end
   end
 
