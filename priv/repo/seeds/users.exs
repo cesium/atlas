@@ -77,9 +77,7 @@ defmodule Atlas.Repo.Seeds.Accounts do
 
   defp random_student_number do
     digits = for _ <- 1..5, into: "", do: Integer.to_string(Enum.random(1..9))
-    "A1#{digits}"
-    number = Enum.random(9000..12000)
-    "a#{number}"
+    "a1#{digits}"
   end
 
   defp create_user(attrs, role, id) do
