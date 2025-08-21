@@ -7,6 +7,7 @@ defmodule Atlas.Accounts do
 
   alias Atlas.Accounts.{User, UserNotifier, UserPreference, UserSession, UserToken}
   alias Atlas.University.Student
+  alias Atlas.Uploaders.UserAvatar
 
   ## Database getters
 
@@ -598,5 +599,40 @@ defmodule Atlas.Accounts do
       on_conflict: [set: [language: language]],
       conflict_target: :user_id
     )
+  end
+
+  @doc """
+  Updates an user's avatar.
+  """
+
+  def update_user_avatar(%User{} = user, attrs) do
+    user
+    |> User.avatar_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Gets the avatar url.
+
+  ## Examples
+    ... (not tested yet)
+  """
+
+  def get_user_avatar_url(%User{} = user) do
+    UserAvatar.url({user.avatar, user})
+  end
+
+  @doc """
+  Deletes a user's avatar.
+  """
+
+  def remove_user_avatar(%User{} = user) do
+    if user.avatar do
+      UserAvatar.delete({user.avatar, user})
+    end
+
+    user
+    |> User.avatar_changeset(%{avatar: nil})
+    |> Repo.update()
   end
 end

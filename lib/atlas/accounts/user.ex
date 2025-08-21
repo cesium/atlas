@@ -3,6 +3,7 @@ defmodule Atlas.Accounts.User do
   Application user schema and changesets.
   """
   use Atlas.Schema
+  use Waffle.Ecto.Schema
 
   alias Atlas.University
 
@@ -14,6 +15,7 @@ defmodule Atlas.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
     field :type, Ecto.Enum, values: [:student, :admin, :professor]
+    field :avatar, Atlas.Uploaders.UserAvatar.Type
 
     has_one :student, University.Student, on_delete: :delete_all
 
@@ -166,5 +168,13 @@ defmodule Atlas.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  @doc """
+  A user changeset for updating avatar
+  """
+  def avatar_changeset(user, attrs) do
+    user
+    |> cast_attachments(attrs, [:avatar])
   end
 end
