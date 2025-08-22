@@ -549,6 +549,28 @@ defmodule Atlas.Accounts do
   ## User Preferences
 
   @doc """
+  Creates a user preference.
+  """
+  def create_preference(attrs) when is_map(attrs) and map_size(attrs) > 0 do
+    %UserPreference{}
+    |> UserPreference.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_preference(_), do: {:error, :invalid_fields}
+
+  @doc """
+  Updates a user preference.
+  """
+  def update_preference(%UserPreference{} = preference, attrs) when is_map(attrs) and map_size(attrs) > 0 do
+    preference
+    |> UserPreference.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def update_preference(_, _), do: {:error, :invalid_fields}
+
+  @doc """
   Gets the set of preferences of a given user.
 
   ## Examples
@@ -580,35 +602,48 @@ defmodule Atlas.Accounts do
   end
 
   @doc """
-  Sets a given preference for a user.
+  Sets a given preference or preferences for an user.
 
   ## Examples
 
-      iex> set_user_preference(1, "language", "en-US")
-      {:ok, %UserPreference{}}
+      iex> set_user_preference(%{"user_id" => "1", "language" => "en-US"})
+      %UserPreference{}
 
-      iex> set_user_preference(1, "void", "none")
-      {:error, %Ecto.Changeset{}}
+      iex> set_user_preference(%{"user_id" => "1", "language" => "pt-PT", "invalid_field" => "none"})
+      %UserPreference{}
+
+      iex> set_user_preference(%{"user_id" => "2", "language" => nil})
+      {:error, :invalid_fields}
+
+      iex> set_user_preference(%{"user_id" => "2", %{}})
+      {:error, :invalid_fields}
   """
-  def set_user_preference(user_id, preference, value) do
-    preference = String.to_atom(preference)
-    attrs = %{preference => value, user_id: user_id}
 
-    %UserPreference{}
-    |> UserPreference.changeset(attrs)
-    |> Repo.insert(
-      on_conflict: [set: [{preference, value}]],
-      conflict_target: :user_id
-    )
+  def set_user_preference(%{"user_id" => user_id} = attrs) when is_binary(user_id) do
+    ap = get_available_preferences()
+
+    update_fields =
+          attrs
+          |> Enum.reject(fn {k, v} -> is_nil(v) or not (k in ap) end)
+          |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+          |> Enum.into(%{})
+
+    case get_user_preferences(user_id) do
+      nil -> create_preference(update_fields)
+      %UserPreference{} = up -> update_preference(up, update_fields)
+    end
   end
 
+  @doc """
+  Gets the available user preferences.
+  """
+  def get_available_preferences(), do: ["language"]
+
+  @doc false
   defp create_default_preferences_multi(multi) do
     Ecto.Multi.insert(multi, :preferences, fn %{user: user} ->
-      %UserPreference{}
-      |> UserPreference.changeset(%{
-        user_id: user.id,
-        language: "en-US"
-      })
+      %UserPreference{user_id: user.id}
+      |> UserPreference.changeset(%{})
     end)
   end
 end

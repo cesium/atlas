@@ -94,152 +94,6 @@
       "title": "User Session",
       "type": "object"
     },
-    "SignOutResponse": {
-      "description": "Response schema for successful sign out",
-      "example": {
-        "message": "Signed out successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful sign out",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "SignOutResponse",
-      "type": "object"
-    },
-    "UnauthorizedResponse": {
-      "description": "Unauthorized response schema",
-      "properties": {
-        "error": {
-          "description": "Unauthorized error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "UnauthorizedResponse",
-      "type": "object"
-    },
-    "ErrorResponse": {
-      "description": "Error response schema",
-      "properties": {
-        "error": {
-          "description": "Error message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "error"
-      ],
-      "title": "ErrorResponse",
-      "type": "object"
-    },
-    "SignInResponse": {
-      "description": "Response schema for successful sign in",
-      "example": {
-        "access_token": "xXxXxXxXxXxX",
-        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
-      },
-      "properties": {
-        "access_token": {
-          "description": "Access token",
-          "type": "string"
-        },
-        "session_id": {
-          "description": "User session ID",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "access_token",
-        "session_id"
-      ],
-      "title": "SignInResponse",
-      "type": "object"
-    },
-    "UserSessionsResponse": {
-      "description": "Response schema for a list of user sessions",
-      "example": {
-        "sessions": [
-          {
-            "first_seen": "2025-07-15T20:13:41Z",
-            "id": "8fd2bef3-f1eb-4bf2-aade-f3ae80e0563d",
-            "ip": "127.0.0.1",
-            "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
-            "user_browser": "Firefox",
-            "user_os": "Linux"
-          }
-        ]
-      },
-      "properties": {
-        "sessions": {
-          "description": "List of user sessions",
-          "items": {
-            "$ref": "#/definitions/UserSession"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "sessions"
-      ],
-      "title": "UserSessionsResponse",
-      "type": "object"
-    },
-    "ResetPasswordResponse": {
-      "description": "Response schema for successful password reset",
-      "example": {
-        "message": "Password reset successfully"
-      },
-      "properties": {
-        "message": {
-          "description": "Message indicating successful password reset",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "ResetPasswordResponse",
-      "type": "object"
-    },
-    "SuccessfulRefreshResponse": {
-      "description": "Response schema for successful token refresh",
-      "example": {
-        "access_token": "xXxXxXxXxXxX"
-      },
-      "properties": {
-        "access_token": {
-          "description": "New access token",
-          "type": "string"
-        }
-      },
-      "required": [
-        "access_token"
-      ],
-      "title": "SuccessfulRefreshResponse",
-      "type": "object"
-    },
-    "NoContentResponse": {
-      "description": "Response schema for no content",
-      "example": {},
-      "properties": {
-        "message": {
-          "description": "Message indicating no content",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message"
-      ],
-      "title": "NoContentResponse",
-      "type": "object"
-    },
     "Job": {
       "description": "A job in the system",
       "properties": {
@@ -287,6 +141,171 @@
       "title": "Job",
       "type": "object"
     },
+    "SignInResponse": {
+      "description": "Response schema for successful sign in",
+      "example": {
+        "access_token": "xXxXxXxXxXxX",
+        "session_id": "e1387cae-ac1d-4aeb-8e13-ff1b3dd15ca4"
+      },
+      "properties": {
+        "access_token": {
+          "description": "Access token",
+          "type": "string"
+        },
+        "session_id": {
+          "description": "User session ID",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "access_token",
+        "session_id"
+      ],
+      "title": "SignInResponse",
+      "type": "object"
+    },
+    "UnauthorizedResponse": {
+      "description": "Unauthorized response schema",
+      "properties": {
+        "error": {
+          "description": "Unauthorized error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "UnauthorizedResponse",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "description": "Error response schema",
+      "properties": {
+        "error": {
+          "description": "Error message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "SuccessfulRefreshResponse": {
+      "description": "Response schema for successful token refresh",
+      "example": {
+        "access_token": "xXxXxXxXxXxX"
+      },
+      "properties": {
+        "access_token": {
+          "description": "New access token",
+          "type": "string"
+        }
+      },
+      "required": [
+        "access_token"
+      ],
+      "title": "SuccessfulRefreshResponse",
+      "type": "object"
+    },
+    "SignOutResponse": {
+      "description": "Response schema for successful sign out",
+      "example": {
+        "message": "Signed out successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful sign out",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "SignOutResponse",
+      "type": "object"
+    },
+    "UserSessionsResponse": {
+      "description": "Response schema for a list of user sessions",
+      "example": {
+        "sessions": [
+          {
+            "first_seen": "2025-07-15T20:13:41Z",
+            "id": "8fd2bef3-f1eb-4bf2-aade-f3ae80e0563d",
+            "ip": "127.0.0.1",
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
+            "user_browser": "Firefox",
+            "user_os": "Linux"
+          }
+        ]
+      },
+      "properties": {
+        "sessions": {
+          "description": "List of user sessions",
+          "items": {
+            "$ref": "#/definitions/UserSession"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "sessions"
+      ],
+      "title": "UserSessionsResponse",
+      "type": "object"
+    },
+    "NoContentResponse": {
+      "description": "Response schema for no content",
+      "example": {},
+      "properties": {
+        "message": {
+          "description": "Message indicating no content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "NoContentResponse",
+      "type": "object"
+    },
+    "ResetPasswordResponse": {
+      "description": "Response schema for successful password reset",
+      "example": {
+        "message": "Password reset successfully"
+      },
+      "properties": {
+        "message": {
+          "description": "Message indicating successful password reset",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "ResetPasswordResponse",
+      "type": "object"
+    },
+    "SuccessfulImport": {
+      "description": "Response for a successful import",
+      "properties": {
+        "job_id": {
+          "description": "ID of the import job",
+          "type": "string"
+        },
+        "message": {
+          "description": "Status message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "job_id"
+      ],
+      "title": "SuccessfulImport",
+      "type": "object"
+    },
     "JobsResponse": {
       "description": "Response containing a list of jobs",
       "properties": {
@@ -310,25 +329,6 @@
         }
       },
       "title": "JobResponse",
-      "type": "object"
-    },
-    "SuccessfulImport": {
-      "description": "Response for a successful import",
-      "properties": {
-        "job_id": {
-          "description": "ID of the import job",
-          "type": "string"
-        },
-        "message": {
-          "description": "Status message",
-          "type": "string"
-        }
-      },
-      "required": [
-        "message",
-        "job_id"
-      ],
-      "title": "SuccessfulImport",
       "type": "object"
     }
   },
