@@ -562,7 +562,8 @@ defmodule Atlas.Accounts do
   @doc """
   Updates a user preference.
   """
-  def update_preference(%UserPreference{} = preference, attrs) when is_map(attrs) and map_size(attrs) > 0 do
+  def update_preference(%UserPreference{} = preference, attrs)
+      when is_map(attrs) and map_size(attrs) > 0 do
     preference
     |> UserPreference.changeset(attrs)
     |> Repo.update()
@@ -623,10 +624,10 @@ defmodule Atlas.Accounts do
     ap = get_available_preferences()
 
     update_fields =
-          attrs
-          |> Enum.reject(fn {k, v} -> is_nil(v) or not (k in ap) end)
-          |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-          |> Enum.into(%{})
+      attrs
+      |> Enum.reject(fn {k, v} -> is_nil(v) or k not in ap end)
+      |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+      |> Enum.into(%{})
 
     case get_user_preferences(user_id) do
       nil -> create_preference(update_fields)
@@ -637,7 +638,7 @@ defmodule Atlas.Accounts do
   @doc """
   Gets the available user preferences.
   """
-  def get_available_preferences(), do: ["language"]
+  def get_available_preferences, do: ["language"]
 
   @doc false
   defp create_default_preferences_multi(multi) do

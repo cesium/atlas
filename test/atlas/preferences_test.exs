@@ -25,7 +25,6 @@ defmodule Atlas.PreferencesTest do
 
   describe "get_preference/2" do
     test "returns the specific preference (language)", %{authenticated_conn: conn} do
-
       PreferencesController.update_preferences(conn, %{
         "language" => "en-US"
       })
@@ -47,9 +46,10 @@ defmodule Atlas.PreferencesTest do
 
   describe "update_preference/2" do
     test "updates the specific preference", %{authenticated_conn: conn} do
-      conn = PreferencesController.update_preferences(conn, %{
-        "language" => "pt-PT"
-      })
+      conn =
+        PreferencesController.update_preferences(conn, %{
+          "language" => "pt-PT"
+        })
 
       response = json_response(conn, 200)
       assert response["status"] == "success"
@@ -57,9 +57,10 @@ defmodule Atlas.PreferencesTest do
     end
 
     test "returns error for invalid fields", %{authenticated_conn: conn} do
-      conn = PreferencesController.update_preferences(conn, %{
-        "invalid_field" => "value"
-      })
+      conn =
+        PreferencesController.update_preferences(conn, %{
+          "invalid_field" => "value"
+        })
 
       response = json_response(conn, 200)
       assert response["status"] == "error"
@@ -67,9 +68,10 @@ defmodule Atlas.PreferencesTest do
     end
 
     test "returns error for invalid values", %{authenticated_conn: conn} do
-      conn = PreferencesController.update_preferences(conn, %{
-        "language" => "invalid_value"
-      })
+      conn =
+        PreferencesController.update_preferences(conn, %{
+          "language" => "invalid_value"
+        })
 
       response = json_response(conn, 200)
       assert response["status"] == "error"

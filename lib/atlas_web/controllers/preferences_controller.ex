@@ -26,6 +26,7 @@ defmodule AtlasWeb.PreferencesController do
 
   def update_preferences(conn, attrs) do
     {user, _session} = Guardian.Plug.current_resource(conn)
+
     case Accounts.set_user_preference(Map.put(attrs, "user_id", user.id)) do
       {:ok, _} ->
         json(conn, %{status: "success", message: "Preferences updated successfully"})
