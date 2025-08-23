@@ -21,6 +21,8 @@ defmodule Atlas.University.Degrees.Courses.Course do
       join_through: Atlas.University.Enrollment,
       on_replace: :delete
 
+    has_many :shifts, Atlas.University.Degrees.Courses.Shifts.Shift
+
     timestamps(type: :utc_datetime)
   end
 

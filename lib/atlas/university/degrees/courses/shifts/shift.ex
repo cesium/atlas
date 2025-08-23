@@ -16,6 +16,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
     field :professor, :string
 
     belongs_to :course, Atlas.University.Degrees.Courses.Course
+    has_many :timeslots, Atlas.University.Degrees.Courses.Shifts.Timeslot
 
     timestamps(type: :utc_datetime)
   end
