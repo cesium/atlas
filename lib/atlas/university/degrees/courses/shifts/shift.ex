@@ -8,7 +8,9 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
   @optional_fields ~w(professor)a
 
   schema "shifts" do
-    field :type, Ecto.Enum, values: [:theoretical, :theoretical_practical, :practical_laboratory, :tutorial_guidance]
+    field :type, Ecto.Enum,
+      values: [:theoretical, :theoretical_practical, :practical_laboratory, :tutorial_guidance]
+
     field :number, :integer
     field :capacity, :integer
     field :professor, :string

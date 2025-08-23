@@ -36,7 +36,13 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
 
     test "update_shift/2 with valid data updates the shift" do
       shift = shift_fixture()
-      update_attrs = %{type: "some updated type", number: 43, capacity: 43, professor: "some updated professor"}
+
+      update_attrs = %{
+        type: "some updated type",
+        number: 43,
+        capacity: 43,
+        professor: "some updated professor"
+      }
 
       assert {:ok, %Shift{} = shift} = Shifts.update_shift(shift, update_attrs)
       assert shift.type == "some updated type"
@@ -60,6 +66,81 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
     test "change_shift/1 returns a shift changeset" do
       shift = shift_fixture()
       assert %Ecto.Changeset{} = Shifts.change_shift(shift)
+    end
+  end
+
+  describe "timeslots" do
+    alias Atlas.University.Degrees.Courses.Shifts.Timeslot
+
+    import Atlas.University.Degrees.Courses.ShiftsFixtures
+
+    @invalid_attrs %{start: nil, end: nil, weekday: nil, building: nil, room: nil}
+
+    test "list_timeslots/0 returns all timeslots" do
+      timeslot = timeslot_fixture()
+      assert Shifts.list_timeslots() == [timeslot]
+    end
+
+    test "get_timeslot!/1 returns the timeslot with given id" do
+      timeslot = timeslot_fixture()
+      assert Shifts.get_timeslot!(timeslot.id) == timeslot
+    end
+
+    test "create_timeslot/1 with valid data creates a timeslot" do
+      valid_attrs = %{
+        start: ~T[14:00:00],
+        end: ~T[14:00:00],
+        weekday: "some weekday",
+        building: "some building",
+        room: "some room"
+      }
+
+      assert {:ok, %Timeslot{} = timeslot} = Shifts.create_timeslot(valid_attrs)
+      assert timeslot.start == ~T[14:00:00]
+      assert timeslot.end == ~T[14:00:00]
+      assert timeslot.weekday == "some weekday"
+      assert timeslot.building == "some building"
+      assert timeslot.room == "some room"
+    end
+
+    test "create_timeslot/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Shifts.create_timeslot(@invalid_attrs)
+    end
+
+    test "update_timeslot/2 with valid data updates the timeslot" do
+      timeslot = timeslot_fixture()
+
+      update_attrs = %{
+        start: ~T[15:01:01],
+        end: ~T[15:01:01],
+        weekday: "some updated weekday",
+        building: "some updated building",
+        room: "some updated room"
+      }
+
+      assert {:ok, %Timeslot{} = timeslot} = Shifts.update_timeslot(timeslot, update_attrs)
+      assert timeslot.start == ~T[15:01:01]
+      assert timeslot.end == ~T[15:01:01]
+      assert timeslot.weekday == "some updated weekday"
+      assert timeslot.building == "some updated building"
+      assert timeslot.room == "some updated room"
+    end
+
+    test "update_timeslot/2 with invalid data returns error changeset" do
+      timeslot = timeslot_fixture()
+      assert {:error, %Ecto.Changeset{}} = Shifts.update_timeslot(timeslot, @invalid_attrs)
+      assert timeslot == Shifts.get_timeslot!(timeslot.id)
+    end
+
+    test "delete_timeslot/1 deletes the timeslot" do
+      timeslot = timeslot_fixture()
+      assert {:ok, %Timeslot{}} = Shifts.delete_timeslot(timeslot)
+      assert_raise Ecto.NoResultsError, fn -> Shifts.get_timeslot!(timeslot.id) end
+    end
+
+    test "change_timeslot/1 returns a timeslot changeset" do
+      timeslot = timeslot_fixture()
+      assert %Ecto.Changeset{} = Shifts.change_timeslot(timeslot)
     end
   end
 end

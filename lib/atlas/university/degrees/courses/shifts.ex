@@ -101,8 +101,106 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   end
 
   def get_shift_by_course_type_number(course_id, type, number) do
-    Repo.one(from s in Shift,
-      where: s.course_id == ^course_id and s.type == ^type and s.number == ^number
+    Repo.one(
+      from s in Shift,
+        where: s.course_id == ^course_id and s.type == ^type and s.number == ^number
     )
+  end
+
+  alias Atlas.University.Degrees.Courses.Shifts.Timeslot
+
+  @doc """
+  Returns the list of timeslots.
+
+  ## Examples
+
+      iex> list_timeslots()
+      [%Timeslot{}, ...]
+
+  """
+  def list_timeslots do
+    Repo.all(Timeslot)
+  end
+
+  @doc """
+  Gets a single timeslot.
+
+  Raises `Ecto.NoResultsError` if the Timeslot does not exist.
+
+  ## Examples
+
+      iex> get_timeslot!(123)
+      %Timeslot{}
+
+      iex> get_timeslot!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_timeslot!(id), do: Repo.get!(Timeslot, id)
+
+  @doc """
+  Creates a timeslot.
+
+  ## Examples
+
+      iex> create_timeslot(%{field: value})
+      {:ok, %Timeslot{}}
+
+      iex> create_timeslot(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_timeslot(attrs \\ %{}) do
+    %Timeslot{}
+    |> Timeslot.changeset(attrs)
+    |> IO.inspect()
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a timeslot.
+
+  ## Examples
+
+      iex> update_timeslot(timeslot, %{field: new_value})
+      {:ok, %Timeslot{}}
+
+      iex> update_timeslot(timeslot, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_timeslot(%Timeslot{} = timeslot, attrs) do
+    timeslot
+    |> Timeslot.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a timeslot.
+
+  ## Examples
+
+      iex> delete_timeslot(timeslot)
+      {:ok, %Timeslot{}}
+
+      iex> delete_timeslot(timeslot)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_timeslot(%Timeslot{} = timeslot) do
+    Repo.delete(timeslot)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking timeslot changes.
+
+  ## Examples
+
+      iex> change_timeslot(timeslot)
+      %Ecto.Changeset{data: %Timeslot{}}
+
+  """
+  def change_timeslot(%Timeslot{} = timeslot, attrs \\ %{}) do
+    Timeslot.changeset(timeslot, attrs)
   end
 end

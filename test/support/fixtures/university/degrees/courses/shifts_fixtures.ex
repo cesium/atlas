@@ -20,4 +20,22 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
 
     shift
   end
+
+  @doc """
+  Generate a timeslot.
+  """
+  def timeslot_fixture(attrs \\ %{}) do
+    {:ok, timeslot} =
+      attrs
+      |> Enum.into(%{
+        building: "some building",
+        end: ~T[14:00:00],
+        room: "some room",
+        start: ~T[14:00:00],
+        weekday: "some weekday"
+      })
+      |> Atlas.University.Degrees.Courses.Shifts.create_timeslot()
+
+    timeslot
+  end
 end

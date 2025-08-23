@@ -14,6 +14,9 @@ defmodule Atlas.Repo.Migrations.CreateShifts do
     end
 
     create index(:shifts, [:course_id])
-    create unique_index(:shifts, [:type, :number, :course_id], name: :shifts_type_number_course_id_index)
+
+    create unique_index(:shifts, [:type, :number, :course_id],
+             name: :shifts_type_number_course_id_index
+           )
   end
 end
