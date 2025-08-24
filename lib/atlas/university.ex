@@ -250,4 +250,100 @@ defmodule Atlas.University do
       )
     )
   end
+
+  alias Atlas.University.ShiftEnrollment
+
+  @doc """
+  Returns the list of shift_enrollments.
+
+  ## Examples
+
+      iex> list_shift_enrollments()
+      [%ShiftEnrollment{}, ...]
+
+  """
+  def list_shift_enrollments do
+    Repo.all(ShiftEnrollment)
+  end
+
+  @doc """
+  Gets a single shift_enrollment.
+
+  Raises `Ecto.NoResultsError` if the Shift enrollment does not exist.
+
+  ## Examples
+
+      iex> get_shift_enrollment!(123)
+      %ShiftEnrollment{}
+
+      iex> get_shift_enrollment!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_shift_enrollment!(id), do: Repo.get!(ShiftEnrollment, id)
+
+  @doc """
+  Creates a shift_enrollment.
+
+  ## Examples
+
+      iex> create_shift_enrollment(%{field: value})
+      {:ok, %ShiftEnrollment{}}
+
+      iex> create_shift_enrollment(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_shift_enrollment(attrs \\ %{}) do
+    %ShiftEnrollment{}
+    |> ShiftEnrollment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a shift_enrollment.
+
+  ## Examples
+
+      iex> update_shift_enrollment(shift_enrollment, %{field: new_value})
+      {:ok, %ShiftEnrollment{}}
+
+      iex> update_shift_enrollment(shift_enrollment, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs) do
+    shift_enrollment
+    |> ShiftEnrollment.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a shift_enrollment.
+
+  ## Examples
+
+      iex> delete_shift_enrollment(shift_enrollment)
+      {:ok, %ShiftEnrollment{}}
+
+      iex> delete_shift_enrollment(shift_enrollment)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_shift_enrollment(%ShiftEnrollment{} = shift_enrollment) do
+    Repo.delete(shift_enrollment)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking shift_enrollment changes.
+
+  ## Examples
+
+      iex> change_shift_enrollment(shift_enrollment)
+      %Ecto.Changeset{data: %ShiftEnrollment{}}
+
+  """
+  def change_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs \\ %{}) do
+    ShiftEnrollment.changeset(shift_enrollment, attrs)
+  end
 end

@@ -5,6 +5,7 @@ defmodule Atlas.UniversityFixtures do
   """
 
   import Atlas.DegreesFixtures
+  import Atlas.University.Degrees.Courses.ShiftsFixtures
 
   @doc """
   Generate a student.
@@ -36,5 +37,21 @@ defmodule Atlas.UniversityFixtures do
       |> Atlas.University.create_course_enrollment()
 
     course_enrollment
+  end
+
+  @doc """
+  Generate a shift_enrollment.
+  """
+  def shift_enrollment_fixture(attrs \\ %{}) do
+    {:ok, shift_enrollment} =
+      attrs
+      |> Enum.into(%{
+        status: :active,
+        student_id: student_fixture().id,
+        shift_id: shift_fixture().id
+      })
+      |> Atlas.University.create_shift_enrollment()
+
+    shift_enrollment
   end
 end

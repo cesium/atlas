@@ -132,4 +132,74 @@ defmodule Atlas.UniversityTest do
       assert %Ecto.Changeset{} = University.change_course_enrollment(course_enrollment)
     end
   end
+
+  describe "shift_enrollments" do
+    alias Atlas.University.ShiftEnrollment
+
+    import Atlas.UniversityFixtures
+    import Atlas.DegreesFixtures
+    import Atlas.University.Degrees.Courses.ShiftsFixtures
+
+    @invalid_attrs %{status: nil, student_id: nil, shift_id: nil}
+
+    test "list_shift_enrollments/0 returns all shift_enrollments" do
+      shift_enrollment = shift_enrollment_fixture()
+      assert University.list_shift_enrollments() == [shift_enrollment]
+    end
+
+    test "get_shift_enrollment!/1 returns the shift_enrollment with given id" do
+      shift_enrollment = shift_enrollment_fixture()
+      assert University.get_shift_enrollment!(shift_enrollment.id) == shift_enrollment
+    end
+
+    test "create_shift_enrollment/1 with valid data creates a shift_enrollment" do
+      valid_attrs = %{
+        status: :active,
+        student_id: student_fixture().id,
+        shift_id: shift_fixture().id
+      }
+
+      assert {:ok, %ShiftEnrollment{} = shift_enrollment} =
+               University.create_shift_enrollment(valid_attrs)
+
+      assert shift_enrollment.status == :active
+    end
+
+    test "create_shift_enrollment/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = University.create_shift_enrollment(@invalid_attrs)
+    end
+
+    test "update_shift_enrollment/2 with valid data updates the shift_enrollment" do
+      shift_enrollment = shift_enrollment_fixture()
+      update_attrs = %{status: :inactive}
+
+      assert {:ok, %ShiftEnrollment{} = shift_enrollment} =
+               University.update_shift_enrollment(shift_enrollment, update_attrs)
+
+      assert shift_enrollment.status == :inactive
+    end
+
+    test "update_shift_enrollment/2 with invalid data returns error changeset" do
+      shift_enrollment = shift_enrollment_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               University.update_shift_enrollment(shift_enrollment, @invalid_attrs)
+
+      assert shift_enrollment == University.get_shift_enrollment!(shift_enrollment.id)
+    end
+
+    test "delete_shift_enrollment/1 deletes the shift_enrollment" do
+      shift_enrollment = shift_enrollment_fixture()
+      assert {:ok, %ShiftEnrollment{}} = University.delete_shift_enrollment(shift_enrollment)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        University.get_shift_enrollment!(shift_enrollment.id)
+      end
+    end
+
+    test "change_shift_enrollment/1 returns a shift_enrollment changeset" do
+      shift_enrollment = shift_enrollment_fixture()
+      assert %Ecto.Changeset{} = University.change_shift_enrollment(shift_enrollment)
+    end
+  end
 end
