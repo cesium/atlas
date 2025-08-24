@@ -96,6 +96,7 @@ defmodule Atlas.Importers.StudentsByCourses do
     get_or_create_course(%{
       code: code,
       name: name,
+      shortname: Courses.get_shortname_from_name(name),
       year: year,
       semester: semester,
       degree_id: degree.id
@@ -121,6 +122,7 @@ defmodule Atlas.Importers.StudentsByCourses do
           get_or_create_course(%{
             code: parent_code,
             name: parent_name,
+            shortname: Courses.get_shortname_from_name(parent_name),
             year: year,
             semester: semester,
             degree_id: degree.id
@@ -130,6 +132,7 @@ defmodule Atlas.Importers.StudentsByCourses do
     get_or_create_course(%{
       code: code,
       name: name,
+      shortname: Courses.get_shortname_from_name(name),
       year: year,
       semester: semester,
       degree_id: degree.id,

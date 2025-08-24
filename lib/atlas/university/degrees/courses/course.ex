@@ -5,10 +5,11 @@ defmodule Atlas.University.Degrees.Courses.Course do
   use Atlas.Schema
 
   @required_fields ~w(name code year semester)a
-  @optional_fields ~w(parent_course_id degree_id)a
+  @optional_fields ~w(parent_course_id degree_id shortname)a
 
   schema "courses" do
     field :name, :string
+    field :shortname, :string
     field :code, :string
     field :year, :integer
     field :semester, :integer

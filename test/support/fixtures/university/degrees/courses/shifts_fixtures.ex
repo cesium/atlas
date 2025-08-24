@@ -3,6 +3,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
   This module defines test helpers for creating
   entities via the `Atlas.University.Degrees.Courses.Shifts` context.
   """
+  alias Atlas.DegreesFixtures
 
   @doc """
   Generate a shift.
@@ -14,7 +15,8 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
         capacity: 42,
         number: 42,
         professor: "some professor",
-        type: "some type"
+        type: :theoretical,
+        course_id: DegreesFixtures.course_fixture().id
       })
       |> Atlas.University.Degrees.Courses.Shifts.create_shift()
 
@@ -32,7 +34,8 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
         end: ~T[14:00:00],
         room: "some room",
         start: ~T[14:00:00],
-        weekday: "some weekday"
+        weekday: :monday,
+        shift_id: shift_fixture().id
       })
       |> Atlas.University.Degrees.Courses.Shifts.create_timeslot()
 

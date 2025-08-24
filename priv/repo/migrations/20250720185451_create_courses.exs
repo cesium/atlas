@@ -6,6 +6,7 @@ defmodule Atlas.Repo.Migrations.CreateCourses do
       add :id, :binary_id, primary_key: true
       add :code, :string
       add :name, :string
+      add :shortname, :string
       add :year, :integer
       add :semester, :integer
       add :degree_id, references(:degrees, on_delete: :nothing, type: :binary_id)

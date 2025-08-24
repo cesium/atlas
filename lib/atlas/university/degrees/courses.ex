@@ -152,4 +152,22 @@ defmodule Atlas.University.Degrees.Courses do
       _ -> 1
     end
   end
+
+  @doc """
+  Gets the short name from the course name.
+
+  ## Examples
+
+      iex> get_shortname_from_name("Functional Programming")
+      "FP"
+
+  """
+  def get_shortname_from_name(name) do
+    name
+    |> String.normalize(:nfd)
+    |> String.replace(~r/\p{Mn}/u, "")
+    |> String.graphemes()
+    |> Enum.filter(&(&1 =~ ~r/^[A-Z]$/))
+    |> Enum.join()
+  end
 end

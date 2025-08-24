@@ -2,6 +2,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
   use Atlas.DataCase
 
   alias Atlas.University.Degrees.Courses.Shifts
+  alias Atlas.DegreesFixtures
 
   describe "shifts" do
     alias Atlas.University.Degrees.Courses.Shifts.Shift
@@ -21,10 +22,16 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
     end
 
     test "create_shift/1 with valid data creates a shift" do
-      valid_attrs = %{type: "some type", number: 42, capacity: 42, professor: "some professor"}
+      valid_attrs = %{
+        type: :theoretical,
+        number: 42,
+        capacity: 42,
+        professor: "some professor",
+        course_id: DegreesFixtures.course_fixture().id
+      }
 
       assert {:ok, %Shift{} = shift} = Shifts.create_shift(valid_attrs)
-      assert shift.type == "some type"
+      assert shift.type == :theoretical
       assert shift.number == 42
       assert shift.capacity == 42
       assert shift.professor == "some professor"
@@ -38,14 +45,14 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       shift = shift_fixture()
 
       update_attrs = %{
-        type: "some updated type",
+        type: :practical_laboratory,
         number: 43,
         capacity: 43,
         professor: "some updated professor"
       }
 
       assert {:ok, %Shift{} = shift} = Shifts.update_shift(shift, update_attrs)
-      assert shift.type == "some updated type"
+      assert shift.type == :practical_laboratory
       assert shift.number == 43
       assert shift.capacity == 43
       assert shift.professor == "some updated professor"
@@ -90,15 +97,16 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       valid_attrs = %{
         start: ~T[14:00:00],
         end: ~T[14:00:00],
-        weekday: "some weekday",
+        weekday: :monday,
         building: "some building",
-        room: "some room"
+        room: "some room",
+        shift_id: shift_fixture().id
       }
 
       assert {:ok, %Timeslot{} = timeslot} = Shifts.create_timeslot(valid_attrs)
       assert timeslot.start == ~T[14:00:00]
       assert timeslot.end == ~T[14:00:00]
-      assert timeslot.weekday == "some weekday"
+      assert timeslot.weekday == :monday
       assert timeslot.building == "some building"
       assert timeslot.room == "some room"
     end
@@ -113,7 +121,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       update_attrs = %{
         start: ~T[15:01:01],
         end: ~T[15:01:01],
-        weekday: "some updated weekday",
+        weekday: :wednesday,
         building: "some updated building",
         room: "some updated room"
       }
@@ -121,7 +129,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       assert {:ok, %Timeslot{} = timeslot} = Shifts.update_timeslot(timeslot, update_attrs)
       assert timeslot.start == ~T[15:01:01]
       assert timeslot.end == ~T[15:01:01]
-      assert timeslot.weekday == "some updated weekday"
+      assert timeslot.weekday == :wednesday
       assert timeslot.building == "some updated building"
       assert timeslot.room == "some updated room"
     end

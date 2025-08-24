@@ -1,4 +1,4 @@
-defmodule Atlas.Importers.CoursesShifts do
+defmodule Atlas.Importers.ShiftsByCourses do
   @moduledoc """
   Import shifts by course.
   """
@@ -25,7 +25,7 @@ defmodule Atlas.Importers.CoursesShifts do
       {:ok, row} ->
         import_row(row)
 
-      {:error, reason} ->
+      {:error, _} ->
         nil
     end)
   end
@@ -33,7 +33,6 @@ defmodule Atlas.Importers.CoursesShifts do
   defp import_row(row) do
     %{
       course_name: course_name,
-      course_shortname: course_shortname,
       course_code: course_code,
       number: number,
       type: type,
@@ -47,7 +46,7 @@ defmodule Atlas.Importers.CoursesShifts do
     } = parse_row(row)
 
     if course_code != "" do
-      course = ensure_course(course_code, course_name, course_shortname)
+      course = ensure_course(course_code, course_name)
 
       if course do
         shift =
@@ -60,15 +59,14 @@ defmodule Atlas.Importers.CoursesShifts do
           })
 
         if shift do
-          timeslot =
-            import_timeslot(%{
-              start: start_time,
-              end: end_time,
-              weekday: weekday,
-              building: building,
-              room: room,
-              shift: shift
-            })
+          import_timeslot(%{
+            start: start_time,
+            end: end_time,
+            weekday: weekday,
+            building: building,
+            room: room,
+            shift: shift
+          })
         end
       end
     end
@@ -77,7 +75,6 @@ defmodule Atlas.Importers.CoursesShifts do
   defp parse_row(row) do
     %{
       course_name: Enum.at(row, 0),
-      course_shortname: Enum.at(row, 1),
       course_code: Enum.at(row, 2),
       number: Enum.at(row, 4) |> String.replace(~r/[^0-9]/, ""),
       type:
@@ -98,18 +95,18 @@ defmodule Atlas.Importers.CoursesShifts do
     }
   end
 
-  defp ensure_course(code, name, shortname) do
+  defp ensure_course(code, name) do
     Courses.get_course_by_code(code) ||
       case Courses.create_course(%{
              name: name,
              code: code,
-             shortname: shortname,
+             shortname: Courses.get_shortname_from_name(name),
              semester: Courses.get_semester_from_code(code),
              year: Courses.get_year_from_code(code),
              degree_id: ensure_degree(code)
            }) do
         {:ok, course} -> course
-        {:error, error} -> nil
+        {:error, _} -> nil
       end
   end
 

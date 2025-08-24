@@ -153,7 +153,6 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   def create_timeslot(attrs \\ %{}) do
     %Timeslot{}
     |> Timeslot.changeset(attrs)
-    |> IO.inspect()
     |> Repo.insert()
   end
 
