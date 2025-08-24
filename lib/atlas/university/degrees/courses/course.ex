@@ -24,6 +24,8 @@ defmodule Atlas.University.Degrees.Courses.Course do
 
     has_many :shifts, Atlas.University.Degrees.Courses.Shifts.Shift
 
+    has_many :courses, Atlas.University.Degrees.Courses.Course, foreign_key: :parent_course_id
+
     timestamps(type: :utc_datetime)
   end
 

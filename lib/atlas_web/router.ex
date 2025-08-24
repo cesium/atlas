@@ -60,6 +60,10 @@ defmodule AtlasWeb.Router do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses
     end
+
+    scope "/courses", University do
+      get "/", CourseController, :index
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
