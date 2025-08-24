@@ -1,8 +1,8 @@
 defmodule Atlas.University.Degrees.Courses.ShiftsTest do
   use Atlas.DataCase
 
-  alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.DegreesFixtures
+  alias Atlas.University.Degrees.Courses.Shifts
 
   describe "shifts" do
     alias Atlas.University.Degrees.Courses.Shifts.Shift

@@ -58,16 +58,14 @@ defmodule Atlas.Importers.ShiftsByCourses do
             capacity: String.to_integer(capacity)
           })
 
-        if shift do
-          import_timeslot(%{
-            start: start_time,
-            end: end_time,
-            weekday: weekday,
-            building: building,
-            room: room,
-            shift: shift
-          })
-        end
+        import_timeslot(%{
+          start: start_time,
+          end: end_time,
+          weekday: weekday,
+          building: building,
+          room: room,
+          shift: shift
+        })
       end
     end
   end

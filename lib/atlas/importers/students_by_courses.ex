@@ -4,7 +4,7 @@ defmodule Atlas.Importers.StudentsByCourses do
   """
   alias Atlas.{Accounts, University}
   alias University.Degrees
-  alias Degrees.Courses
+  alias University.Degrees.Courses
 
   def import_from_excel_file(file_path) do
     with {:ok, package} <- XlsxReader.open(file_path),

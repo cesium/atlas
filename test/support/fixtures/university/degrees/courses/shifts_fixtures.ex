@@ -4,6 +4,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
   entities via the `Atlas.University.Degrees.Courses.Shifts` context.
   """
   alias Atlas.DegreesFixtures
+  alias Atlas.University.Degrees.Courses.Shifts
 
   @doc """
   Generate a shift.
@@ -18,7 +19,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
         type: :theoretical,
         course_id: DegreesFixtures.course_fixture().id
       })
-      |> Atlas.University.Degrees.Courses.Shifts.create_shift()
+      |> Shifts.create_shift()
 
     shift
   end
@@ -37,7 +38,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
         weekday: :monday,
         shift_id: shift_fixture().id
       })
-      |> Atlas.University.Degrees.Courses.Shifts.create_timeslot()
+      |> Shifts.create_timeslot()
 
     timeslot
   end
