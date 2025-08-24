@@ -2,7 +2,9 @@ defmodule Atlas.Importers.StudentsByCourses do
   @moduledoc """
   Import students by course.
   """
-  alias Atlas.{Accounts, Degrees, University}
+  alias Atlas.{Accounts, University}
+  alias University.Degrees
+  alias University.Degrees.Courses
 
   def import_from_excel_file(file_path) do
     with {:ok, package} <- XlsxReader.open(file_path),
@@ -89,11 +91,12 @@ defmodule Atlas.Importers.StudentsByCourses do
   end
 
   defp import_course(%{code: code, name: name, parent_code: "", year: year, degree: degree}) do
-    semester = get_semester(code)
+    semester = Courses.get_semester_from_code(code)
 
     get_or_create_course(%{
       code: code,
       name: name,
+      shortname: Courses.get_shortname_from_name(name),
       year: year,
       semester: semester,
       degree_id: degree.id
@@ -108,7 +111,7 @@ defmodule Atlas.Importers.StudentsByCourses do
          year: year,
          degree: degree
        }) do
-    semester = get_semester(parent_code)
+    semester = Courses.get_semester_from_code(parent_code)
 
     parent_course =
       case String.at(code, 2) |> Integer.parse() do
@@ -119,6 +122,7 @@ defmodule Atlas.Importers.StudentsByCourses do
           get_or_create_course(%{
             code: parent_code,
             name: parent_name,
+            shortname: Courses.get_shortname_from_name(parent_name),
             year: year,
             semester: semester,
             degree_id: degree.id
@@ -128,6 +132,7 @@ defmodule Atlas.Importers.StudentsByCourses do
     get_or_create_course(%{
       code: code,
       name: name,
+      shortname: Courses.get_shortname_from_name(name),
       year: year,
       semester: semester,
       degree_id: degree.id,
@@ -141,16 +146,9 @@ defmodule Atlas.Importers.StudentsByCourses do
     end
   end
 
-  defp get_semester(code) do
-    case String.at(code, 3) |> Integer.parse() do
-      {n, _} -> if rem(n, 2) == 0, do: 2, else: 1
-      _ -> 1
-    end
-  end
-
   defp get_or_create_course(attrs) do
-    Degrees.get_course_by_code(attrs.code) ||
-      case Degrees.create_course(attrs) do
+    Courses.get_course_by_code(attrs.code) ||
+      case Courses.create_course(attrs) do
         {:ok, course} -> course
         {:error, _} -> nil
       end

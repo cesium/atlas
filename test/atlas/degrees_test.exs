@@ -1,10 +1,11 @@
 defmodule Atlas.DegreesTest do
   use Atlas.DataCase
 
-  alias Atlas.Degrees
+  alias Atlas.University.Degrees
+  alias Atlas.University.Degrees.Courses
 
   describe "degrees" do
-    alias Atlas.Degrees.Degree
+    alias Atlas.University.Degrees.Degree
 
     import Atlas.DegreesFixtures
 
@@ -58,7 +59,7 @@ defmodule Atlas.DegreesTest do
   end
 
   describe "courses" do
-    alias Atlas.Degrees.Course
+    alias Atlas.University.Degrees.Courses.Course
 
     import Atlas.DegreesFixtures
 
@@ -66,12 +67,12 @@ defmodule Atlas.DegreesTest do
 
     test "list_courses/0 returns all courses" do
       course = course_fixture()
-      assert Degrees.list_courses() == [course]
+      assert Courses.list_courses() == [course]
     end
 
     test "get_course!/1 returns the course with given id" do
       course = course_fixture()
-      assert Degrees.get_course!(course.id) == course
+      assert Courses.get_course!(course.id) == course
     end
 
     test "create_course/1 with valid data creates a course" do
@@ -83,7 +84,7 @@ defmodule Atlas.DegreesTest do
         degree_id: degree_fixture().id
       }
 
-      assert {:ok, %Course{} = course} = Degrees.create_course(valid_attrs)
+      assert {:ok, %Course{} = course} = Courses.create_course(valid_attrs)
       assert course.code == "code"
       assert course.name == "some name"
       assert course.year == 1
@@ -91,14 +92,14 @@ defmodule Atlas.DegreesTest do
     end
 
     test "create_course/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Degrees.create_course(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Courses.create_course(@invalid_attrs)
     end
 
     test "update_course/2 with valid data updates the course" do
       course = course_fixture()
       update_attrs = %{code: "code", name: "some updated name", year: 43, semester: 43}
 
-      assert {:ok, %Course{} = course} = Degrees.update_course(course, update_attrs)
+      assert {:ok, %Course{} = course} = Courses.update_course(course, update_attrs)
       assert course.code == "code"
       assert course.name == "some updated name"
       assert course.year == 43
@@ -107,19 +108,19 @@ defmodule Atlas.DegreesTest do
 
     test "update_course/2 with invalid data returns error changeset" do
       course = course_fixture()
-      assert {:error, %Ecto.Changeset{}} = Degrees.update_course(course, @invalid_attrs)
-      assert course == Degrees.get_course!(course.id)
+      assert {:error, %Ecto.Changeset{}} = Courses.update_course(course, @invalid_attrs)
+      assert course == Courses.get_course!(course.id)
     end
 
     test "delete_course/1 deletes the course" do
       course = course_fixture()
-      assert {:ok, %Course{}} = Degrees.delete_course(course)
-      assert_raise Ecto.NoResultsError, fn -> Degrees.get_course!(course.id) end
+      assert {:ok, %Course{}} = Courses.delete_course(course)
+      assert_raise Ecto.NoResultsError, fn -> Courses.get_course!(course.id) end
     end
 
     test "change_course/1 returns a course changeset" do
       course = course_fixture()
-      assert %Ecto.Changeset{} = Degrees.change_course(course)
+      assert %Ecto.Changeset{} = Courses.change_course(course)
     end
   end
 end

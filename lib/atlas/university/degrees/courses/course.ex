@@ -1,24 +1,28 @@
-defmodule Atlas.Degrees.Course do
+defmodule Atlas.University.Degrees.Courses.Course do
   @moduledoc """
   Courses offered in a degree program.
   """
   use Atlas.Schema
 
-  @required_fields ~w(name code year semester degree_id)a
-  @optional_fields ~w(parent_course_id)a
+  @required_fields ~w(name code year semester)a
+  @optional_fields ~w(parent_course_id degree_id shortname)a
 
   schema "courses" do
     field :name, :string
+    field :shortname, :string
     field :code, :string
     field :year, :integer
     field :semester, :integer
-    field :parent_course_id, :binary_id
 
-    belongs_to :degree, Atlas.Degrees.Degree
+    belongs_to :course, Atlas.University.Degrees.Courses.Course, foreign_key: :parent_course_id
+
+    belongs_to :degree, Atlas.University.Degrees.Degree
 
     many_to_many :students, Atlas.University.Student,
       join_through: Atlas.University.Enrollment,
       on_replace: :delete
+
+    has_many :shifts, Atlas.University.Degrees.Courses.Shifts.Shift
 
     timestamps(type: :utc_datetime)
   end

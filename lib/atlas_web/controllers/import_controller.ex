@@ -19,4 +19,18 @@ defmodule AtlasWeb.ImportController do
         |> json(%{error: "Could not start import."})
     end
   end
+
+  def shifts_by_courses(conn, %{"file" => %Upload{path: file_path}}) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    case University.queue_import_shifts_by_courses(file_path, user) do
+      {:ok, job} ->
+        json(conn, %{job_id: job.id, message: "Import job queued successfully."})
+
+      {:error, _reason} ->
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Could not start import."})
+    end
+  end
 end
