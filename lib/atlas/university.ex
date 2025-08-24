@@ -5,7 +5,7 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
-  alias Atlas.University.{Enrollment, Student}
+  alias Atlas.University.{CourseEnrollment, Student}
   alias Atlas.Workers
 
   @doc """
@@ -103,97 +103,97 @@ defmodule Atlas.University do
   end
 
   @doc """
-  Returns the list of enrollments.
+  Returns the list of course enrollments.
 
   ## Examples
 
-      iex> list_enrollments()
-      [%Enrollment{}, ...]
+      iex> list_course_enrollments()
+      [%CourseEnrollment{}, ...]
 
   """
-  def list_enrollments do
-    Repo.all(Enrollment)
+  def list_course_enrollments do
+    Repo.all(CourseEnrollment)
   end
 
   @doc """
-  Gets a single enrollment.
+  Gets a single course enrollment.
 
-  Raises `Ecto.NoResultsError` if the Enrollment does not exist.
+  Raises `Ecto.NoResultsError` if the CourseEnrollment does not exist.
 
   ## Examples
 
-      iex> get_enrollment!(123)
-      %Enrollment{}
+      iex> get_course_enrollment!(123)
+      %CourseEnrollment{}
 
-      iex> get_enrollment!(456)
+      iex> get_course_enrollment!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_enrollment!(id), do: Repo.get!(Enrollment, id)
+  def get_course_enrollment!(id), do: Repo.get!(CourseEnrollment, id)
 
   @doc """
-  Creates a enrollment.
+  Creates a course enrollment.
 
   ## Examples
 
-      iex> create_enrollment(%{field: value})
-      {:ok, %Enrollment{}}
+      iex> create_course_enrollment(%{field: value})
+      {:ok, %CourseEnrollment{}}
 
-      iex> create_enrollment(%{field: bad_value})
+      iex> create_course_enrollment(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_enrollment(attrs \\ %{}) do
-    %Enrollment{}
-    |> Enrollment.changeset(attrs)
+  def create_course_enrollment(attrs \\ %{}) do
+    %CourseEnrollment{}
+    |> CourseEnrollment.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a enrollment.
+  Updates a course enrollment.
 
   ## Examples
 
-      iex> update_enrollment(enrollment, %{field: new_value})
-      {:ok, %Enrollment{}}
+      iex> update_course_enrollment(course_enrollment, %{field: new_value})
+      {:ok, %CourseEnrollment{}}
 
-      iex> update_enrollment(enrollment, %{field: bad_value})
+      iex> update_course_enrollment(course_enrollment, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_enrollment(%Enrollment{} = enrollment, attrs) do
-    enrollment
-    |> Enrollment.changeset(attrs)
+  def update_course_enrollment(%CourseEnrollment{} = course_enrollment, attrs) do
+    course_enrollment
+    |> CourseEnrollment.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a enrollment.
+  Deletes a course enrollment.
 
   ## Examples
 
-      iex> delete_enrollment(enrollment)
-      {:ok, %Enrollment{}}
+      iex> delete_course_enrollment(course_enrollment)
+      {:ok, %CourseEnrollment{}}
 
-      iex> delete_enrollment(enrollment)
+      iex> delete_course_enrollment(course_enrollment)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_enrollment(%Enrollment{} = enrollment) do
-    Repo.delete(enrollment)
+  def delete_course_enrollment(%CourseEnrollment{} = course_enrollment) do
+    Repo.delete(course_enrollment)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking enrollment changes.
+  Returns an `%Ecto.Changeset{}` for tracking course_enrollment changes.
 
   ## Examples
 
-      iex> change_enrollment(enrollment)
-      %Ecto.Changeset{data: %Enrollment{}}
+      iex> change_course_enrollment(course_enrollment)
+      %Ecto.Changeset{data: %CourseEnrollment{}}
 
   """
-  def change_enrollment(%Enrollment{} = enrollment, attrs \\ %{}) do
-    Enrollment.changeset(enrollment, attrs)
+  def change_course_enrollment(%CourseEnrollment{} = course_enrollment, attrs \\ %{}) do
+    CourseEnrollment.changeset(course_enrollment, attrs)
   end
 
   @doc """
@@ -202,14 +202,14 @@ defmodule Atlas.University do
   ## Examples
 
       iex> enroll_student_in_course(student, course)
-      {:ok, %Enrollment{}}
+      {:ok, %CourseEnrollment{}}
 
       iex> enroll_student_in_course(student, course)
       {:error, %Ecto.Changeset{}}
   """
   def enroll_student_in_course(student, course) do
-    %Enrollment{}
-    |> Enrollment.changeset(%{student_id: student.id, course_id: course.id})
+    %CourseEnrollment{}
+    |> CourseEnrollment.changeset(%{student_id: student.id, course_id: course.id})
     |> Repo.insert()
   end
 

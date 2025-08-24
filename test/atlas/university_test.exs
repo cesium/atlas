@@ -72,60 +72,64 @@ defmodule Atlas.UniversityTest do
     end
   end
 
-  describe "enrollments" do
-    alias Atlas.University.Enrollment
+  describe "course_enrollments" do
+    alias Atlas.University.CourseEnrollment
 
     import Atlas.UniversityFixtures
     import Atlas.DegreesFixtures
 
     @invalid_attrs %{course_id: nil, student_id: nil}
 
-    test "list_enrollments/0 returns all enrollments" do
-      enrollment = enrollment_fixture()
-      assert University.list_enrollments() == [enrollment]
+    test "list_course_enrollments/0 returns all course_enrollments" do
+      course_enrollment = course_enrollment_fixture()
+      assert University.list_course_enrollments() == [course_enrollment]
     end
 
-    test "get_enrollment!/1 returns the enrollment with given id" do
-      enrollment = enrollment_fixture()
-      assert University.get_enrollment!(enrollment.id) == enrollment
+    test "get_course_enrollment!/1 returns the course_enrollment with given id" do
+      course_enrollment = course_enrollment_fixture()
+      assert University.get_course_enrollment!(course_enrollment.id) == course_enrollment
     end
 
-    test "create_enrollment/1 with valid data creates a enrollment" do
+    test "create_course_enrollment/1 with valid data creates a course_enrollment" do
       valid_attrs = %{course_id: course_fixture().id, student_id: student_fixture().id}
 
-      assert {:ok, %Enrollment{} = _enrollment} = University.create_enrollment(valid_attrs)
+      assert {:ok, %CourseEnrollment{} = _course_enrollment} =
+               University.create_course_enrollment(valid_attrs)
     end
 
-    test "create_enrollment/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = University.create_enrollment(@invalid_attrs)
+    test "create_course_enrollment/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = University.create_course_enrollment(@invalid_attrs)
     end
 
-    test "update_enrollment/2 with valid data updates the enrollment" do
-      enrollment = enrollment_fixture()
+    test "update_course_enrollment/2 with valid data updates the course_enrollment" do
+      course_enrollment = course_enrollment_fixture()
       update_attrs = %{}
 
-      assert {:ok, %Enrollment{} = _enrollment} =
-               University.update_enrollment(enrollment, update_attrs)
+      assert {:ok, %CourseEnrollment{} = _course_enrollment} =
+               University.update_course_enrollment(course_enrollment, update_attrs)
     end
 
-    test "update_enrollment/2 with invalid data returns error changeset" do
-      enrollment = enrollment_fixture()
+    test "update_course_enrollment/2 with invalid data returns error changeset" do
+      course_enrollment = course_enrollment_fixture()
 
       assert {:error, %Ecto.Changeset{}} =
-               University.update_enrollment(enrollment, @invalid_attrs)
+               University.update_course_enrollment(course_enrollment, @invalid_attrs)
 
-      assert enrollment == University.get_enrollment!(enrollment.id)
+      assert course_enrollment == University.get_course_enrollment!(course_enrollment.id)
     end
 
-    test "delete_enrollment/1 deletes the enrollment" do
-      enrollment = enrollment_fixture()
-      assert {:ok, %Enrollment{}} = University.delete_enrollment(enrollment)
-      assert_raise Ecto.NoResultsError, fn -> University.get_enrollment!(enrollment.id) end
+    test "delete_course_enrollment/1 deletes the course_enrollment" do
+      course_enrollment = course_enrollment_fixture()
+      assert {:ok, %CourseEnrollment{}} = University.delete_course_enrollment(course_enrollment)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        University.get_course_enrollment!(course_enrollment.id)
+      end
     end
 
-    test "change_enrollment/1 returns a enrollment changeset" do
-      enrollment = enrollment_fixture()
-      assert %Ecto.Changeset{} = University.change_enrollment(enrollment)
+    test "change_course_enrollment/1 returns a course_enrollment changeset" do
+      course_enrollment = course_enrollment_fixture()
+      assert %Ecto.Changeset{} = University.change_course_enrollment(course_enrollment)
     end
   end
 end

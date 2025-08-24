@@ -24,17 +24,17 @@ defmodule Atlas.UniversityFixtures do
   end
 
   @doc """
-  Generate a enrollment.
+  Generate a course enrollment.
   """
-  def enrollment_fixture(attrs \\ %{}) do
-    {:ok, enrollment} =
+  def course_enrollment_fixture(attrs \\ %{}) do
+    {:ok, course_enrollment} =
       attrs
       |> Enum.into(%{
         student_id: student_fixture().id,
         course_id: course_fixture(%{code: "some code"}).id
       })
-      |> Atlas.University.create_enrollment()
+      |> Atlas.University.create_course_enrollment()
 
-    enrollment
+    course_enrollment
   end
 end

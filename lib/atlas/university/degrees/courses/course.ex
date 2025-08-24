@@ -19,7 +19,7 @@ defmodule Atlas.University.Degrees.Courses.Course do
     belongs_to :degree, Atlas.University.Degrees.Degree
 
     many_to_many :students, Atlas.University.Student,
-      join_through: Atlas.University.Enrollment,
+      join_through: Atlas.University.CourseEnrollment,
       on_replace: :delete
 
     has_many :shifts, Atlas.University.Degrees.Courses.Shifts.Shift
