@@ -21,10 +21,12 @@ defmodule AtlasWeb.University.StudentsController do
 
     case Atlas.University.update_student_schedule(user.student.id, shifts) do
       {:ok, %{}} ->
+        courses =
+          Atlas.University.list_student_schedule(user.student.id)
+
         conn
-        # |> put_view(AtlasWeb.University.CourseJSON)
-        # |> render(:index, courses: courses)
-        |> put_status(:no_content)
+        |> put_view(AtlasWeb.University.CourseJSON)
+        |> render(:index, courses: courses)
 
       {:error, _, changeset} ->
         conn
