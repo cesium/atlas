@@ -15,8 +15,27 @@ defmodule Atlas.University.Degrees.Courses do
       [%Course{}, ...]
 
   """
-  def list_courses do
-    Repo.all(Course)
+  def list_courses(opts \\ []) do
+    Course
+    |> apply_filters(opts)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of courses with no parent.
+
+  ## Examples
+
+      iex> list_courses_with_no_parent()
+      [%Course{}, ...]
+
+  """
+  def list_courses_with_no_parent(opts \\ []) do
+    Course
+    |> where([c], is_nil(c.parent_course_id))
+    |> preload([:shifts, courses: [:shifts]])
+    |> apply_filters(opts)
+    |> Repo.all()
   end
 
   @doc """

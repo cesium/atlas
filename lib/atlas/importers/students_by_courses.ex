@@ -47,7 +47,7 @@ defmodule Atlas.Importers.StudentsByCourses do
         })
       end
 
-    import_enrollment(course, user.student)
+    import_course_enrollment(course, user.student)
   end
 
   defp parse_row(row) do
@@ -140,7 +140,7 @@ defmodule Atlas.Importers.StudentsByCourses do
     })
   end
 
-  defp import_enrollment(course, student) do
+  defp import_course_enrollment(course, student) do
     if course && student do
       University.enroll_student_in_course(student, course)
     end
