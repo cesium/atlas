@@ -21,6 +21,8 @@ defmodule Atlas.University.ShiftEnrollment do
   def changeset(shift_enrollment, attrs) do
     shift_enrollment
     |> cast(attrs, @required_fields)
+    |> foreign_key_constraint(:student_id)
+    |> foreign_key_constraint(:shift_id)
     |> validate_required(@required_fields)
   end
 end

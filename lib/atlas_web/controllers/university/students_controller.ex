@@ -20,7 +20,7 @@ defmodule AtlasWeb.University.StudentsController do
     user = user |> Atlas.Repo.preload(:student)
 
     case Atlas.University.update_student_schedule(user.student.id, shifts) do
-      {:ok, %{}} ->
+      {:ok, _} ->
         courses =
           Atlas.University.list_student_schedule(user.student.id)
 
@@ -28,10 +28,15 @@ defmodule AtlasWeb.University.StudentsController do
         |> put_view(AtlasWeb.University.CourseJSON)
         |> render(:index, courses: courses)
 
-      {:error, _, changeset} ->
+      {:error, _reason} ->
         conn
-        |> put_view(AtlasWeb.University.CourseJSON)
-        |> render(:error, changeset: changeset)
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Could not update schedule."})
+
+      {:error, _, _, _} ->
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Could not update schedule."})
     end
   end
 end

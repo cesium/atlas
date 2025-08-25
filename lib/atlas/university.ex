@@ -403,22 +403,9 @@ defmodule Atlas.University do
 
       new_shift_ids = shifts |> Enum.filter(&(!MapSet.member?(existing_shift_ids, &1)))
 
-      new_shift_ids
-      |> Enum.map(fn shift_id ->
-        %ShiftEnrollment{}
-        |> ShiftEnrollment.changeset(%{
-          student_id: student_id,
-          shift_id: shift_id,
-          status: :override
-        })
-        |> repo.insert()
-      end)
-      |> case do
-        [] -> {:ok, []}
-        results -> {:ok, results}
-      end
+      insert_new_shift_enrollments(repo, student_id, new_shift_ids)
     end)
-    |> Repo.transaction()
+    |> Repo.transact()
   end
 
   defp fetch_existing_shifts(repo, student_id, shifts) do
@@ -431,5 +418,31 @@ defmodule Atlas.University do
       |> select([se], se.shift_id)
     )
     |> MapSet.new()
+  end
+
+  defp insert_new_shift_enrollments(repo, student_id, new_shift_ids) do
+    new_shift_ids
+    |> Enum.reduce_while({:ok, []}, fn shift_id, {:ok, acc} ->
+      shift_id
+      |> create_shift_enrollment_changeset(student_id)
+      |> repo.insert()
+      |> case do
+        {:ok, enrollment} -> {:cont, {:ok, [enrollment | acc]}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+    |> case do
+      {:ok, results} -> {:ok, results}
+      error -> error
+    end
+  end
+
+  defp create_shift_enrollment_changeset(shift_id, student_id) do
+    %ShiftEnrollment{}
+    |> ShiftEnrollment.changeset(%{
+      student_id: student_id,
+      shift_id: shift_id,
+      status: :override
+    })
   end
 end
