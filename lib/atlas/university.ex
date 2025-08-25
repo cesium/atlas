@@ -6,6 +6,7 @@ defmodule Atlas.University do
   use Atlas.Context
 
   alias Atlas.University.{CourseEnrollment, Student}
+  alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
   @doc """
@@ -345,5 +346,90 @@ defmodule Atlas.University do
   """
   def change_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs \\ %{}) do
     ShiftEnrollment.changeset(shift_enrollment, attrs)
+  end
+
+  def list_student_schedule(student_id, original_only \\ false) do
+    statuses = if original_only, do: [:active, :inactive], else: [:active, :override]
+
+    Course
+    |> join(:left, [c], cc in assoc(c, :courses))
+    |> join(:left, [c], s in assoc(c, :shifts))
+    |> join(:left, [c, cc], cs in assoc(cc, :shifts))
+    |> join(:inner, [c, cc, s, cs], se in Atlas.University.ShiftEnrollment,
+      on: se.shift_id == s.id or se.shift_id == cs.id
+    )
+    |> join(:left, [c, cc, s], t1 in assoc(s, :timeslots))
+    |> join(:left, [c, cc, s, cs], t2 in assoc(cs, :timeslots))
+    |> where([c], is_nil(c.parent_course_id))
+    |> where([c, cc, s, cs, se], se.student_id == ^student_id)
+    |> where([c, cc, s, cs, se], se.status in ^statuses)
+    |> preload([c, cc, s, cs, se, t1, t2],
+      shifts: {s, timeslots: t1},
+      courses: {cc, shifts: {cs, timeslots: t2}}
+    )
+    |> Repo.all()
+  end
+
+  def update_student_schedule(student_id, shifts) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_existing_enrollment_overrides,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :override and se.shift_id not in ^shifts
+      )
+    )
+    |> Ecto.Multi.update_all(
+      :deactivate_removed_enrollments,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :active and se.shift_id not in ^shifts
+      ),
+      set: [status: :inactive]
+    )
+    |> Ecto.Multi.update_all(
+      :reactivate_existing_enrollments,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :inactive and se.shift_id in ^shifts
+      ),
+      set: [status: :active]
+    )
+    |> Ecto.Multi.run(:insert_new_schedule, fn repo, _changes ->
+      existing_shift_ids = fetch_existing_shifts(repo, student_id, shifts)
+
+      new_shift_ids = shifts |> Enum.filter(&(!MapSet.member?(existing_shift_ids, &1)))
+
+      new_shift_ids
+      |> Enum.map(fn shift_id ->
+        %ShiftEnrollment{}
+        |> ShiftEnrollment.changeset(%{
+          student_id: student_id,
+          shift_id: shift_id,
+          status: :override
+        })
+        |> repo.insert()
+      end)
+      |> case do
+        [] -> {:ok, []}
+        results -> {:ok, results}
+      end
+    end)
+    |> Repo.transaction()
+  end
+
+  defp fetch_existing_shifts(repo, student_id, shifts) do
+    repo.all(
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.shift_id in ^shifts
+      )
+      |> select([se], se.shift_id)
+    )
+    |> MapSet.new()
   end
 end

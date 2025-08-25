@@ -49,6 +49,15 @@ defmodule AtlasWeb.Router do
       get "/sessions", AuthController, :sessions
     end
 
+    scope "/courses", University do
+      get "/", CourseController, :index
+    end
+
+    scope "/student", University do
+      get "/schedule", StudentsController, :schedule_index
+      post "/schedule", StudentsController, :schedule_update
+    end
+
     pipe_through :is_at_least_professor
 
     scope "/jobs" do
@@ -59,10 +68,6 @@ defmodule AtlasWeb.Router do
     scope "/import" do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses
-    end
-
-    scope "/courses", University do
-      get "/", CourseController, :index
     end
   end
 
