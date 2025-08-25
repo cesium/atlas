@@ -231,4 +231,23 @@ defmodule Atlas.University do
       )
     )
   end
+
+  @doc """
+  Queues a job to import shifts by courses from a CSV file.
+
+  ## Examples
+
+      iex> queue_import_shifts_by_courses(file_path, user)
+      {:ok, %Oban.Job{}}
+
+      iex> queue_import_shifts_by_courses(file_path, user)
+      {:error, reason}
+  """
+  def queue_import_shifts_by_courses(file_path, user) do
+    Oban.insert(
+      Workers.ImportShiftsByCourses.new(%{"file_path" => file_path},
+        meta: %{user_id: user.id, type: :import_shifts_by_courses}
+      )
+    )
+  end
 end

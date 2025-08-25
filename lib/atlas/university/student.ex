@@ -13,9 +13,9 @@ defmodule Atlas.University.Student do
     field :degree_year, :integer
 
     belongs_to :user, Atlas.Accounts.User
-    belongs_to :degree, Atlas.Degrees.Degree
+    belongs_to :degree, Atlas.University.Degrees.Degree
 
-    many_to_many :courses, Atlas.Degrees.Course,
+    many_to_many :courses, Atlas.University.Degrees.Courses.Course,
       join_through: Atlas.University.Enrollment,
       on_replace: :delete
 

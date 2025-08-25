@@ -9,7 +9,7 @@ defmodule Atlas.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      compilers: Mix.compilers() ++ [:phoenix_swagger],
+      compilers: Mix.compilers(),
       deps: deps()
     ]
   end
@@ -58,6 +58,7 @@ defmodule Atlas.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:xlsx_reader, "~> 0.8.8"},
       {:igniter, "~> 0.5", only: [:dev]},
+      {:csv, "~> 3.2"},
 
       # monitoring
       {:telemetry_metrics, "~> 1.0"},
@@ -73,10 +74,7 @@ defmodule Atlas.MixProject do
 
       # utilities
       {:remote_ip, "~> 1.2"},
-      {:ua_parser, "~> 1.8"},
-
-      # swagger
-      {:phoenix_swagger, "~> 0.8", runtime: false}
+      {:ua_parser, "~> 1.8"}
     ]
   end
 
