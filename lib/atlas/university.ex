@@ -348,6 +348,15 @@ defmodule Atlas.University do
     ShiftEnrollment.changeset(shift_enrollment, attrs)
   end
 
+  @doc """
+  Lists the schedule for a student.
+
+  ## Examples
+
+      iex> list_student_schedule(123)
+      [%Course{}, ...]
+
+  """
   def list_student_schedule(student_id, original_only \\ false) do
     statuses = if original_only, do: [:active, :inactive], else: [:active, :override]
 
@@ -370,7 +379,40 @@ defmodule Atlas.University do
     |> Repo.all()
   end
 
-  def update_student_schedule(student_id, shifts) do
+  @doc """
+  Updates the schedule for a student.
+
+  ## Examples
+
+      iex> update_student_schedule(123, [123, 345])
+      {:ok, [%Course{}]}
+
+      iex> update_student_schedule(123, [456])
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_student_schedule(student_id, shifts, override_original \\ false) do
+    if override_original do
+      update_student_schedule_with_override(student_id, shifts)
+    else
+      update_student_schedule_normal(student_id, shifts)
+    end
+  end
+
+  defp update_student_schedule_with_override(student_id, shifts) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_all_existing_enrollments,
+      ShiftEnrollment
+      |> where([se], se.student_id == ^student_id)
+    )
+    |> Ecto.Multi.run(:insert_new_schedule, fn repo, _changes ->
+      insert_new_shift_enrollments(repo, student_id, shifts, :active)
+    end)
+    |> Repo.transact()
+  end
+
+  defp update_student_schedule_normal(student_id, shifts) do
     Ecto.Multi.new()
     |> Ecto.Multi.delete_all(
       :delete_existing_enrollment_overrides,
@@ -400,9 +442,7 @@ defmodule Atlas.University do
     )
     |> Ecto.Multi.run(:insert_new_schedule, fn repo, _changes ->
       existing_shift_ids = fetch_existing_shifts(repo, student_id, shifts)
-
       new_shift_ids = shifts |> Enum.filter(&(!MapSet.member?(existing_shift_ids, &1)))
-
       insert_new_shift_enrollments(repo, student_id, new_shift_ids)
     end)
     |> Repo.transact()
@@ -420,11 +460,11 @@ defmodule Atlas.University do
     |> MapSet.new()
   end
 
-  defp insert_new_shift_enrollments(repo, student_id, new_shift_ids) do
+  defp insert_new_shift_enrollments(repo, student_id, new_shift_ids, status \\ :override) do
     new_shift_ids
     |> Enum.reduce_while({:ok, []}, fn shift_id, {:ok, acc} ->
       shift_id
-      |> create_shift_enrollment_changeset(student_id)
+      |> create_shift_enrollment_changeset(student_id, status)
       |> repo.insert()
       |> case do
         {:ok, enrollment} -> {:cont, {:ok, [enrollment | acc]}}
@@ -437,12 +477,12 @@ defmodule Atlas.University do
     end
   end
 
-  defp create_shift_enrollment_changeset(shift_id, student_id) do
+  defp create_shift_enrollment_changeset(shift_id, student_id, status) do
     %ShiftEnrollment{}
     |> ShiftEnrollment.changeset(%{
       student_id: student_id,
       shift_id: shift_id,
-      status: :override
+      status: status
     })
   end
 end
