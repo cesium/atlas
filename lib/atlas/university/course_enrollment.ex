@@ -1,6 +1,6 @@
 defmodule Atlas.University.CourseEnrollment do
   @moduledoc """
-  Student course enrollment in courses.
+  Student enrollment in courses.
   """
   use Atlas.Schema
 
