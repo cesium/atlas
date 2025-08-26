@@ -1,11 +1,11 @@
-defmodule Atlas.University.Enrollment do
+defmodule Atlas.University.CourseEnrollment do
   @moduledoc """
   Student enrollment in courses.
   """
   use Atlas.Schema
 
   @required_fields ~w(student_id course_id)a
-  schema "enrollments" do
+  schema "course_enrollments" do
     belongs_to :student, Atlas.University.Student
     belongs_to :course, Atlas.University.Degrees.Courses.Course
 
@@ -13,8 +13,8 @@ defmodule Atlas.University.Enrollment do
   end
 
   @doc false
-  def changeset(enrollment, attrs) do
-    enrollment
+  def changeset(course_enrollment, attrs) do
+    course_enrollment
     |> cast(attrs, @required_fields)
     |> validate_required(@required_fields)
     |> unique_constraint([:student_id, :course_id], name: :unique_student_course_enrollment)

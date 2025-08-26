@@ -79,7 +79,7 @@
             "semester": 1,
             "courses": [
                  {
-                    "code": "J3U004",
+                    "code": "J3U79W",
                     "name": "Matemática das Coisas",
                     "year": 1,
                     "semester": 1
@@ -97,25 +97,25 @@
                     "semester": 1
                 },
                 {
-                    "code": "J3U090",
+                    "code": "J3U79J",
                     "name": "Desporto e Saúde",
                     "year": 1,
                     "semester": 1
                 },
                 {
-                    "code": "J3U170",
+                    "code": "G6U905",
                     "name": "Cidadania Digital",
                     "year": 1,
                     "semester": 1
                 },
                 {
-                    "code": "J3U171",
+                    "code": "45U904",
                     "name": "Sustentabilidade Ambiental, Social e Económica",
                     "year": 1,
                     "semester": 1
                 },
                 {
-                    "code": "J3U238",
+                    "code": "14U908",
                     "name": "Literacia Fotográfica da Física à Mensagem",
                     "year": 1,
                     "semester": 1
@@ -127,7 +127,7 @@
                     "semester": 1
                 },
                 {
-                    "code": "J3U240",
+                    "code": "14U912",
                     "name": "Tópicos de Astronomia e Cosmologia",
                     "year": 1,
                     "semester": 1
@@ -151,7 +151,7 @@
                     "semester": 1
                 },
                 {
-                    "code": "J3U275",
+                    "code": "79U906",
                     "name": "Direito Laboral",
                     "year": 1,
                     "semester": 1
@@ -181,12 +181,6 @@
                     "semester": 1
                 },
                 {
-                    "code": "J3U79J",
-                    "name": "Desporto e Saúde",
-                    "year": 1,
-                    "semester": 1
-                },
-                {
                     "code": "J3U79L",
                     "name": "Gestão de Ativos",
                     "year": 1,
@@ -211,8 +205,14 @@
                     "semester": 1
                 },
                 {
-                    "code": "J3U79W",
-                    "name": "Matemática das Coisas",
+                    "code": "J5U901",
+                    "name": "Psicologia no Quotidiano",
+                    "year": 1,
+                    "semester": 1
+                },
+                {
+                    "code": "H6U906",
+                    "name": "Ergonomia Visual",
                     "year": 1,
                     "semester": 1
                 }
@@ -267,13 +267,13 @@
             "semester": 2
         },
         {
-            "code": "J304N3",
+            "code": "J303O1",
             "name": "Bases de Dados",
             "year": 2,
             "semester": 2
         },
         {
-            "code": "J304N4",
+            "code": "J305O9",
             "name": "Métodos Numéricos e Otimização não Linear",
             "year": 2,
             "semester": 2
