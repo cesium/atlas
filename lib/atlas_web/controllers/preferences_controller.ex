@@ -1,6 +1,5 @@
 defmodule AtlasWeb.PreferencesController do
   use AtlasWeb, :controller
-  use PhoenixSwagger
 
   alias Atlas.Accounts
 
