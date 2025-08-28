@@ -63,6 +63,7 @@ defmodule Atlas.MixProject do
       {:xlsx_reader, "~> 0.8.8"},
       {:igniter, "~> 0.5", only: [:dev]},
       {:csv, "~> 3.2"},
+      {:libgraph, "~> 0.16.0"},
 
       # monitoring
       {:telemetry_metrics, "~> 1.0"},
