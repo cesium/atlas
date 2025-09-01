@@ -44,13 +44,16 @@ defmodule AtlasWeb.Router do
     pipe_through :auth
 
     scope "/auth" do
-      get "/preferences", PreferencesController, :get_preferences
-      get "/preferences/:preference", PreferencesController, :get_preference
-      get "/available_preferences", PreferencesController, :get_available_preferences
-      put "/preferences", PreferencesController, :update_preferences
       post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
+    end
+
+    scope "/preferences" do
+      get "/", PreferencesController, :get_preferences
+      get "/available", PreferencesController, :get_available_preferences
+      get "/:preference", PreferencesController, :get_preference
+      put "/", PreferencesController, :update_preferences
     end
 
     pipe_through :is_at_least_professor
