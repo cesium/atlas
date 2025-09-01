@@ -1,4 +1,4 @@
-defmodule Atlas.Accounts.UserPreference do
+defmodule Atlas.Accounts.UserPreferences do
   @moduledoc """
   Schema for storing a user's preference.
   """

@@ -13,16 +13,6 @@ defmodule Atlas.PreferencesTest do
     }
   end
 
-  describe "get_preferences/2" do
-    test "returns the user's preferences", %{authenticated_conn: conn, user: user} do
-      conn = PreferencesController.get_preferences(conn, %{})
-
-      response = json_response(conn, 200)
-      assert response["user_id"] == user.id
-      assert Map.has_key?(response, "language")
-    end
-  end
-
   describe "get_preference/2" do
     test "returns the specific preference (language)", %{authenticated_conn: conn} do
       PreferencesController.update_preferences(conn, %{

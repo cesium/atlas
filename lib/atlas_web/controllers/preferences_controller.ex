@@ -3,16 +3,6 @@ defmodule AtlasWeb.PreferencesController do
 
   alias Atlas.Accounts
 
-  def get_preferences(conn, _params) do
-    {user, _session} = Guardian.Plug.current_resource(conn)
-    preferences = Accounts.get_user_preferences(user.id)
-
-    json(conn, %{
-      user_id: preferences.user_id,
-      language: preferences.language
-    })
-  end
-
   def get_preference(conn, %{"preference" => preference}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
     preference_value = Accounts.get_user_preference(user.id, preference)

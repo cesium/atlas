@@ -5,7 +5,7 @@ defmodule Atlas.Accounts do
 
   use Atlas.Context
 
-  alias Atlas.Accounts.{User, UserNotifier, UserPreference, UserSession, UserToken}
+  alias Atlas.Accounts.{User, UserNotifier, UserPreferences, UserSession, UserToken}
   alias Atlas.University.Student
 
   ## Database getters
@@ -552,8 +552,8 @@ defmodule Atlas.Accounts do
   Creates a user preference.
   """
   def create_preference(attrs) when is_map(attrs) and map_size(attrs) > 0 do
-    %UserPreference{}
-    |> UserPreference.changeset(attrs)
+    %UserPreferences{}
+    |> UserPreferences.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -562,10 +562,10 @@ defmodule Atlas.Accounts do
   @doc """
   Updates a user preference.
   """
-  def update_preference(%UserPreference{} = preference, attrs)
+  def update_preference(%UserPreferences{} = preference, attrs)
       when is_map(attrs) and map_size(attrs) > 0 do
     preference
-    |> UserPreference.changeset(attrs)
+    |> UserPreferences.changeset(attrs)
     |> Repo.update()
   end
 
@@ -577,13 +577,13 @@ defmodule Atlas.Accounts do
   ## Examples
 
       iex> get_user_preferences(1)
-      %UserPreference{}
+      %UserPreferences{}
 
       iex> get_user_preferences(999)
       nil
   """
   def get_user_preferences(user_id) do
-    Repo.get_by(UserPreference, user_id: user_id)
+    Repo.get_by(UserPreferences, user_id: user_id)
   end
 
   @doc """
@@ -608,10 +608,10 @@ defmodule Atlas.Accounts do
   ## Examples
 
       iex> set_user_preference(%{"user_id" => "1", "language" => "en-US"})
-      %UserPreference{}
+      %UserPreferences{}
 
       iex> set_user_preference(%{"user_id" => "1", "language" => "pt-PT", "invalid_field" => "none"})
-      %UserPreference{}
+      %UserPreferences{}
 
       iex> set_user_preference(%{"user_id" => "2", "language" => nil})
       {:error, :invalid_fields}
@@ -631,7 +631,7 @@ defmodule Atlas.Accounts do
 
     case get_user_preferences(user_id) do
       nil -> create_preference(update_fields)
-      %UserPreference{} = up -> update_preference(up, update_fields)
+      %UserPreferences{} = up -> update_preference(up, update_fields)
     end
   end
 
@@ -643,8 +643,8 @@ defmodule Atlas.Accounts do
   @doc false
   defp create_default_preferences_multi(multi) do
     Ecto.Multi.insert(multi, :preferences, fn %{user: user} ->
-      %UserPreference{user_id: user.id}
-      |> UserPreference.changeset(%{})
+      %UserPreferences{user_id: user.id}
+      |> UserPreferences.changeset(%{})
     end)
   end
 end
