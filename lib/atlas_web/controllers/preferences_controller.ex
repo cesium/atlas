@@ -3,6 +3,16 @@ defmodule AtlasWeb.PreferencesController do
 
   alias Atlas.Accounts
 
+  def get_preferences(conn, _params) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+    case Accounts.get_user_preferences(user.id) do
+      nil -> json(conn, %{error: "Preferences not found"})
+      preferences -> conn
+      |> put_view(AtlasWeb.UserPreferencesJSON)
+      |> render(:show, preferences: preferences)
+    end
+  end
+
   def get_preference(conn, %{"preference" => preference}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
     preference_value = Accounts.get_user_preference(user.id, preference)
