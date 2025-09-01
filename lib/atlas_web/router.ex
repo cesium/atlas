@@ -53,9 +53,9 @@ defmodule AtlasWeb.Router do
       get "/", PreferencesController, :get_preferences
       get "/available", PreferencesController, :get_available_preferences
       get "/:preference", PreferencesController, :get_preference
-      put "/", PreferencesController, :update_preferences  
+      put "/", PreferencesController, :update_preferences
     end
-    
+
     scope "/courses", University do
       get "/", CourseController, :index
     end
