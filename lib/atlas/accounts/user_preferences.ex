@@ -9,7 +9,7 @@ defmodule Atlas.Accounts.UserPreference do
   @optional_fields ~w(language)a
   @required_fields ~w(user_id)a
 
-  schema "user_preferences" do
+  schema "users_preferences" do
     field :language, :string
 
     belongs_to :user, Atlas.Accounts.User, type: :binary_id
