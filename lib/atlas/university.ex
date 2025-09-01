@@ -5,7 +5,8 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
-  alias Atlas.University.{Enrollment, Student}
+  alias Atlas.University.{CourseEnrollment, Student}
+  alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
   @doc """
@@ -103,97 +104,97 @@ defmodule Atlas.University do
   end
 
   @doc """
-  Returns the list of enrollments.
+  Returns the list of course enrollments.
 
   ## Examples
 
-      iex> list_enrollments()
-      [%Enrollment{}, ...]
+      iex> list_course_enrollments()
+      [%CourseEnrollment{}, ...]
 
   """
-  def list_enrollments do
-    Repo.all(Enrollment)
+  def list_course_enrollments do
+    Repo.all(CourseEnrollment)
   end
 
   @doc """
-  Gets a single enrollment.
+  Gets a single course enrollment.
 
-  Raises `Ecto.NoResultsError` if the Enrollment does not exist.
+  Raises `Ecto.NoResultsError` if the CourseEnrollment does not exist.
 
   ## Examples
 
-      iex> get_enrollment!(123)
-      %Enrollment{}
+      iex> get_course_enrollment!(123)
+      %CourseEnrollment{}
 
-      iex> get_enrollment!(456)
+      iex> get_course_enrollment!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_enrollment!(id), do: Repo.get!(Enrollment, id)
+  def get_course_enrollment!(id), do: Repo.get!(CourseEnrollment, id)
 
   @doc """
-  Creates a enrollment.
+  Creates a course enrollment.
 
   ## Examples
 
-      iex> create_enrollment(%{field: value})
-      {:ok, %Enrollment{}}
+      iex> create_course_enrollment(%{field: value})
+      {:ok, %CourseEnrollment{}}
 
-      iex> create_enrollment(%{field: bad_value})
+      iex> create_course_enrollment(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_enrollment(attrs \\ %{}) do
-    %Enrollment{}
-    |> Enrollment.changeset(attrs)
+  def create_course_enrollment(attrs \\ %{}) do
+    %CourseEnrollment{}
+    |> CourseEnrollment.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a enrollment.
+  Updates a course enrollment.
 
   ## Examples
 
-      iex> update_enrollment(enrollment, %{field: new_value})
-      {:ok, %Enrollment{}}
+      iex> update_course_enrollment(course_enrollment, %{field: new_value})
+      {:ok, %CourseEnrollment{}}
 
-      iex> update_enrollment(enrollment, %{field: bad_value})
+      iex> update_course_enrollment(course_enrollment, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_enrollment(%Enrollment{} = enrollment, attrs) do
-    enrollment
-    |> Enrollment.changeset(attrs)
+  def update_course_enrollment(%CourseEnrollment{} = course_enrollment, attrs) do
+    course_enrollment
+    |> CourseEnrollment.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a enrollment.
+  Deletes a course enrollment.
 
   ## Examples
 
-      iex> delete_enrollment(enrollment)
-      {:ok, %Enrollment{}}
+      iex> delete_course_enrollment(course_enrollment)
+      {:ok, %CourseEnrollment{}}
 
-      iex> delete_enrollment(enrollment)
+      iex> delete_course_enrollment(course_enrollment)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_enrollment(%Enrollment{} = enrollment) do
-    Repo.delete(enrollment)
+  def delete_course_enrollment(%CourseEnrollment{} = course_enrollment) do
+    Repo.delete(course_enrollment)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking enrollment changes.
+  Returns an `%Ecto.Changeset{}` for tracking course_enrollment changes.
 
   ## Examples
 
-      iex> change_enrollment(enrollment)
-      %Ecto.Changeset{data: %Enrollment{}}
+      iex> change_course_enrollment(course_enrollment)
+      %Ecto.Changeset{data: %CourseEnrollment{}}
 
   """
-  def change_enrollment(%Enrollment{} = enrollment, attrs \\ %{}) do
-    Enrollment.changeset(enrollment, attrs)
+  def change_course_enrollment(%CourseEnrollment{} = course_enrollment, attrs \\ %{}) do
+    CourseEnrollment.changeset(course_enrollment, attrs)
   end
 
   @doc """
@@ -202,14 +203,14 @@ defmodule Atlas.University do
   ## Examples
 
       iex> enroll_student_in_course(student, course)
-      {:ok, %Enrollment{}}
+      {:ok, %CourseEnrollment{}}
 
       iex> enroll_student_in_course(student, course)
       {:error, %Ecto.Changeset{}}
   """
   def enroll_student_in_course(student, course) do
-    %Enrollment{}
-    |> Enrollment.changeset(%{student_id: student.id, course_id: course.id})
+    %CourseEnrollment{}
+    |> CourseEnrollment.changeset(%{student_id: student.id, course_id: course.id})
     |> Repo.insert()
   end
 
@@ -249,5 +250,239 @@ defmodule Atlas.University do
         meta: %{user_id: user.id, type: :import_shifts_by_courses}
       )
     )
+  end
+
+  alias Atlas.University.ShiftEnrollment
+
+  @doc """
+  Returns the list of shift_enrollments.
+
+  ## Examples
+
+      iex> list_shift_enrollments()
+      [%ShiftEnrollment{}, ...]
+
+  """
+  def list_shift_enrollments do
+    Repo.all(ShiftEnrollment)
+  end
+
+  @doc """
+  Gets a single shift_enrollment.
+
+  Raises `Ecto.NoResultsError` if the Shift enrollment does not exist.
+
+  ## Examples
+
+      iex> get_shift_enrollment!(123)
+      %ShiftEnrollment{}
+
+      iex> get_shift_enrollment!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_shift_enrollment!(id), do: Repo.get!(ShiftEnrollment, id)
+
+  @doc """
+  Creates a shift_enrollment.
+
+  ## Examples
+
+      iex> create_shift_enrollment(%{field: value})
+      {:ok, %ShiftEnrollment{}}
+
+      iex> create_shift_enrollment(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_shift_enrollment(attrs \\ %{}) do
+    %ShiftEnrollment{}
+    |> ShiftEnrollment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a shift_enrollment.
+
+  ## Examples
+
+      iex> update_shift_enrollment(shift_enrollment, %{field: new_value})
+      {:ok, %ShiftEnrollment{}}
+
+      iex> update_shift_enrollment(shift_enrollment, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs) do
+    shift_enrollment
+    |> ShiftEnrollment.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a shift_enrollment.
+
+  ## Examples
+
+      iex> delete_shift_enrollment(shift_enrollment)
+      {:ok, %ShiftEnrollment{}}
+
+      iex> delete_shift_enrollment(shift_enrollment)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_shift_enrollment(%ShiftEnrollment{} = shift_enrollment) do
+    Repo.delete(shift_enrollment)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking shift_enrollment changes.
+
+  ## Examples
+
+      iex> change_shift_enrollment(shift_enrollment)
+      %Ecto.Changeset{data: %ShiftEnrollment{}}
+
+  """
+  def change_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs \\ %{}) do
+    ShiftEnrollment.changeset(shift_enrollment, attrs)
+  end
+
+  @doc """
+  Lists the schedule for a student.
+
+  ## Examples
+
+      iex> list_student_schedule(123)
+      [%Course{}, ...]
+
+  """
+  def list_student_schedule(student_id, original_only \\ false) do
+    statuses = if original_only, do: [:active, :inactive], else: [:active, :override]
+
+    Course
+    |> join(:left, [c], cc in assoc(c, :courses))
+    |> join(:left, [c], s in assoc(c, :shifts))
+    |> join(:left, [c, cc], cs in assoc(cc, :shifts))
+    |> join(:inner, [c, cc, s, cs], se in Atlas.University.ShiftEnrollment,
+      on: se.shift_id == s.id or se.shift_id == cs.id
+    )
+    |> join(:left, [c, cc, s], t1 in assoc(s, :timeslots))
+    |> join(:left, [c, cc, s, cs], t2 in assoc(cs, :timeslots))
+    |> where([c], is_nil(c.parent_course_id))
+    |> where([c, cc, s, cs, se], se.student_id == ^student_id)
+    |> where([c, cc, s, cs, se], se.status in ^statuses)
+    |> preload([c, cc, s, cs, se, t1, t2],
+      shifts: {s, timeslots: t1},
+      courses: {cc, shifts: {cs, timeslots: t2}}
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Updates the schedule for a student.
+
+  ## Examples
+
+      iex> update_student_schedule(123, [123, 345])
+      {:ok, [%Course{}]}
+
+      iex> update_student_schedule(123, [456])
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_student_schedule(student_id, shifts, override_original \\ false) do
+    if override_original do
+      update_student_schedule_with_override(student_id, shifts)
+    else
+      update_student_schedule_normal(student_id, shifts)
+    end
+  end
+
+  defp update_student_schedule_with_override(student_id, shifts) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_all_existing_enrollments,
+      ShiftEnrollment
+      |> where([se], se.student_id == ^student_id)
+    )
+    |> Ecto.Multi.run(:insert_new_schedule, fn repo, _changes ->
+      insert_new_shift_enrollments(repo, student_id, shifts, :active)
+    end)
+    |> Repo.transact()
+  end
+
+  defp update_student_schedule_normal(student_id, shifts) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_existing_enrollment_overrides,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :override and se.shift_id not in ^shifts
+      )
+    )
+    |> Ecto.Multi.update_all(
+      :deactivate_removed_enrollments,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :active and se.shift_id not in ^shifts
+      ),
+      set: [status: :inactive]
+    )
+    |> Ecto.Multi.update_all(
+      :reactivate_existing_enrollments,
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.status == :inactive and se.shift_id in ^shifts
+      ),
+      set: [status: :active]
+    )
+    |> Ecto.Multi.run(:insert_new_schedule, fn repo, _changes ->
+      existing_shift_ids = fetch_existing_shifts(repo, student_id, shifts)
+      new_shift_ids = shifts |> Enum.filter(&(!MapSet.member?(existing_shift_ids, &1)))
+      insert_new_shift_enrollments(repo, student_id, new_shift_ids)
+    end)
+    |> Repo.transact()
+  end
+
+  defp fetch_existing_shifts(repo, student_id, shifts) do
+    repo.all(
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.shift_id in ^shifts
+      )
+      |> select([se], se.shift_id)
+    )
+    |> MapSet.new()
+  end
+
+  defp insert_new_shift_enrollments(repo, student_id, new_shift_ids, status \\ :override) do
+    new_shift_ids
+    |> Enum.reduce_while({:ok, []}, fn shift_id, {:ok, acc} ->
+      shift_id
+      |> create_shift_enrollment_changeset(student_id, status)
+      |> repo.insert()
+      |> case do
+        {:ok, enrollment} -> {:cont, {:ok, [enrollment | acc]}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+    |> case do
+      {:ok, results} -> {:ok, results}
+      error -> error
+    end
+  end
+
+  defp create_shift_enrollment_changeset(shift_id, student_id, status) do
+    %ShiftEnrollment{}
+    |> ShiftEnrollment.changeset(%{
+      student_id: student_id,
+      shift_id: shift_id,
+      status: status
+    })
   end
 end
