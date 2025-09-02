@@ -74,8 +74,6 @@ defmodule AtlasWeb do
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
-
-      alias Pearl.Uploaders
     end
   end
 

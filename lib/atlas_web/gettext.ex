@@ -5,7 +5,7 @@ defmodule AtlasWeb.Gettext do
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-    use Gettext, backend: PearlWeb.Gettext
+    use Gettext, backend: AtlasWeb.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")
