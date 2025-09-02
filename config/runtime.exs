@@ -22,6 +22,10 @@ end
 
 config :atlas, :frontend_url, System.get_env("FRONTEND_URL", "http://localhost:3000")
 
+config :atlas,
+  from_email_name: System.get_env("FROM_EMAIL_NAME") || "Pombo",
+  from_email_address: System.get_env("FROM_EMAIL_ADDRESS") || "no-reply@pombo.di.uminho.pt"
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

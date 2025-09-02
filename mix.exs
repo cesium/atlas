@@ -52,7 +52,10 @@ defmodule Atlas.MixProject do
 
       # mailer
       {:swoosh, "~> 1.5"},
+      {:phoenix_view, "~> 2.0"},
+      {:phoenix_swoosh, "~> 1.0"},
       {:finch, "~> 0.13"},
+      {:gettext, "~> 0.26"},
 
       # tools
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},

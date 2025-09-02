@@ -1,0 +1,56 @@
+## This file is a PO Template file.
+##
+## "msgid"s here are often extracted from source code.
+## Add new messages manually only if they're dynamic
+## messages that can't be statically extracted.
+##
+## Run "mix gettext.extract" to bring this file up to
+## date. Leave "msgstr"s empty as changing them here has no
+## effect: edit them in PO (.po) files instead.
+#
+msgid ""
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:116
+#: lib/atlas_web/templates/email/reset_password.html.heex:116
+#, elixir-autogen, elixir-format
+msgid "Hi"
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:235
+#, elixir-autogen, elixir-format
+msgid "If the button above doesn&#x27;t work, you can also click\n                      on the following link:"
+msgstr ""
+
+#: lib/atlas/accounts/user_notifier.ex:96
+#: lib/atlas_web/templates/email/reset_password.html.heex:193
+#, elixir-autogen, elixir-format
+msgid "Reset your password"
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:215
+#: lib/atlas_web/templates/email/reset_password.html.heex:216
+#, elixir-autogen, elixir-format
+msgid "See you soon!"
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:193
+#, elixir-autogen, elixir-format
+msgid "Verify your Email"
+msgstr ""
+
+#: lib/atlas_web/templates/email/reset_password.html.heex:127
+#, elixir-autogen, elixir-format
+msgid "We received a request to reset your password. Click the\n                      button below to reset it. If you did not request a\n                      password reset, please ignore this email."
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:127
+#, elixir-autogen, elixir-format
+msgid "We&#x27;re excited to have you here! To get started,\n                      please verify your email address by clicking the button\n                      below."
+msgstr ""
+
+#: lib/atlas_web/templates/email/confirm_email.html.heex:37
+#: lib/atlas_web/templates/email/reset_password.html.heex:37
+#, elixir-autogen, elixir-format
+msgid "Welcome to Pombo! We&#x27;re excited to have you on board."
+msgstr ""

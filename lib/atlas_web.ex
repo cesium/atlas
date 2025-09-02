@@ -47,6 +47,38 @@ defmodule AtlasWeb do
     end
   end
 
+  def view do
+    quote do
+      use Phoenix.View,
+        root: "lib/atlas_web/templates",
+        namespace: AtlasWeb
+
+      # Import convenience functions from controllers
+      import Phoenix.Controller,
+        only: [view_module: 1, view_template: 1]
+
+      # Include shared imports and aliases for views
+      unquote(html_helpers())
+    end
+  end
+
+  defp html_helpers do
+    quote do
+      # HTML escaping functionality
+      import Phoenix.HTML
+      # Core UI components and translation
+      use Gettext, backend: AtlasWeb.Gettext
+
+      # Shortcut for generating JS commands
+      alias Phoenix.LiveView.JS
+
+      # Routes generation with the ~p sigil
+      unquote(verified_routes())
+
+      alias Pearl.Uploaders
+    end
+  end
+
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
