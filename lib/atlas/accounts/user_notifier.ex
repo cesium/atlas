@@ -83,8 +83,8 @@ defmodule Atlas.Accounts.UserNotifier do
 
     # Set locale based on user preference, fallback to default
     locale =
-      case Atlas.Accounts.get_user_preference(user.id) do
-        {:ok, %{locale: user_locale}} -> user_locale |> String.replace("-", "_")
+      case Atlas.Accounts.get_user_preferences(user.id) do
+        %{language: language} -> language |> String.replace("-", "_")
         _ -> "pt_PT"
       end
 
