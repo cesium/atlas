@@ -47,21 +47,9 @@ defmodule Atlas.Accounts.UserNotifier do
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, path) do
-    # deliver(user.email, "Confirmation instructions", """
-
-    # ==============================
-
-    # Hi #{user.email},
-
-    # You can confirm your account by visiting the URL below:
-
-    # #{build_full_url(path)}
-
-    # If you didn't create an account with us, please ignore this.
-
-    # ==============================
-    # """)
     url = build_full_url(path)
+
+    set_gettext_language(user)
 
     email =
       base_html_email(user.email, "Confirm your email")
@@ -81,14 +69,7 @@ defmodule Atlas.Accounts.UserNotifier do
   def deliver_reset_password_instructions(user, path) do
     url = build_full_url(path)
 
-    # Set locale based on user preference, fallback to default
-    locale =
-      case Atlas.Accounts.get_user_preferences(user.id) do
-        %{language: language} -> language |> String.replace("-", "_")
-        _ -> "pt_PT"
-      end
-
-    Gettext.put_locale(AtlasWeb.Gettext, locale)
+    set_gettext_language(user)
 
     email =
       base_html_email(user.email, gettext("Reset your password"))
@@ -125,5 +106,15 @@ defmodule Atlas.Accounts.UserNotifier do
   defp build_full_url(path) do
     base_url = Application.fetch_env!(:atlas, :frontend_url)
     "#{base_url}#{path}"
+  end
+
+  defp set_gettext_language(user) do
+    language =
+      case Atlas.Accounts.get_user_preference(user.id, "language") do
+        nil -> "pt_PT"
+        language -> language |> String.replace("-", "_")
+      end
+
+    Gettext.put_locale(AtlasWeb.Gettext, language)
   end
 end
