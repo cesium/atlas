@@ -27,8 +27,19 @@ defmodule Atlas.AccountsFixtures do
 
   def extract_user_token(fun) do
     {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
-    token
+
+    # Try to extract from html_body first, then fall back to text_body
+    body =
+      case captured_email do
+        %{html_body: html_body} when is_binary(html_body) and html_body != "" -> html_body
+        %{text_body: text_body} when is_binary(text_body) and text_body != "" -> text_body
+        _ -> ""
+      end
+
+    case String.split(body, "[TOKEN]") do
+      [_, token | _] -> token
+      _ -> nil
+    end
   end
 
   @doc """

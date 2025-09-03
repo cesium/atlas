@@ -8,6 +8,27 @@ defmodule Atlas.Accounts.UserNotifier do
 
   alias Atlas.Mailer
 
+  use Phoenix.Swoosh, view: AtlasWeb.EmailView
+
+  use Gettext, backend: AtlasWeb.Gettext
+
+  defp base_html_email(recipient, subject) do
+    sender = {Mailer.get_sender_name(), Mailer.get_sender_address()}
+
+    phx_host =
+      if System.get_env("PHX_HOST") != nil do
+        "https://" <> System.get_env("PHX_HOST")
+      else
+        ""
+      end
+
+    new()
+    |> to(recipient)
+    |> from(sender)
+    |> subject("[#{elem(sender, 0)}] #{subject}")
+    |> assign(:phx_host, phx_host)
+  end
+
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
     email =
@@ -26,40 +47,40 @@ defmodule Atlas.Accounts.UserNotifier do
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, path) do
-    deliver(user.email, "Confirmation instructions", """
+    url = build_full_url(path)
 
-    ==============================
+    set_gettext_language(user)
 
-    Hi #{user.email},
+    email =
+      base_html_email(user.email, "Confirm your email")
+      |> assign(:user_name, user.name)
+      |> assign(:confirm_email_link, url)
+      |> render_body("confirm_email.html")
 
-    You can confirm your account by visiting the URL below:
-
-    #{build_full_url(path)}
-
-    If you didn't create an account with us, please ignore this.
-
-    ==============================
-    """)
+    case Mailer.deliver(email) do
+      {:ok, _metadata} -> {:ok, email}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
   Deliver instructions to reset a user password.
   """
   def deliver_reset_password_instructions(user, path) do
-    deliver(user.email, "Reset password instructions", """
+    url = build_full_url(path)
 
-    ==============================
+    set_gettext_language(user)
 
-    Hi #{user.email},
+    email =
+      base_html_email(user.email, gettext("Reset your password"))
+      |> assign(:user_name, user.name)
+      |> assign(:reset_password_link, url)
+      |> render_body("reset_password.html")
 
-    You can reset your password by visiting the URL below:
-
-    #{build_full_url(path)}
-
-    If you didn't request this change, please ignore this.
-
-    ==============================
-    """)
+    case Mailer.deliver(email) do
+      {:ok, _metadata} -> {:ok, email}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   @doc """
@@ -85,5 +106,15 @@ defmodule Atlas.Accounts.UserNotifier do
   defp build_full_url(path) do
     base_url = Application.fetch_env!(:atlas, :frontend_url)
     "#{base_url}#{path}"
+  end
+
+  defp set_gettext_language(user) do
+    language =
+      case Atlas.Accounts.get_user_preference(user.id, "language") do
+        nil -> "pt_PT"
+        language -> language |> String.replace("-", "_")
+      end
+
+    Gettext.put_locale(AtlasWeb.Gettext, language)
   end
 end
