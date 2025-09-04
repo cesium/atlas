@@ -164,6 +164,7 @@ defmodule Atlas.Accounts do
         User.confirm_changeset(user)
       end
     )
+    |> create_default_preferences_multi()
     |> Ecto.Multi.insert(:student, fn %{user: user} ->
       Student.changeset(%Student{}, Map.put(attrs.student, :user_id, user.id))
     end)
