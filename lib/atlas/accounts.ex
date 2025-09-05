@@ -457,7 +457,7 @@ defmodule Atlas.Accounts do
   """
   def get_user_session(id) do
     UserSession
-    |> preload(:user)
+    |> preload(user: [:student])
     |> Repo.get(id)
   end
 

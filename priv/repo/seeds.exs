@@ -8,6 +8,7 @@ defmodule Atlas.Repo.Seeds do
 
   def run do
     [
+      "degrees.exs",
       "users.exs"
     ]
     |> Enum.each(fn file ->

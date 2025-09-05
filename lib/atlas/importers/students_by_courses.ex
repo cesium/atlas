@@ -86,7 +86,7 @@ defmodule Atlas.Importers.StudentsByCourses do
              }
            }) do
         {:ok, user} -> user
-        {:error, _, _} -> nil
+        _ -> nil
       end
   end
 

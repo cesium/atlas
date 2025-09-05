@@ -7,7 +7,10 @@ defmodule AtlasWeb.ShiftExchangeRequestJSON do
   Renders a list of shift exchange requests as JSON.
   """
   def index(%{shift_exchange_requests: shift_exchange_requests}) do
-    %{requests: for(shift_exchange_request <- shift_exchange_requests, do: data(shift_exchange_request))}
+    %{
+      requests:
+        for(shift_exchange_request <- shift_exchange_requests, do: data(shift_exchange_request))
+    }
   end
 
   @doc """

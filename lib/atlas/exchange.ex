@@ -100,7 +100,10 @@ defmodule Atlas.Exchange do
       %Ecto.Changeset{data: %ShiftExchangeRequest{}}
 
   """
-  def change_shift_exchange_request(%ShiftExchangeRequest{} = shift_exchange_request, attrs \\ %{}) do
+  def change_shift_exchange_request(
+        %ShiftExchangeRequest{} = shift_exchange_request,
+        attrs \\ %{}
+      ) do
     ShiftExchangeRequest.changeset(shift_exchange_request, attrs)
   end
 
@@ -135,7 +138,7 @@ defmodule Atlas.Exchange do
     end)
   end
 
- defp fulfill_cycle(cycle, graph) do
+  defp fulfill_cycle(cycle, graph) do
     requests =
       cycle
       |> Enum.chunk_every(2, 1, :discard)
