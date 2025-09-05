@@ -67,7 +67,9 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/shift_exchanges" do
-      get "/", ShiftExchangeController, :index
+      get "/", ShiftExchangeRequestController, :index
+      post "/", ShiftExchangeRequestController, :create
+      get "/:id", ShiftExchangeRequestController, :show
     end
 
     pipe_through :is_at_least_professor
