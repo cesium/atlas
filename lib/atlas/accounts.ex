@@ -600,9 +600,10 @@ defmodule Atlas.Accounts do
   def get_user_preference(user_id, preference) do
     preferences = get_user_preferences(user_id)
 
-    case Map.has_key?(preferences, String.to_atom(preference)) do
-      true -> Map.get(preferences, String.to_atom(preference))
-      false -> {:error, "Preference not found"}
+    if Map.has_key?(preferences, String.to_atom(preference)) do
+      Map.get(preferences, String.to_atom(preference))
+    else
+      {:error, "Preference not found"}
     end
   end
 
