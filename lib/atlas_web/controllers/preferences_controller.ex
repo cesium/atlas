@@ -21,13 +21,13 @@ defmodule AtlasWeb.PreferencesController do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
     case Accounts.get_user_preference(user.id, preference) do
+      {:ok, value} ->
+        json(conn, %{preference => value})
+
       {:error, reason} ->
         conn
         |> put_status(:not_found)
         |> json(%{error: reason})
-
-      value ->
-        json(conn, %{preference => value})
     end
   end
 
