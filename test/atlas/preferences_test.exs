@@ -29,7 +29,7 @@ defmodule Atlas.PreferencesTest do
     test "returns error for non-existent preference", %{authenticated_conn: conn} do
       conn = PreferencesController.get_preference(conn, %{"preference" => "none"})
 
-      response = json_response(conn, 200)
+      response = json_response(conn, 404)
       assert response["error"] == "Preference not found"
     end
   end

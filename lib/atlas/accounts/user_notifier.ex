@@ -111,6 +111,7 @@ defmodule Atlas.Accounts.UserNotifier do
   defp set_gettext_language(user) do
     language =
       case Atlas.Accounts.get_user_preference(user.id, "language") do
+        {:error, _reason} -> "pt_PT"
         nil -> "pt_PT"
         language -> language |> String.replace("-", "_")
       end
