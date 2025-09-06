@@ -11,16 +11,12 @@ defmodule Atlas.Accounts do
 
   ## Database getters
 
-  def list_students do
-    Repo.all(Student)
-  end
-
   def list_users do
     Repo.all(User)
   end
 
   @doc """
-    Updates all students' degree_year field with the average year of their enrolled courses.
+    Updates all students' degree year with the average year of the courses they are enrolled in.
   """
   def update_students_with_years do
     student_years =
@@ -34,6 +30,7 @@ defmodule Atlas.Accounts do
     from(s in Student,
       join: m in subquery(student_years),
       on: m.student_id == s.id,
+      where: is_nil(s.degree_year),
       update: [set: [degree_year: m.average]]
     )
     |> Repo.update_all([])
