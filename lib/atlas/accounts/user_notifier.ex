@@ -6,6 +6,7 @@ defmodule Atlas.Accounts.UserNotifier do
 
   import Swoosh.Email
 
+  alias Atlas.Accounts
   alias Atlas.Mailer
 
   use Phoenix.Swoosh, view: AtlasWeb.EmailView
@@ -110,9 +111,10 @@ defmodule Atlas.Accounts.UserNotifier do
 
   defp set_gettext_language(user) do
     language =
-      case Atlas.Accounts.get_user_preference(user.id, "language") do
-        nil -> "pt_PT"
-        language -> language |> String.replace("-", "_")
+      case Accounts.get_user_preference(user.id, "language") do
+        {:ok, nil} -> "pt_PT"
+        {:ok, language} -> language |> String.replace("-", "_")
+        {:error, _reason} -> "pt_PT"
       end
 
     Gettext.put_locale(AtlasWeb.Gettext, language)

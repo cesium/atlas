@@ -19,11 +19,15 @@ defmodule AtlasWeb.PreferencesController do
 
   def get_preference(conn, %{"preference" => preference}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
-    preference_value = Accounts.get_user_preference(user.id, preference)
 
-    case preference_value do
-      nil -> json(conn, %{error: "Preference not found"})
-      _ -> json(conn, %{preference => preference_value})
+    case Accounts.get_user_preference(user.id, preference) do
+      {:ok, value} ->
+        json(conn, %{preference => value})
+
+      {:error, reason} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: reason})
     end
   end
 

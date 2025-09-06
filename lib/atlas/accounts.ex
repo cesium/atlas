@@ -592,14 +592,19 @@ defmodule Atlas.Accounts do
   ## Examples
 
       iex> get_user_preference(1, "language")
-      "en-US"
+      {:ok, "en-US"}
 
       iex> get_user_preference(1, "void")
-      nil
+      {:error, "Preference not found"}
   """
   def get_user_preference(user_id, preference) do
     preferences = get_user_preferences(user_id)
-    Map.get(preferences, String.to_atom(preference), nil)
+
+    if Map.has_key?(preferences, String.to_atom(preference)) do
+      {:ok, Map.get(preferences, String.to_atom(preference))}
+    else
+      {:error, "Preference not found"}
+    end
   end
 
   @doc """
