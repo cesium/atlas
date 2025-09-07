@@ -72,6 +72,11 @@ defmodule AtlasWeb.Router do
       get "/:id", JobController, :show
     end
 
+    scope "/schedule", University do
+      get "/degrees", ScheduleController, :available_degrees
+      post "/generate", ScheduleController, :generate_schedule
+    end
+
     scope "/import" do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses

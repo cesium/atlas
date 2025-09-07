@@ -39,6 +39,24 @@ defmodule Atlas.University do
   def get_student!(id), do: Repo.get!(Student, id)
 
   @doc """
+  Gets a single student by number.
+
+  Raises `Ecto.NoResultsError` if the Student does not exist.
+
+  ## Examples
+
+      iex> get_student_by_number!(12345)
+      %Student{}
+
+      iex> get_student_by_number!(67890)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_student_by_number!(number) do
+    Repo.get_by!(Student, number: number)
+  end
+
+  @doc """
   Creates a student.
 
   ## Examples

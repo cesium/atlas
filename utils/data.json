@@ -234,7 +234,7 @@
             "code": "J303N3",
             "name": "Física Moderna",
             "year": 2,
-            "semester": 1
+            "semester": 2
         },
         {
             "code": "J303N4",
@@ -270,13 +270,13 @@
             "code": "J303O1",
             "name": "Bases de Dados",
             "year": 2,
-            "semester": 2
+            "semester": 1
         },
         {
             "code": "J305O9",
             "name": "Métodos Numéricos e Otimização não Linear",
-            "year": 2,
-            "semester": 2
+            "year": 3,
+            "semester": 1
         },
         {
             "code": "J304N5",
@@ -324,7 +324,7 @@
             "code": "J305N6",
             "name": "Laboratórios de Informática IV",
             "year": 3,
-            "semester": 1
+            "semester": 2
         },
         {
             "code": "J306N4",
@@ -341,7 +341,7 @@
         {
             "code": "J306N1",
             "name": "Interface Pessoa-Máquina",
-            "year": 3,
+            "year": 2,
             "semester": 2
         },
         {
