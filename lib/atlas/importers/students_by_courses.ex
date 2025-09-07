@@ -14,6 +14,8 @@ defmodule Atlas.Importers.StudentsByCourses do
       |> Enum.drop(7)
       |> Enum.each(&import_row/1)
     end
+
+    Accounts.update_students_with_years()
   end
 
   defp import_row(row) do

@@ -6,12 +6,34 @@ defmodule Atlas.Accounts do
   use Atlas.Context
 
   alias Atlas.Accounts.{User, UserNotifier, UserPreferences, UserSession, UserToken}
-  alias Atlas.University.Student
+  alias Atlas.University.{CourseEnrollment, Student}
+  alias Atlas.University.Degrees.Courses.Course
 
   ## Database getters
 
   def list_users do
     Repo.all(User)
+  end
+
+  @doc """
+    Updates all students' degree year with the average year of the courses they are enrolled in.
+  """
+  def update_students_with_years do
+    student_years =
+      from(c in CourseEnrollment,
+        join: course in Course,
+        on: c.course_id == course.id,
+        group_by: c.student_id,
+        select: %{student_id: c.student_id, average: avg(course.year)}
+      )
+
+    from(s in Student,
+      join: m in subquery(student_years),
+      on: m.student_id == s.id,
+      where: is_nil(s.degree_year),
+      update: [set: [degree_year: m.average]]
+    )
+    |> Repo.update_all([])
   end
 
   @doc """
@@ -139,6 +161,7 @@ defmodule Atlas.Accounts do
         User.confirm_changeset(user)
       end
     )
+    |> create_default_preferences_multi()
     |> Ecto.Multi.insert(:student, fn %{user: user} ->
       Student.changeset(%Student{}, Map.put(attrs.student, :user_id, user.id))
     end)
