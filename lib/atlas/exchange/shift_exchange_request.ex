@@ -9,7 +9,7 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
   @required_fields ~w(status student_id shift_from shift_to)a
 
   schema "shift_exchange_requests" do
-    field :status, Ecto.Enum, values: ~w(pending approved cancelled)a, default: :pending
+    field :status, Ecto.Enum, values: ~w(pending approved)a, default: :pending
 
     belongs_to :student, Atlas.University.Student
 
@@ -26,7 +26,7 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     |> validate_required(@required_fields)
     |> validate_same_type_shifts()
     |> validate_different_shifts()
-    |> unique_constraint([:student_id, :shift_from],
+    |> unique_constraint([:student_id, :shift_from, :status],
       name: :unique_shift_exchange_request,
       message: "This request already exists"
     )
@@ -38,7 +38,7 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     |> validate_required(@required_fields)
     |> validate_same_type_shifts()
     |> validate_different_shifts()
-    |> unique_constraint([:student_id, :shift_from],
+    |> unique_constraint([:student_id, :shift_from, :status],
       name: :unique_shift_exchange_request,
       message: "This request already exists"
     )

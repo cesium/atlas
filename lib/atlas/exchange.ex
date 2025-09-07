@@ -76,7 +76,7 @@ defmodule Atlas.Exchange do
   def create_shift_exchange_request(attrs \\ %{}) do
     if University.student_enrolled_in_shift?(attrs["student_id"], attrs["shift_from"]) do
       %ShiftExchangeRequest{}
-      |> ShiftExchangeRequest.changeset(attrs)
+      |> ShiftExchangeRequest.create_request_changeset(attrs)
       |> Repo.insert()
       |> case do
         {:ok, request} ->

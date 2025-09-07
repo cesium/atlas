@@ -26,6 +26,7 @@ defmodule AtlasWeb.ShiftExchangeRequestJSON do
   """
   def data(shift_exchange_request) do
     %{
+      id: shift_exchange_request.id,
       status: shift_exchange_request.status,
       from: ShiftJSON.data(shift_exchange_request.from),
       to: ShiftJSON.data(shift_exchange_request.to),

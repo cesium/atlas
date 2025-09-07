@@ -66,11 +66,8 @@ defmodule AtlasWeb.Router do
       post "/schedule", StudentsController, :schedule_update
     end
 
-    scope "/shift_exchanges" do
-      get "/", ShiftExchangeRequestController, :index
-      post "/", ShiftExchangeRequestController, :create
-      get "/:id", ShiftExchangeRequestController, :show
-    end
+    resources "/shift_exchanges", ShiftExchangeRequestController,
+      only: [:index, :create, :show, :delete]
 
     pipe_through :is_at_least_professor
 
