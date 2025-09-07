@@ -40,3 +40,7 @@ npm-debug.log
 .env.dev
 .env.prod
 .env
+
+# Ignore all excel files to prevent sensitive data leak
+*.xlsx
+*.xls

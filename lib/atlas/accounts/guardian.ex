@@ -18,7 +18,7 @@ defmodule Atlas.Accounts.Guardian do
 
   @impl true
   def resource_from_claims(%{"sub" => session_id}) do
-    case Accounts.get_user_session(session_id) |> IO.inspect() do
+    case Accounts.get_user_session(session_id) do
       nil ->
         {:error, :not_found}
 

@@ -1,5 +1,10 @@
 defmodule Atlas.Exchange.ShiftExchangeRequest do
+  @moduledoc """
+  Schema for shift exchange requests.
+  """
   use Atlas.Schema
+
+  alias Atlas.University.Degrees.Courses.Shifts
 
   @required_fields ~w(status student_id shift_from shift_to)a
 
@@ -8,8 +13,8 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
 
     belongs_to :student, Atlas.University.Student
 
-    belongs_to :from, Atlas.University.Shift, foreign_key: :shift_from
-    belongs_to :to, Atlas.University.Shift, foreign_key: :shift_to
+    belongs_to :from, Shifts.Shift, foreign_key: :shift_from
+    belongs_to :to, Shifts.Shift, foreign_key: :shift_to
 
     timestamps(type: :utc_datetime)
   end
@@ -19,8 +24,11 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     shift_exchange_request
     |> cast(attrs, @required_fields)
     |> validate_required(@required_fields)
-    |> unique_constraint([:student_id, :shift_from, :shift_to],
-      name: :unique_shift_exchange_request
+    |> validate_same_type_shifts()
+    |> validate_different_shifts()
+    |> unique_constraint([:student_id, :shift_from],
+      name: :unique_shift_exchange_request,
+      message: "This request already exists"
     )
   end
 
@@ -28,11 +36,12 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     shift_exchange_request
     |> cast(attrs, [:shift_from, :shift_to, :student_id])
     |> validate_required(@required_fields)
-    |> unique_constraint([:student_id, :shift_from, :shift_to],
-      name: :unique_shift_exchange_request
-    )
     |> validate_same_type_shifts()
     |> validate_different_shifts()
+    |> unique_constraint([:student_id, :shift_from],
+      name: :unique_shift_exchange_request,
+      message: "This request already exists"
+    )
   end
 
   defp validate_same_type_shifts(changeset) do
@@ -40,8 +49,8 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     shift_to_id = get_field(changeset, :shift_to)
 
     if shift_from_id && shift_to_id do
-      shift_from = Atlas.Repo.get(Atlas.University.Shift, shift_from_id)
-      shift_to = Atlas.Repo.get(Atlas.University.Shift, shift_to_id)
+      shift_from = Shifts.get_shift!(shift_from_id)
+      shift_to = Shifts.get_shift!(shift_to_id)
 
       if shift_from && shift_to &&
            (shift_from.course_id != shift_to.course_id || shift_from.type != shift_to.type) do

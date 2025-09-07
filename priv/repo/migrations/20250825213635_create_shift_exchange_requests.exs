@@ -16,7 +16,7 @@ defmodule Atlas.Repo.Migrations.CreateShiftExchangeRequests do
     create index(:shift_exchange_requests, [:shift_from])
     create index(:shift_exchange_requests, [:shift_to])
 
-    create unique_index(:shift_exchange_requests, [:student_id, :shift_from, :shift_to],
+    create unique_index(:shift_exchange_requests, [:student_id, :shift_from],
              name: :unique_shift_exchange_request
            )
   end

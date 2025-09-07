@@ -485,4 +485,26 @@ defmodule Atlas.University do
       status: status
     })
   end
+
+  @doc """
+  Checks if a student is enrolled in a specific shift.
+
+  ## Examples
+
+      iex> student_enrolled_in_shift?(123, 456)
+      true
+
+      iex> student_enrolled_in_shift?(123, 789)
+      false
+
+  """
+  def student_enrolled_in_shift?(student_id, shift_id) do
+    Repo.exists?(
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.shift_id == ^shift_id and se.status in [:active]
+      )
+    )
+  end
 end

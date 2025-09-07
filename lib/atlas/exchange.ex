@@ -6,6 +6,7 @@ defmodule Atlas.Exchange do
   use Atlas.Context
 
   alias Atlas.Exchange.ShiftExchangeRequest
+  alias Atlas.University
   alias Graph
 
   @doc """
@@ -52,9 +53,15 @@ defmodule Atlas.Exchange do
 
   """
   def create_shift_exchange_request(attrs \\ %{}) do
-    %ShiftExchangeRequest{}
-    |> ShiftExchangeRequest.changeset(attrs)
-    |> Repo.insert()
+    if University.student_enrolled_in_shift?(attrs["student_id"], attrs["shift_from"]) do
+      %ShiftExchangeRequest{}
+      |> ShiftExchangeRequest.changeset(attrs)
+      |> Repo.insert()
+    else
+      {:error,
+       Ecto.Changeset.change(%ShiftExchangeRequest{})
+       |> Ecto.Changeset.add_error(:shift_from, "Student is not enrolled in the origin shift")}
+    end
   end
 
   @doc """
