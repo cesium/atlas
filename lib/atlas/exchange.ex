@@ -7,6 +7,9 @@ defmodule Atlas.Exchange do
 
   alias Atlas.Exchange.ShiftExchangeRequest
   alias Atlas.University
+  alias Atlas.University.ShiftEnrollment
+  alias Atlas.Workers
+  alias Ecto.Multi
   alias Graph
 
   @doc """
@@ -21,6 +24,24 @@ defmodule Atlas.Exchange do
   def list_shift_exchange_requests(opts \\ []) do
     ShiftExchangeRequest
     |> apply_filters(opts)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of unique pending shift exchange requests.
+
+  ## Examples
+
+      iex> list_unique_pending_shift_exchange_requests()
+      [%ShiftExchangeRequest{}, ...]
+
+  """
+  def list_unique_pending_shift_exchange_requests(opts \\ []) do
+    ShiftExchangeRequest
+    |> apply_filters(opts)
+    |> where([r], r.status == :pending)
+    |> distinct([r], [r.shift_from, r.shift_to])
+    |> order_by([r], asc: r.inserted_at)
     |> Repo.all()
   end
 
@@ -41,7 +62,7 @@ defmodule Atlas.Exchange do
   def get_shift_exchange_request!(id), do: Repo.get!(ShiftExchangeRequest, id)
 
   @doc """
-  Creates a shift_exchange_request.
+  Creates a shift_exchange_request and enqueues a job to try to solve all.
 
   ## Examples
 
@@ -57,11 +78,24 @@ defmodule Atlas.Exchange do
       %ShiftExchangeRequest{}
       |> ShiftExchangeRequest.changeset(attrs)
       |> Repo.insert()
+      |> case do
+        {:ok, request} ->
+          enqueue_shift_exchange_solver_job()
+          {:ok, request}
+
+        {:error, changeset} ->
+          {:error, changeset}
+      end
     else
       {:error,
        Ecto.Changeset.change(%ShiftExchangeRequest{})
        |> Ecto.Changeset.add_error(:shift_from, "Student is not enrolled in the origin shift")}
     end
+  end
+
+  defp enqueue_shift_exchange_solver_job do
+    # Enqueue job to try to solve exchanges
+    Oban.insert(Workers.ShiftExchange.new(%{}))
   end
 
   @doc """
@@ -114,50 +148,133 @@ defmodule Atlas.Exchange do
     ShiftExchangeRequest.changeset(shift_exchange_request, attrs)
   end
 
-  def solve_exchanges do
-    pending_requests =
-      list_shift_exchange_requests(where: [status: :pending])
-      |> Enum.sort_by(&priority/1, :desc)
+  def solve_exchanges(opts \\ []) do
+    pending = list_unique_pending_shift_exchange_requests(opts)
+    graph = build_graph(pending)
+    cycles = find_cycles(graph)
 
-    graph = build_graph(pending_requests)
-    cycles = Graph.cycles(graph)
+    Enum.reduce(cycles, %{cycles_found: length(cycles), requests_approved: 0}, fn cycle, acc ->
+      case approve_cycle(graph, cycle) do
+        {:ok, approved_count} ->
+          %{acc | requests_approved: acc.requests_approved + approved_count}
 
-    cycles
-    |> Enum.sort_by(&cycle_priority(&1, graph), :desc)
-    |> Enum.each(&fulfill_cycle(&1, graph))
+        {:error, _reason} ->
+          # If a cycle approval fails, we skip it. Others can still succeed.
+          acc
+      end
+    end)
   end
 
-  defp priority(%ShiftExchangeRequest{inserted_at: inserted_at}) do
-    DateTime.diff(DateTime.utc_now(), inserted_at, :minute)
-  end
-
-  defp cycle_priority(cycle, graph) do
-    cycle
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.map(fn [from, to] -> Graph.edge(graph, from, to).label end)
-    |> Enum.map(&priority/1)
-    |> Enum.sum()
-  end
+  ## Graph-related utility functions
 
   defp build_graph(requests) do
     Enum.reduce(requests, Graph.new(type: :directed), fn req, g ->
-      Graph.add_edge(g, req.shift_from_id, req.shift_to_id, label: req)
+      Graph.add_edge(g, req.shift_from, req.shift_to, label: req)
     end)
   end
 
-  defp fulfill_cycle(cycle, graph) do
-    requests =
-      cycle
-      |> Enum.chunk_every(2, 1, :discard)
-      |> Enum.map(fn [from, to] -> Graph.edge(graph, from, to).label end)
+  defp find_cycles(g) do
+    g
+    |> Graph.strong_components()
+    |> Enum.filter(&(length(&1) >= 2))
+    |> Enum.flat_map(&find_cycles_in_component(g, &1))
+    |> uniq_cycles()
+  end
 
-    Repo.transaction(fn ->
-      Enum.each(requests, fn req ->
-        # Update request → approved
-        update_shift_exchange_request(req, %{status: :approved})
+  defp find_cycles_in_component(g, vertices) do
+    sub = Graph.subgraph(g, vertices)
 
-        # TODO: Update student shifts enrollments
-      end)
+    vertices
+    |> Enum.flat_map(fn start ->
+      dfs_cycles(sub, start, start, [start], MapSet.new([start]))
     end)
+  end
+
+  defp dfs_cycles(g, start, current, path, visited) do
+    Graph.out_neighbors(g, current)
+    |> Enum.flat_map(fn next ->
+      cond do
+        next == start and length(path) >= 2 ->
+          # Found cycle
+          [Enum.reverse(path)]
+
+        MapSet.member?(visited, next) ->
+          # Ignore back edges to already visited vertex (other than start)
+          []
+
+        true ->
+          dfs_cycles(g, start, next, [next | path], MapSet.put(visited, next))
+      end
+    end)
+  end
+
+  defp uniq_cycles(cycles) do
+    cycles
+    |> Enum.map(&canonical_cycle/1)
+    |> MapSet.new()
+    |> Enum.map(& &1)
+  end
+
+  defp canonical_cycle(cycle) do
+    rotations = rotations(cycle)
+    best_forward = Enum.min_by(rotations, & &1)
+    best_backward = Enum.min_by(rotations(Enum.reverse(cycle)), & &1)
+    if best_forward <= best_backward, do: best_forward, else: best_backward
+  end
+
+  defp rotations(list) do
+    for i <- 0..(length(list) - 1) do
+      {head, tail} = Enum.split(list, i)
+      tail ++ head
+    end
+  end
+
+  defp approve_cycle(g, cycle_vertices) do
+    cycle_set = MapSet.new(cycle_vertices)
+
+    # Get all requests whose edges are inside the cycle
+    requests =
+      g
+      |> Graph.edges()
+      |> Enum.filter(fn e -> e.v1 in cycle_set and e.v2 in cycle_set end)
+      |> Enum.map(& &1.label)
+      |> Enum.filter(&match?(%ShiftExchangeRequest{}, &1))
+
+    multi =
+      Enum.reduce(requests, Multi.new(), fn %ShiftExchangeRequest{} = req, m ->
+        # Update the request status to approved
+        m =
+          Multi.update(
+            m,
+            {:approve_request, req.id},
+            Ecto.Changeset.change(req, status: :approved)
+          )
+
+        # Delete the student’s enrollment in the origin shift
+        m =
+          Multi.delete_all(
+            m,
+            {:delete_from_enrollment, req.id},
+            from(se in ShiftEnrollment,
+              where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_from
+            )
+          )
+
+        # Create a new enrollment for the student in the destination shift
+        new_enrollment_changeset =
+          %ShiftEnrollment{}
+          |> ShiftEnrollment.changeset(%{
+            student_id: req.student_id,
+            shift_id: req.shift_to,
+            status: :active
+          })
+
+        Multi.insert(m, {:insert_to_enrollment, req.id}, new_enrollment_changeset)
+      end)
+
+    case Repo.transaction(multi) do
+      {:ok, _changes} -> {:ok, length(requests)}
+      {:error, _op, _changeset, _sofar} -> {:error, :transaction_failed}
+    end
   end
 end

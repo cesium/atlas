@@ -1,7 +1,7 @@
 defmodule AtlasWeb.ShiftExchangeRequestController do
   use AtlasWeb, :controller
 
-  alias Atlas.{Exchange, Workers}
+  alias Atlas.Exchange
   alias Atlas.Repo
 
   action_fallback AtlasWeb.FallbackController

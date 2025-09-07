@@ -5,7 +5,7 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
-  alias Atlas.University.{CourseEnrollment, Student}
+  alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
@@ -251,8 +251,6 @@ defmodule Atlas.University do
       )
     )
   end
-
-  alias Atlas.University.ShiftEnrollment
 
   @doc """
   Returns the list of shift_enrollments.
@@ -503,7 +501,8 @@ defmodule Atlas.University do
       ShiftEnrollment
       |> where(
         [se],
-        se.student_id == ^student_id and se.shift_id == ^shift_id and se.status in [:active]
+        se.student_id == ^student_id and se.shift_id == ^shift_id and
+          se.status in [:active, :inactive]
       )
     )
   end

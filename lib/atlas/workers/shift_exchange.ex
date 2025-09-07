@@ -2,7 +2,7 @@ defmodule Atlas.Workers.ShiftExchange do
   @moduledoc """
   Worker to handle shift exchange requests.
   """
-  use Oban.Worker, queue: :exchange
+  use Oban.Worker, queue: :exchanges
 
   alias Atlas.Exchange
 
