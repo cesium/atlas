@@ -4,6 +4,7 @@ defmodule Atlas.University.Schedule do
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.University.Degrees.Courses.Shifts.Shift
   alias Atlas.University.Student
+  alias Atlas.Workers
 
   @shift_type_letters %{
     :theoretical => "T",
@@ -38,12 +39,15 @@ defmodule Atlas.University.Schedule do
   end
 
   def fetch_result(request_id) do
+    IO.inspect(request_id, label: "Fetching schedule result for request ID")
+
     Finch.build(:get, "http://localhost:8000/api/v1/solution/#{request_id}")
     |> Finch.request(Atlas.Finch)
     |> case do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         case Jason.decode!(body) do
           %{"schedules" => schedules} ->
+            Atlas.University.delete_all_original_shift_enrollments()
             import_schedule_result(schedules)
             {:ok, %{status: :completed}}
 
@@ -111,8 +115,8 @@ defmodule Atlas.University.Schedule do
     |> join(:left, [s, c], shift_enrollment in assoc(s, :shift_enrollments),
       on: shift_enrollment.status in [:active, :inactive]
     )
-    |> join(:inner, [s, c, shift_enrollment], shift in assoc(shift_enrollment, :shift))
-    |> join(:inner, [s, c, shift_enrollment, shift], shift_course in assoc(shift, :course))
+    |> join(:left, [s, c, shift_enrollment], shift in assoc(shift_enrollment, :shift))
+    |> join(:left, [s, c, shift_enrollment, shift], shift_course in assoc(shift, :course))
     |> where(
       [s, c, shift_enrollment, shift, shift_course],
       is_nil(shift_enrollment.id) or
@@ -204,5 +208,15 @@ defmodule Atlas.University.Schedule do
       _, query_acc ->
         query_acc
     end)
+  end
+
+  def queue_generate_schedule(job_id, user) do
+    IO.inspect(job_id, label: "Queuing schedule generation for job ID")
+
+    Oban.insert(
+      Workers.GenerateStudentsSchedule.new(%{"job_id" => job_id},
+        meta: %{user_id: user.id, type: :generate_students_schedule}
+      )
+    )
   end
 end
