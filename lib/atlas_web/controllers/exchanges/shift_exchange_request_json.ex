@@ -2,7 +2,7 @@ defmodule AtlasWeb.ShiftExchangeRequestJSON do
   @moduledoc """
   A module for rendering shift exchange request data in JSON format.
   """
-  alias AtlasWeb.University.ShiftJSON
+  alias AtlasWeb.University.{CourseJSON, ShiftJSON}
 
   @doc """
   Renders a list of shift exchange requests as JSON.
@@ -30,6 +30,7 @@ defmodule AtlasWeb.ShiftExchangeRequestJSON do
       status: shift_exchange_request.status,
       from: ShiftJSON.data(shift_exchange_request.from),
       to: ShiftJSON.data(shift_exchange_request.to),
+      course: CourseJSON.data(shift_exchange_request.from.course),
       inserted_at: shift_exchange_request.inserted_at
     }
   end

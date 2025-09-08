@@ -6,9 +6,8 @@ defmodule Atlas.Exchange do
   use Atlas.Context
 
   alias Atlas.Exchange.ShiftExchangeRequest
-  alias Atlas.University
+  alias Atlas.{Constants, University, Workers}
   alias Atlas.University.ShiftEnrollment
-  alias Atlas.Workers
   alias Ecto.Multi
   alias Graph
 
@@ -148,6 +147,74 @@ defmodule Atlas.Exchange do
     ShiftExchangeRequest.changeset(shift_exchange_request, attrs)
   end
 
+  @doc """
+  Checks if the current time is within the exchange period.
+  """
+  def exchange_period_active? do
+    case get_exchange_period() do
+      nil ->
+        false
+
+      %{start: start_time, end: end_time} ->
+        now = DateTime.utc_now()
+        DateTime.compare(now, start_time) != :lt and DateTime.compare(now, end_time) != :gt
+    end
+  end
+
+  @doc """
+  Sets the interval during which shift exchange requests can be created.
+
+  ## Examples
+
+      iex> set_exchange_period(~U[2024-09-01 00:00:00Z], ~U[2024-09-30 23:59:59Z])
+      :ok
+
+      iex> set_exchange_period(~U[2024-10-01 00:00:00Z], ~U[2024-09-30 23:59:59Z])
+      {:error, :invalid_interval}
+
+  """
+  def set_exchange_period(start_time, end_time) do
+    if DateTime.compare(start_time, end_time) != :lt do
+      {:error, "Start time must be before end time"}
+    else
+      Constants.set("exchange_period_start", start_time)
+      Constants.set("exchange_period_end", end_time)
+    end
+  end
+
+  @doc """
+  Gets the current shift exchange period.
+  """
+  def get_exchange_period do
+    start_time =
+      case Constants.get("exchange_period_start") do
+        {:ok, time} -> time
+        _ -> nil
+      end
+
+    end_time =
+      case Constants.get("exchange_period_end") do
+        {:ok, time} -> time
+        _ -> nil
+      end
+
+    case {start_time, end_time} do
+      {nil, nil} -> nil
+      _ -> %{start: start_time, end: end_time}
+    end
+  end
+
+  @doc """
+  Deletes the current shift exchange period.
+  """
+  def delete_exchange_period do
+    Constants.set("exchange_period_start", nil)
+    Constants.set("exchange_period_end", nil)
+  end
+
+  @doc """
+  Attempts to solve pending shift exchange requests by finding cycles in the exchange graph and approving them.
+  """
   def solve_exchanges(opts \\ []) do
     pending = list_unique_pending_shift_exchange_requests(opts)
     graph = build_graph(pending)
