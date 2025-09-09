@@ -428,13 +428,7 @@ defmodule Atlas.Accounts do
   end
 
   def update_user_password(user, attrs) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
-    |> Repo.transaction()
-    |> case do
-      {:ok, %{user: user}} -> {:ok, user}
-      {:error, :user, changeset, _} -> {:error, changeset}
-    end
+    user |> User.password_changeset(attrs) |> Repo.update()
   end
 
   @doc """
