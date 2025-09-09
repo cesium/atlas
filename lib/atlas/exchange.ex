@@ -155,9 +155,14 @@ defmodule Atlas.Exchange do
       nil ->
         false
 
-      %{start: start_time, end: end_time} ->
-        now = DateTime.utc_now()
-        DateTime.compare(now, start_time) != :lt and DateTime.compare(now, end_time) != :gt
+      %{start: start_str, end: end_str} ->
+        with {:ok, start_time, _} <- DateTime.from_iso8601(start_str),
+             {:ok, end_time, _} <- DateTime.from_iso8601(end_str) do
+          now = DateTime.utc_now()
+          DateTime.compare(now, start_time) != :lt and DateTime.compare(now, end_time) != :gt
+        else
+          _ -> false
+        end
     end
   end
 

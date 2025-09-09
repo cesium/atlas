@@ -1,8 +1,7 @@
 defmodule AtlasWeb.ShiftExchangeRequestController do
   use AtlasWeb, :controller
 
-  alias Atlas.Exchange
-  alias Atlas.Repo
+  alias Atlas.{Exchange, Repo}
 
   action_fallback AtlasWeb.FallbackController
 
@@ -40,7 +39,7 @@ defmodule AtlasWeb.ShiftExchangeRequestController do
   end
 
   def create(conn, %{"request" => shift_exchange_request}) do
-    if exchange_period_active?() do
+    if Exchange.exchange_period_active?() do
       {user, _session} = Guardian.Plug.current_resource(conn)
 
       if user.type == :student do
@@ -68,7 +67,7 @@ defmodule AtlasWeb.ShiftExchangeRequestController do
   end
 
   def delete(conn, %{"id" => id}) do
-    if exchange_period_active?() do
+    if Exchange.exchange_period_active?() do
       {user, _session} = Guardian.Plug.current_resource(conn)
 
       request = Exchange.get_shift_exchange_request!(id)
