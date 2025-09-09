@@ -1,10 +1,12 @@
 defmodule AtlasWeb.University.ScheduleController do
   use AtlasWeb, :controller
 
+  alias Atlas.University
+  alias Atlas.University.Degrees
   alias Atlas.University.Degrees.Degree
 
   def available_degrees(conn, _params) do
-    degrees = Atlas.University.Degrees.list_degrees()
+    degrees = Degrees.list_degrees()
 
     conn
     |> put_view(AtlasWeb.University.DegreeeJSON)
@@ -14,14 +16,14 @@ defmodule AtlasWeb.University.ScheduleController do
   def generate_schedule(conn, %{"degree" => degree_id, "semester" => semester}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
-    with %Degree{} = degree <- Atlas.University.Degrees.get_degree(degree_id),
+    with %Degree{} = degree <- Degrees.get_degree(degree_id),
          {:ok, semester} <- parse_semester(semester),
          {:ok, body} <-
-           Atlas.University.Schedule.request_schedule_generation(%{
+           University.Schedule.request_schedule_generation(%{
              degree: degree.id,
              semester: semester
            }),
-         {:ok, job} <- Atlas.University.Schedule.queue_generate_schedule(body["jobid"], user) do
+         {:ok, job} <- University.Schedule.queue_generate_schedule(body["jobid"], user) do
       conn
       |> json(%{job_id: job.id, message: "Import job queued successfully."})
     else

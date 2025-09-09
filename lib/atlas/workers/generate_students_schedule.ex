@@ -8,13 +8,10 @@ defmodule Atlas.Workers.GenerateStudentsSchedule do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"job_id" => job_id}}) do
-    IO.inspect(job_id, label: "Starting schedule generation for job ID 2")
     poll_schedule_result(job_id)
   end
 
   def poll_schedule_result(request_id, attempts \\ 0) do
-    IO.inspect(request_id, label: "Polling schedule result for request ID")
-
     case Schedule.fetch_result(request_id) do
       {:ok, %{status: :completed}} ->
         :ok

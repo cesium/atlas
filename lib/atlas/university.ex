@@ -366,12 +366,6 @@ defmodule Atlas.University do
     ShiftEnrollment.changeset(shift_enrollment, attrs)
   end
 
-  def delete_all_original_shift_enrollments() do
-    ShiftEnrollment
-    |> where([se], se.status in [:active, :inactive])
-    |> Repo.delete_all()
-  end
-
   @doc """
   Lists the schedule for a student.
 

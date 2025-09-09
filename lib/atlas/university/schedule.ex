@@ -1,6 +1,11 @@
 defmodule Atlas.University.Schedule do
+  @moduledoc """
+  The schedule context.
+  """
+
   use Atlas.Context
 
+  alias Atlas.University.Degrees.Courses
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.University.Degrees.Courses.Shifts.Shift
   alias Atlas.University.Student
@@ -39,15 +44,12 @@ defmodule Atlas.University.Schedule do
   end
 
   def fetch_result(request_id) do
-    IO.inspect(request_id, label: "Fetching schedule result for request ID")
-
     Finch.build(:get, "http://localhost:8000/api/v1/solution/#{request_id}")
     |> Finch.request(Atlas.Finch)
     |> case do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         case Jason.decode!(body) do
           %{"schedules" => schedules} ->
-            Atlas.University.delete_all_original_shift_enrollments()
             import_schedule_result(schedules)
             {:ok, %{status: :completed}}
 
@@ -67,38 +69,51 @@ defmodule Atlas.University.Schedule do
   end
 
   def import_schedule_result(schedules) do
-    schedules
-    |> Enum.each(fn {student_number, enrollments} ->
-      student = Atlas.University.get_student_by_number!(student_number)
-
-      case student do
-        nil ->
-          nil
-
-        %Student{} = student ->
-          enrollments
-          |> Enum.each(fn %{
-                            "course" => course,
-                            "shift_type" => shift_type,
-                            "shift_number" => shift_number
-                          } ->
-            fetched_course = Atlas.University.Degrees.Courses.get_course_by_code(course)
-
-            shift =
-              Atlas.University.Degrees.Courses.Shifts.get_shift_by_course_type_number(
-                fetched_course.id,
-                Map.get(@shift_types, shift_type),
-                shift_number
-              )
-
-            Atlas.University.create_shift_enrollment(%{
-              student_id: student.id,
-              shift_id: shift.id,
-              status: :active
-            })
-          end)
-      end
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:import_schedules, fn _repo, _changes ->
+      schedules
+      |> Enum.reduce_while({:ok, []}, fn {student_number, enrollments}, {:ok, acc} ->
+        import_student_schedule(student_number, enrollments, acc)
+      end)
     end)
+    |> Repo.transact()
+  end
+
+  defp import_student_schedule(student_number, enrollments, acc) do
+    student = Atlas.University.get_student_by_number!(student_number)
+
+    case student do
+      nil ->
+        {:halt, {:error, "Student with number #{student_number} not found."}}
+
+      %Student{} = student ->
+        enrollments
+        |> Enum.reduce([], fn %{
+                                "course" => course,
+                                "shift_type" => shift_type,
+                                "shift_number" => shift_number
+                              },
+                              acc ->
+          fetched_course = Courses.get_course_by_code(course)
+
+          shift =
+            Courses.Shifts.get_shift_by_course_type_number(
+              fetched_course.id,
+              Map.get(@shift_types, shift_type),
+              shift_number
+            )
+
+          [shift.id | acc]
+        end)
+        |> then(&Atlas.University.update_student_schedule(student.id, &1, true))
+        |> case do
+          {:ok, _student} ->
+            {:cont, {:ok, acc}}
+
+          {:error, reason} ->
+            {:halt, {:error, reason}}
+        end
+    end
   end
 
   def build_schedule_request(opts \\ %{}) do
@@ -211,8 +226,6 @@ defmodule Atlas.University.Schedule do
   end
 
   def queue_generate_schedule(job_id, user) do
-    IO.inspect(job_id, label: "Queuing schedule generation for job ID")
-
     Oban.insert(
       Workers.GenerateStudentsSchedule.new(%{"job_id" => job_id},
         meta: %{user_id: user.id, type: :generate_students_schedule}
