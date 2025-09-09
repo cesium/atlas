@@ -51,7 +51,8 @@ defmodule Atlas.MixProject do
       {:guardian_db, "~> 3.0"},
 
       # mailer
-      {:swoosh, "~> 1.5"},
+      {:swoosh, "~> 1.17.6"},
+      {:gen_smtp, "~>1.2.0"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_swoosh, "~> 1.0"},
       {:finch, "~> 0.13"},
@@ -77,7 +78,10 @@ defmodule Atlas.MixProject do
 
       # utilities
       {:remote_ip, "~> 1.2"},
-      {:ua_parser, "~> 1.8"}
+      {:ua_parser, "~> 1.8"},
+
+      # providers
+      {:ex_aws, "~> 2.1.2"}
     ]
   end
 
