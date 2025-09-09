@@ -49,6 +49,8 @@ defmodule AtlasWeb.Router do
       get "/sessions", AuthController, :sessions
     end
 
+    post "/update_password", AuthController, :update_password
+
     scope "/preferences" do
       get "/", PreferencesController, :get_preferences
       get "/available", PreferencesController, :get_available_preferences

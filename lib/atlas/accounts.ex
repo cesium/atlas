@@ -427,6 +427,23 @@ defmodule Atlas.Accounts do
     end
   end
 
+  def update_user_password(user, attrs) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  @doc """
+  Verifies if the given password matches the user's password.
+  """
+  def verify_user_password(%User{} = user, password) do
+    Bcrypt.verify_pass(password, user.hashed_password)
+  end
+
   @doc """
   Returns the list of users_sessions.
 
