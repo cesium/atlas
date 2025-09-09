@@ -47,9 +47,9 @@ defmodule AtlasWeb.Router do
       post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
+      post "/update_password", AuthController, :update_password
     end
 
-    post "/update_password", AuthController, :update_password
 
     scope "/preferences" do
       get "/", PreferencesController, :get_preferences
