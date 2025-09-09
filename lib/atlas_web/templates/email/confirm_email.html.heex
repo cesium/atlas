@@ -34,7 +34,7 @@
       "
       data-skip-in-text="true"
     >
-      {gettext("Welcome to Pombo! We&#x27;re excited to have you on board.")}
+      {gettext("Welcome to Pombo! We're excited to have you on board.")}
       <div>
          ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿
       </div>
@@ -87,7 +87,7 @@
                           "
                         >
                           <img
-                            alt="Pombo Logo"
+                            alt="Pombo"
                             src={"#{@phx_host}/images/email/logo.png"}
                             style="
                               margin-left: auto;
@@ -113,7 +113,7 @@
                         margin-bottom: 16px;
                       "
                     >
-                      {gettext("Hi")}<strong></strong>,
+                      {gettext("Hi")} <strong>{@user_name}</strong>,
                     </p>
                     <p
                       style="
@@ -124,7 +124,7 @@
                         margin-bottom: 16px;
                       "
                     >
-                      {gettext("We&#x27;re excited to have you here! To get started,
+                      {gettext("We're excited to have you here! To get started,
                       please verify your email address by clicking the button
                       below.")}
                     </p>
@@ -233,8 +233,8 @@
                         margin-bottom: 16px;
                       "
                     >
-                      {gettext("If the button above doesn&#x27;t work, you can also click
-                      on the following link:")}"
+                      {gettext("If the button above doesn't work, you can also click
+                      on the following link:")}
                       <a style="color: rgb(51, 65, 85)" href={@confirm_email_link}>{@confirm_email_link}</a>
                     </p>
                   </td>

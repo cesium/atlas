@@ -53,8 +53,8 @@ defmodule Atlas.Accounts.UserNotifier do
     set_gettext_language(user)
 
     email =
-      base_html_email(user.email, "Confirm your email")
-      |> assign(:user_name, user.name)
+      base_html_email(user.email, gettext("Confirm your email"))
+      |> assign(:user_name, get_first_name(user.name))
       |> assign(:confirm_email_link, url)
       |> render_body("confirm_email.html")
 
@@ -73,8 +73,8 @@ defmodule Atlas.Accounts.UserNotifier do
     set_gettext_language(user)
 
     email =
-      base_html_email(user.email, gettext("Reset your password"))
-      |> assign(:user_name, user.name)
+      base_html_email(user.email, gettext("Reset password"))
+      |> assign(:user_name, get_first_name(user.name))
       |> assign(:reset_password_link, url)
       |> render_body("reset_password.html")
 
@@ -118,5 +118,11 @@ defmodule Atlas.Accounts.UserNotifier do
       end
 
     Gettext.put_locale(AtlasWeb.Gettext, language)
+  end
+
+  defp get_first_name(full_name) do
+    full_name
+    |> String.split(" ")
+    |> List.first()
   end
 end

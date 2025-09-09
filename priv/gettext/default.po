@@ -11,46 +11,56 @@
 msgid ""
 msgstr ""
 
+#: lib/atlas/accounts/user_notifier.ex:56
+#, elixir-autogen, elixir-format
+msgid "Confirm your email"
+msgstr ""
+
 #: lib/atlas_web/templates/email/confirm_email.html.heex:116
 #: lib/atlas_web/templates/email/reset_password.html.heex:116
 #, elixir-autogen, elixir-format
 msgid "Hi"
 msgstr ""
 
-#: lib/atlas_web/templates/email/confirm_email.html.heex:235
+#: lib/atlas_web/templates/email/confirm_email.html.heex:236
+#: lib/atlas_web/templates/email/reset_password.html.heex:236
 #, elixir-autogen, elixir-format
-msgid "If the button above doesn&#x27;t work, you can also click\n                      on the following link:"
+msgid "If the button above doesn't work, you can also click\n                      on the following link:"
 msgstr ""
 
-#: lib/atlas/accounts/user_notifier.ex:96
+#: lib/atlas/accounts/user_notifier.ex:76
+#, elixir-autogen, elixir-format
+msgid "Reset password"
+msgstr ""
+
 #: lib/atlas_web/templates/email/reset_password.html.heex:193
 #, elixir-autogen, elixir-format
 msgid "Reset your password"
 msgstr ""
 
-#: lib/atlas_web/templates/email/confirm_email.html.heex:215
+#: lib/atlas_web/templates/email/confirm_email.html.heex:216
 #: lib/atlas_web/templates/email/reset_password.html.heex:216
 #, elixir-autogen, elixir-format
 msgid "See you soon!"
 msgstr ""
 
-#: lib/atlas_web/templates/email/confirm_email.html.heex:193
+#: lib/atlas_web/templates/email/confirm_email.html.heex:194
 #, elixir-autogen, elixir-format
 msgid "Verify your Email"
 msgstr ""
 
 #: lib/atlas_web/templates/email/reset_password.html.heex:127
 #, elixir-autogen, elixir-format
-msgid "We received a request to reset your password. Click the\n                      button below to reset it. If you did not request a\n                      password reset, please ignore this email."
+msgid "We received a request to reset your password. Click the\n                      button below to reset it."
 msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:127
 #, elixir-autogen, elixir-format
-msgid "We&#x27;re excited to have you here! To get started,\n                      please verify your email address by clicking the button\n                      below."
+msgid "We're excited to have you here! To get started,\n                      please verify your email address by clicking the button\n                      below."
 msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:37
 #: lib/atlas_web/templates/email/reset_password.html.heex:37
 #, elixir-autogen, elixir-format
-msgid "Welcome to Pombo! We&#x27;re excited to have you on board."
+msgid "Welcome to Pombo! We're excited to have you on board."
 msgstr ""
