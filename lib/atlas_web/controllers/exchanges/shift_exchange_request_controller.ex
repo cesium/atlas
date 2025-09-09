@@ -69,29 +69,33 @@ defmodule AtlasWeb.ShiftExchangeRequestController do
   def delete(conn, %{"id" => id}) do
     if Exchange.exchange_period_active?() do
       {user, _session} = Guardian.Plug.current_resource(conn)
-
       request = Exchange.get_shift_exchange_request!(id)
 
-      if request.student_id != user.student.id and not user_has_elevated_privileges?(user) do
-        conn
-        |> put_status(:not_found)
-        |> json(%{errors: %{"detail" => "Not found"}})
-      else
-        if request.status != :pending do
+      cond do
+        request.student_id != user.student.id and not user_has_elevated_privileges?(user) ->
+          conn
+          |> put_status(:not_found)
+          |> json(%{errors: %{"detail" => "Not found"}})
+
+        request.status != :pending ->
           conn
           |> put_status(:forbidden)
           |> json(%{errors: %{"detail" => "Only pending requests can be deleted"}})
-        else
+
+        true ->
           with {:ok, %Exchange.ShiftExchangeRequest{}} <-
                  Exchange.delete_shift_exchange_request(request) do
             send_resp(conn, :no_content, "")
           end
-        end
       end
     else
       conn
       |> put_status(:forbidden)
-      |> json(%{error: "Shift exchange requests can only be deleted during the exchange period"})
+      |> json(%{
+        errors: %{
+          "detail" => "Shift exchange requests can only be deleted during the exchange period"
+        }
+      })
     end
   end
 
