@@ -36,7 +36,11 @@ defmodule Atlas.University do
       ** (Ecto.NoResultsError)
 
   """
-  def get_student!(id), do: Repo.get!(Student, id)
+  def get_student!(id, opts \\ []) do
+    Student
+    |> apply_filters(opts)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a student.

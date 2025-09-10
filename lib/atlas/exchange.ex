@@ -5,8 +5,10 @@ defmodule Atlas.Exchange do
 
   use Atlas.Context
 
+  alias Atlas.Accounts.UserNotifier
   alias Atlas.Exchange.ShiftExchangeRequest
   alias Atlas.{Constants, University, Workers}
+  alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.University.ShiftEnrollment
   alias Ecto.Multi
   alias Graph
@@ -345,8 +347,23 @@ defmodule Atlas.Exchange do
       end)
 
     case Repo.transaction(multi) do
-      {:ok, _changes} -> {:ok, length(requests)}
-      {:error, _op, _changeset, _sofar} -> {:error, :transaction_failed}
+      {:ok, _changes} ->
+        # Send notification emails
+        Enum.each(requests, fn req ->
+          user = University.get_student!(req.student_id, preloads: [:user]).user
+          shift_to = Shifts.get_shift!(req.shift_to, preloads: [:course])
+
+          UserNotifier.deliver_shift_exchange_request_fulfilled(
+            user,
+            shift_to.course.name,
+            Shifts.Shift.short_name(shift_to)
+          )
+        end)
+
+        {:ok, length(requests)}
+
+      {:error, _op, _changeset, _sofar} ->
+        {:error, :transaction_failed}
     end
   end
 end

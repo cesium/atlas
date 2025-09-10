@@ -35,7 +35,11 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_shift!(id), do: Repo.get!(Shift, id)
+  def get_shift!(id, opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a shift.

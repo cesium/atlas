@@ -137,7 +137,7 @@ defmodule Atlas.Accounts.UserNotifier do
         {:error, _reason} -> "pt_PT"
       end
 
-    Gettext.put_locale(AtlasWeb.Gettext, "language")
+    Gettext.put_locale(AtlasWeb.Gettext, language)
   end
 
   defp get_first_name(full_name) do
