@@ -21,11 +21,13 @@ defmodule Atlas.University.Schedule do
   @shift_types Map.new(@shift_type_letters, fn {k, v} -> {v, k} end)
 
   def request_schedule_generation(opts \\ %{}) do
+    kepler_api_url = Application.fetch_env!(:atlas, :kepler_api_url)
+
     build_schedule_request(opts)
     |> then(
       &Finch.build(
         :post,
-        "http://localhost:8000/api/v1/solve",
+        "#{kepler_api_url}/solve",
         [{"Content-Type", "application/json"}],
         &1
       )
@@ -44,14 +46,15 @@ defmodule Atlas.University.Schedule do
   end
 
   def fetch_result(request_id) do
-    Finch.build(:get, "http://localhost:8000/api/v1/solution/#{request_id}")
+    kepler_api_url = Application.fetch_env!(:atlas, :kepler_api_url)
+
+    Finch.build(:get, "#{kepler_api_url}/solution/#{request_id}")
     |> Finch.request(Atlas.Finch)
     |> case do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         case Jason.decode!(body) do
           %{"schedules" => schedules} ->
             import_schedule_result(schedules)
-            {:ok, %{status: :completed}}
 
           %{"status" => status} when status in ["Running"] ->
             {:ok, %{status: :running}}
@@ -77,6 +80,10 @@ defmodule Atlas.University.Schedule do
       end)
     end)
     |> Repo.transact()
+    |> case do
+      {:ok, _result} -> {:ok, %{status: :completed}}
+      {:error, reason} -> {:error, %{status: :failed, reason: reason}}
+    end
   end
 
   defp import_student_schedule(student_number, enrollments, acc) do
@@ -117,10 +124,14 @@ defmodule Atlas.University.Schedule do
   end
 
   def build_schedule_request(opts \\ %{}) do
-    Jason.encode!(%{
+    Jason.encode(%{
       students: get_students_data(opts),
       courses: get_courses_data(opts)
     })
+    |> case do
+      {:ok, body} -> body
+      _ -> nil
+    end
   end
 
   defp get_students_data(opts) do
