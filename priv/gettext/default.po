@@ -11,6 +11,11 @@
 msgid ""
 msgstr ""
 
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:128
+#, elixir-autogen, elixir-format
+msgid "Click the button below to see your updated schedule."
+msgstr ""
+
 #: lib/atlas/accounts/user_notifier.ex:56
 #, elixir-autogen, elixir-format
 msgid "Confirm your email"
@@ -18,14 +23,21 @@ msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:116
 #: lib/atlas_web/templates/email/reset_password.html.heex:116
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:116
 #, elixir-autogen, elixir-format
 msgid "Hi"
 msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:236
 #: lib/atlas_web/templates/email/reset_password.html.heex:236
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:235
 #, elixir-autogen, elixir-format
 msgid "If the button above doesn't work, you can also click\n                      on the following link:"
+msgstr ""
+
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:37
+#, elixir-autogen, elixir-format
+msgid "Now enrolled in %{course_name} - %{shift_shortname}."
 msgstr ""
 
 #: lib/atlas/accounts/user_notifier.ex:76
@@ -38,10 +50,21 @@ msgstr ""
 msgid "Reset your password"
 msgstr ""
 
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:193
+#, elixir-autogen, elixir-format
+msgid "Schedule"
+msgstr ""
+
 #: lib/atlas_web/templates/email/confirm_email.html.heex:216
 #: lib/atlas_web/templates/email/reset_password.html.heex:216
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:215
 #, elixir-autogen, elixir-format
 msgid "See you soon!"
+msgstr ""
+
+#: lib/atlas/accounts/user_notifier.ex:94
+#, elixir-autogen, elixir-format
+msgid "Shift exchange request fulfilled"
 msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:194
@@ -52,6 +75,11 @@ msgstr ""
 #: lib/atlas_web/templates/email/reset_password.html.heex:127
 #, elixir-autogen, elixir-format
 msgid "We received a request to reset your password. Click the\n                      button below to reset it."
+msgstr ""
+
+#: lib/atlas_web/templates/email/shift_exchange_request_fulfilled.html.heex:127
+#, elixir-autogen, elixir-format
+msgid "We were able to fulfill your shift exchange request. You are now enrolled in"
 msgstr ""
 
 #: lib/atlas_web/templates/email/confirm_email.html.heex:127
