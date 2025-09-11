@@ -47,6 +47,7 @@ defmodule AtlasWeb.Router do
       post "/sign_out", AuthController, :sign_out
       get "/me", AuthController, :me
       get "/sessions", AuthController, :sessions
+      post "/update_password", AuthController, :update_password
     end
 
     scope "/preferences" do
@@ -65,7 +66,18 @@ defmodule AtlasWeb.Router do
       post "/schedule", StudentsController, :schedule_update
     end
 
-    pipe_through :is_at_least_professor
+    scope "/shift_exchanges" do
+      scope "/exchange_period" do
+        get "/", ShiftExchangeRequestController, :get_exchange_period
+
+        pipe_through :is_at_least_professor
+
+        post "/", ShiftExchangeRequestController, :set_exchange_period
+        delete "/", ShiftExchangeRequestController, :delete_exchange_period
+      end
+
+      resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
+    end
 
     scope "/jobs" do
       get "/", JobController, :index
@@ -82,6 +94,16 @@ defmodule AtlasWeb.Router do
     scope "/import" do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses
+    end
+
+    scope "/export" do
+      scope "/blackboard" do
+        get "/:course_id/groups", ExportController, :blackboard_groups_export
+
+        get "/:course_id/group_enrollments",
+            ExportController,
+            :blackboard_group_enrollments_export
+      end
     end
   end
 

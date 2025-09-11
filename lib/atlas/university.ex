@@ -5,7 +5,7 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
-  alias Atlas.University.{CourseEnrollment, Student}
+  alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
@@ -36,7 +36,11 @@ defmodule Atlas.University do
       ** (Ecto.NoResultsError)
 
   """
-  def get_student!(id), do: Repo.get!(Student, id)
+  def get_student!(id, opts \\ []) do
+    Student
+    |> apply_filters(opts)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Gets a single student by number.
@@ -270,8 +274,6 @@ defmodule Atlas.University do
     )
   end
 
-  alias Atlas.University.ShiftEnrollment
-
   @doc """
   Returns the list of shift_enrollments.
 
@@ -502,5 +504,28 @@ defmodule Atlas.University do
       shift_id: shift_id,
       status: status
     })
+  end
+
+  @doc """
+  Checks if a student is enrolled in a specific shift.
+
+  ## Examples
+
+      iex> student_enrolled_in_shift?(123, 456)
+      true
+
+      iex> student_enrolled_in_shift?(123, 789)
+      false
+
+  """
+  def student_enrolled_in_shift?(student_id, shift_id) do
+    Repo.exists?(
+      ShiftEnrollment
+      |> where(
+        [se],
+        se.student_id == ^student_id and se.shift_id == ^shift_id and
+          se.status in [:active, :inactive]
+      )
+    )
   end
 end

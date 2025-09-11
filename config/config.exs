@@ -45,6 +45,7 @@ config :atlas, Oban,
   repo: Atlas.Repo,
   queues: [
     imports: 1,
+    exchanges: 1,
     schedule_generator: 1
   ]
 

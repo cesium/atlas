@@ -53,8 +53,8 @@ defmodule Atlas.Accounts.UserNotifier do
     set_gettext_language(user)
 
     email =
-      base_html_email(user.email, "Confirm your email")
-      |> assign(:user_name, user.name)
+      base_html_email(user.email, gettext("Confirm your email"))
+      |> assign(:user_name, get_first_name(user.name))
       |> assign(:confirm_email_link, url)
       |> render_body("confirm_email.html")
 
@@ -73,10 +73,30 @@ defmodule Atlas.Accounts.UserNotifier do
     set_gettext_language(user)
 
     email =
-      base_html_email(user.email, gettext("Reset your password"))
-      |> assign(:user_name, user.name)
+      base_html_email(user.email, gettext("Reset password"))
+      |> assign(:user_name, get_first_name(user.name))
       |> assign(:reset_password_link, url)
       |> render_body("reset_password.html")
+
+    case Mailer.deliver(email) do
+      {:ok, _metadata} -> {:ok, email}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Notify user that their shift exchange request was fulfilled.
+  """
+  def deliver_shift_exchange_request_fulfilled(user, course_name, shift_shortname) do
+    set_gettext_language(user)
+
+    email =
+      base_html_email(user.email, gettext("Shift exchange request fulfilled"))
+      |> assign(:user_name, get_first_name(user.name))
+      |> assign(:course_name, course_name)
+      |> assign(:shift_shortname, shift_shortname)
+      |> assign(:schedule_link, build_full_url("/schedule"))
+      |> render_body("shift_exchange_request_fulfilled.html")
 
     case Mailer.deliver(email) do
       {:ok, _metadata} -> {:ok, email}
@@ -118,5 +138,11 @@ defmodule Atlas.Accounts.UserNotifier do
       end
 
     Gettext.put_locale(AtlasWeb.Gettext, language)
+  end
+
+  defp get_first_name(full_name) do
+    full_name
+    |> String.split(" ")
+    |> List.first()
   end
 end

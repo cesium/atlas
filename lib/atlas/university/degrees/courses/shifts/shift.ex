@@ -28,4 +28,16 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
     |> validate_required(@required_fields)
     |> unique_constraint([:type, :number, :course_id], name: :shifts_type_number_course_id_index)
   end
+
+  def short_name(shift) do
+    short_type =
+      case shift.type do
+        :theoretical -> "T"
+        :theoretical_practical -> "TP"
+        :practical_laboratory -> "PL"
+        :tutorial_guidance -> "OT"
+      end
+
+    "#{short_type}#{shift.number}"
+  end
 end
