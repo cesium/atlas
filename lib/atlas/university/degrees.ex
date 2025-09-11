@@ -36,6 +36,21 @@ defmodule Atlas.University.Degrees do
   def get_degree!(id), do: Repo.get!(Degree, id)
 
   @doc """
+  Gets a single degree.
+
+  ## Examples
+
+      iex> get_degree(123)
+      {:ok, %Degree{}}
+
+      iex> get_degree(456)
+      {:error, :not_found}
+  """
+  def get_degree(id) do
+    Repo.get(Degree, id)
+  end
+
+  @doc """
   Gets a single degree by code.
 
   ## Examples

@@ -144,8 +144,11 @@ defmodule Atlas.Importers.ShiftsByCourses do
            building: building,
            room: room
          }) do
-      {:ok, timeslot} -> timeslot
-      {:error, _} -> nil
+      {:ok, timeslot} ->
+        timeslot
+
+      {:error, _} ->
+        nil
     end
   end
 
@@ -165,18 +168,30 @@ defmodule Atlas.Importers.ShiftsByCourses do
   end
 
   defp parse_building(location) do
-    location
-    |> String.split("-")
-    |> Enum.at(1)
-    |> String.trim()
-    |> String.split()
-    |> Enum.at(1)
+    case location do
+      "" ->
+        nil
+
+      location ->
+        location
+        |> String.split("-")
+        |> Enum.at(1)
+        |> String.trim()
+        |> String.split()
+        |> Enum.at(1)
+    end
   end
 
   defp parse_room(location) do
-    location
-    |> String.split("-")
-    |> Enum.at(2)
-    |> String.trim()
+    case location do
+      "" ->
+        nil
+
+      location ->
+        location
+        |> String.split("-")
+        |> Enum.at(2)
+        |> String.trim()
+    end
   end
 end

@@ -21,6 +21,7 @@ services:
       SECRET_KEY_GUARDIAN: ${SECRET_KEY_GUARDIAN:-your-dev-secret-key-here-make-it-long-enough}
       PHX_HOST: ${PHX_HOST:-localhost}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      KEPLER_API_URL: ${KEPLER_API_URL:-http://localhost:8000/api/v1}
     build:
       context: .
       dockerfile: Dockerfile

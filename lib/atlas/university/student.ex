@@ -19,6 +19,8 @@ defmodule Atlas.University.Student do
       join_through: Atlas.University.CourseEnrollment,
       on_replace: :delete
 
+    has_many :shift_enrollments, Atlas.University.ShiftEnrollment
+
     timestamps(type: :utc_datetime)
   end
 
