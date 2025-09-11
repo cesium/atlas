@@ -27,7 +27,7 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     |> validate_same_type_shifts()
     |> validate_different_shifts()
     |> unique_constraint([:student_id, :shift_from, :status],
-      name: :unique_shift_exchange_request,
+      name: :unique_pending_shift_exchange_request,
       message: "This request already exists"
     )
   end
@@ -39,7 +39,7 @@ defmodule Atlas.Exchange.ShiftExchangeRequest do
     |> validate_same_type_shifts()
     |> validate_different_shifts()
     |> unique_constraint([:student_id, :shift_from, :status],
-      name: :unique_shift_exchange_request,
+      name: :unique_pending_shift_exchange_request,
       message: "This request already exists"
     )
   end
