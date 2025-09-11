@@ -163,6 +163,23 @@ defmodule AtlasWeb.AuthController do
     end
   end
 
+  def update_password(conn, %{
+        "current_password" => current_password,
+        "password" => password,
+        "password_confirmation" => password_confirmation
+      }) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    with {:ok, _user} <-
+           Accounts.update_user_password(user, current_password, %{
+             password: password,
+             password_confirmation: password_confirmation
+           }) do
+      conn
+      |> send_resp(:no_content, "")
+    end
+  end
+
   defp fetch_refresh_token_cookie(conn) do
     conn = fetch_cookies(conn, signed: ["refresh_token"])
 
