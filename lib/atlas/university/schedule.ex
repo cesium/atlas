@@ -83,6 +83,7 @@ defmodule Atlas.University.Schedule do
     |> case do
       {:ok, _result} -> {:ok, %{status: :completed}}
       {:error, reason} -> {:error, %{status: :failed, reason: reason}}
+      {:error, _step, reason, _changes} -> {:error, %{status: :failed, reason: reason}}
     end
   end
 
@@ -115,7 +116,7 @@ defmodule Atlas.University.Schedule do
         |> then(&Atlas.University.update_student_schedule(student.id, &1, true))
         |> case do
           {:ok, _student} ->
-            {:cont, {:ok, acc}}
+            enroll_shifts_for_courses_with_parent(student.id, acc)
 
           {:error, reason} ->
             {:halt, {:error, reason}}
@@ -123,6 +124,7 @@ defmodule Atlas.University.Schedule do
     end
   end
 
+  @spec build_schedule_request(any()) :: nil | binary()
   def build_schedule_request(opts \\ %{}) do
     Jason.encode(%{
       students: get_students_data(opts),
@@ -242,5 +244,32 @@ defmodule Atlas.University.Schedule do
         meta: %{user_id: user.id, type: :generate_students_schedule}
       )
     )
+  end
+
+  defp enroll_shifts_for_courses_with_parent(student_id, acc) do
+    Student
+    |> where([s], s.id == ^student_id)
+    |> join(:inner, [s], c in assoc(s, :courses))
+    |> where([s, c], not is_nil(c.parent_course_id))
+    |> join(:inner, [s, c], course_shift in assoc(c, :shifts))
+    |> select([s, c, course_shift], {s.id, course_shift.id})
+    |> Repo.one()
+    |> case do
+      nil ->
+        {:cont, {:ok, acc}}
+
+      {_student_id, nil} ->
+        {:cont, {:ok, acc}}
+
+      {student_id, shift_id} ->
+        case Atlas.University.create_shift_enrollment(%{
+               student_id: student_id,
+               shift_id: shift_id,
+               status: :active
+             }) do
+          {:ok, _shift_enrollment} -> {:cont, {:ok, acc}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+    end
   end
 end

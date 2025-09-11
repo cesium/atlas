@@ -6,7 +6,9 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
 
   @weekdays ~w(monday tuesday wednesday thursday friday saturday sunday)a
 
-  @required_fields ~w(start end weekday building room shift_id)a
+  @required_fields ~w(start end weekday shift_id)a
+
+  @optional_fields ~w(building room)a
 
   schema "timeslots" do
     field :start, :time
@@ -23,7 +25,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
   @doc false
   def changeset(timeslot, attrs) do
     timeslot
-    |> cast(attrs, @required_fields)
+    |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
 
