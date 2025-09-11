@@ -124,7 +124,6 @@ defmodule Atlas.University.Schedule do
     end
   end
 
-  @spec build_schedule_request(any()) :: nil | binary()
   def build_schedule_request(opts \\ %{}) do
     Jason.encode(%{
       students: get_students_data(opts),

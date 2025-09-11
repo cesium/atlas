@@ -5,14 +5,6 @@ defmodule AtlasWeb.University.ScheduleController do
   alias Atlas.University.Degrees
   alias Atlas.University.Degrees.Degree
 
-  def available_degrees(conn, _params) do
-    degrees = Degrees.list_degrees()
-
-    conn
-    |> put_view(AtlasWeb.University.DegreeeJSON)
-    |> render(:index, degrees: degrees)
-  end
-
   def generate_schedule(conn, %{"degree" => degree_id, "semester" => semester}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 

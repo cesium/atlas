@@ -1,4 +1,4 @@
-defmodule AtlasWeb.University.DegreeeJSON do
+defmodule AtlasWeb.University.DegreeJSON do
   alias Atlas.University.Degrees.Degree
 
   def index(%{degrees: degrees}) do
