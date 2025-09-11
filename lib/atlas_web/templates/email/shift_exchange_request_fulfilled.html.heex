@@ -34,7 +34,7 @@
       "
       data-skip-in-text="true"
     >
-      {gettext("Welcome to Pombo! We're excited to have you on board.")}
+      {@course_name} - {@shift_shortname}
       <div>
          ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿
       </div>
@@ -124,9 +124,8 @@
                         margin-bottom: 16px;
                       "
                     >
-                      {gettext("We're excited to have you here! To get started,
-                      please verify your email address by clicking the button
-                      below.")}
+                      {gettext("We were able to fulfill your shift exchange request. You are now enrolled in")} <strong>{@course_name} - {@shift_shortname}</strong>.
+                      {gettext("Click the button below to see your updated schedule.")}
                     </p>
                     <table
                       align="center"
@@ -145,7 +144,7 @@
                         <tr>
                           <td>
                             <a
-                              href={@confirm_email_link}
+                              href={@schedule_link}
                               style="
                                 border-radius: 9999px;
                                 font-weight: 700;
@@ -191,7 +190,7 @@
                                 "
                                 ><div class="gmail-blend-difference">
                                   <div class="gmail-blend-screen">
-                                    {gettext("Verify your Email")}
+                                    {gettext("Schedule")}
                                   </div>
                                 </div></span>
                               <span><!--[if mso
@@ -235,7 +234,7 @@
                     >
                       {gettext("If the button above doesn't work, you can also click
                       on the following link:")}
-                      <a style="color: rgb(51, 65, 85)" href={@confirm_email_link}>{@confirm_email_link}</a>
+                      <a style="color: rgb(51, 65, 85)" href={@schedule_link}>{@schedule_link}</a>
                     </p>
                   </td>
                 </tr>

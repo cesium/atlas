@@ -44,7 +44,8 @@ config :atlas, Oban,
   engine: Oban.Engines.Basic,
   repo: Atlas.Repo,
   queues: [
-    imports: 1
+    imports: 1,
+    exchanges: 1
   ]
 
 # Import environment specific config. This must remain at the bottom
