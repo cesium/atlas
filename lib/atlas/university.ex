@@ -375,7 +375,7 @@ defmodule Atlas.University do
     |> where([c, cc, s, cs, se], se.student_id == ^student_id)
     |> where([c, cc, s, cs, se], se.status in ^statuses)
     |> preload([c, cc, s, cs, se, t1, t2],
-      shifts: {s, timeslots: t1},
+      shifts: {s, timeslots: t1, enrollments: se},
       courses: {cc, shifts: {cs, timeslots: t2}}
     )
     |> Repo.all()

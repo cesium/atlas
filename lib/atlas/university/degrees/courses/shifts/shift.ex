@@ -17,6 +17,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
 
     belongs_to :course, Atlas.University.Degrees.Courses.Course
     has_many :timeslots, Atlas.University.Degrees.Courses.Shifts.Timeslot
+    has_many :enrollments, Atlas.University.ShiftEnrollment
 
     timestamps(type: :utc_datetime)
   end
