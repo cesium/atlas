@@ -427,17 +427,6 @@ defmodule Atlas.Accounts do
     end
   end
 
-  def update_user_password(user, attrs) do
-    user |> User.password_changeset(attrs) |> Repo.update()
-  end
-
-  @doc """
-  Verifies if the given password matches the user's password.
-  """
-  def verify_user_password(%User{} = user, password) do
-    Bcrypt.verify_pass(password, user.hashed_password)
-  end
-
   @doc """
   Returns the list of users_sessions.
 

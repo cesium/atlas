@@ -170,22 +170,13 @@ defmodule AtlasWeb.AuthController do
       }) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
-    if user do
-      with true <- Accounts.verify_user_password(user, current_password),
-           {:ok, _user} <-
-             Accounts.update_user_password(user, %{
-               password: password,
-               password_confirmation: password_confirmation
-             }) do
-        conn
-        |> put_status(:ok)
-        |> json(%{message: "Password updated successfully"})
-      end
-    else
+    with {:ok, _user} <-
+           Accounts.update_user_password(user, current_password, %{
+             password: password,
+             password_confirmation: password_confirmation
+           }) do
       conn
-      |> put_status(:not_found)
-      |> json(%{error: "Invalid or expired reset token"})
-      |> halt()
+      |> send_resp(:no_content, "")
     end
   end
 
