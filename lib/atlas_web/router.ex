@@ -76,6 +76,16 @@ defmodule AtlasWeb.Router do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses
     end
+
+    scope "/export" do
+      scope "/blackboard" do
+        get "/:course_id/groups", ExportController, :blackboard_groups_export
+
+        get "/:course_id/group_enrollments",
+            ExportController,
+            :blackboard_group_enrollments_export
+      end
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

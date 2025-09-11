@@ -15,8 +15,10 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
       [%Shift{}, ...]
 
   """
-  def list_shifts do
-    Repo.all(Shift)
+  def list_shifts(opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.all()
   end
 
   @doc """
