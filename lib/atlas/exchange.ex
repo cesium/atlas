@@ -84,7 +84,7 @@ defmodule Atlas.Exchange do
           # Try auto approve
           case Repo.transaction(maybe_auto_approve_request(request)) do
             {:ok, _changes} ->
-              # Reload student and shift for notif
+              # Reload student and shift for notification email
               user = University.get_student!(request.student_id, preloads: [:user]).user
               shift_to = Shifts.get_shift!(request.shift_to, preloads: [:course])
 
@@ -97,12 +97,11 @@ defmodule Atlas.Exchange do
               {:ok, %{request | status: :approved}}
 
             {:error, :shift_has_space, :no_space, _} ->
-              # Couldn't auto approve → enqueue solver as before
+              # Couldn't auto approve → enqueue solver
               enqueue_shift_exchange_solver_job()
               {:ok, request}
 
             {:error, _step, _reason, _changes} ->
-              # fallback safe path
               {:ok, request}
           end
 
