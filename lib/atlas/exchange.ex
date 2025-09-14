@@ -81,29 +81,7 @@ defmodule Atlas.Exchange do
       |> Repo.insert()
       |> case do
         {:ok, request} ->
-          # Try auto approve
-          case Repo.transaction(maybe_auto_approve_request(request)) do
-            {:ok, _changes} ->
-              # Reload student and shift for notification email
-              user = University.get_student!(request.student_id, preloads: [:user]).user
-              shift_to = Shifts.get_shift!(request.shift_to, preloads: [:course])
-
-              UserNotifier.deliver_shift_exchange_request_fulfilled(
-                user,
-                shift_to.course.name,
-                Shifts.Shift.short_name(shift_to)
-              )
-
-              {:ok, %{request | status: :approved}}
-
-            {:error, :shift_has_space, :no_space, _} ->
-              # Couldn't auto approve → enqueue solver
-              enqueue_shift_exchange_solver_job()
-              {:ok, request}
-
-            {:error, _step, _reason, _changes} ->
-              {:ok, request}
-          end
+          execute_create_shift_exchange_request(request)
 
         {:error, changeset} ->
           {:error, changeset}
@@ -112,6 +90,32 @@ defmodule Atlas.Exchange do
       {:error,
        Ecto.Changeset.change(%ShiftExchangeRequest{})
        |> Ecto.Changeset.add_error(:shift_from, "Student is not enrolled in the origin shift")}
+    end
+  end
+
+  defp execute_create_shift_exchange_request(request) do
+    # Try auto approve
+    case Repo.transaction(maybe_auto_approve_request(request)) do
+      {:ok, _changes} ->
+        # Reload student and shift for notification email
+        user = University.get_student!(request.student_id, preloads: [:user]).user
+        shift_to = Shifts.get_shift!(request.shift_to, preloads: [:course])
+
+        UserNotifier.deliver_shift_exchange_request_fulfilled(
+          user,
+          shift_to.course.name,
+          Shifts.Shift.short_name(shift_to)
+        )
+
+        {:ok, %{request | status: :approved}}
+
+      {:error, :shift_has_space, :no_space, _} ->
+        # Couldn't auto approve → enqueue solver
+        enqueue_shift_exchange_solver_job()
+        {:ok, request}
+
+      {:error, _step, _reason, _changes} ->
+        {:ok, request}
     end
   end
 
