@@ -31,14 +31,17 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
   end
 
   def short_name(shift) do
-    short_type =
-      case shift.type do
-        :theoretical -> "T"
-        :theoretical_practical -> "TP"
-        :practical_laboratory -> "PL"
-        :tutorial_guidance -> "OT"
-      end
+    short_type = short_type(shift)
 
     "#{short_type}#{shift.number}"
+  end
+
+  def short_type(shift) do
+    case shift.type do
+      :theoretical -> "T"
+      :theoretical_practical -> "TP"
+      :practical_laboratory -> "PL"
+      :tutorial_guidance -> "OT"
+    end
   end
 end
