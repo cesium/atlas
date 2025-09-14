@@ -81,8 +81,30 @@ defmodule Atlas.Exchange do
       |> Repo.insert()
       |> case do
         {:ok, request} ->
-          enqueue_shift_exchange_solver_job()
-          {:ok, request}
+          # Try auto approve
+          case Repo.transaction(maybe_auto_approve_request(request)) do
+            {:ok, _changes} ->
+              # Reload student and shift for notif
+              user = University.get_student!(request.student_id, preloads: [:user]).user
+              shift_to = Shifts.get_shift!(request.shift_to, preloads: [:course])
+
+              UserNotifier.deliver_shift_exchange_request_fulfilled(
+                user,
+                shift_to.course.name,
+                Shifts.Shift.short_name(shift_to)
+              )
+
+              {:ok, %{request | status: :approved}}
+
+            {:error, :shift_has_space, :no_space, _} ->
+              # Couldn't auto approve → enqueue solver as before
+              enqueue_shift_exchange_solver_job()
+              {:ok, request}
+
+            {:error, _step, _reason, _changes} ->
+              # fallback safe path
+              {:ok, request}
+          end
 
         {:error, changeset} ->
           {:error, changeset}
@@ -365,5 +387,44 @@ defmodule Atlas.Exchange do
       {:error, _op, _changeset, _sofar} ->
         {:error, :transaction_failed}
     end
+  end
+
+  defp maybe_auto_approve_request(%ShiftExchangeRequest{} = req) do
+    Multi.new()
+    |> Multi.run(:shift_has_space, fn _repo, _changes ->
+      enrolled_count =
+        Repo.one(
+          from(se in ShiftEnrollment,
+            where: se.shift_id == ^req.shift_to and se.status == :active,
+            select: count(se.id)
+          )
+        )
+
+      shift = Shifts.get_shift!(req.shift_to)
+
+      if enrolled_count < shift.capacity do
+        {:ok, :has_space}
+      else
+        {:error, :no_space}
+      end
+    end)
+    |> Multi.update(
+      :approve_request,
+      Ecto.Changeset.change(req, status: :approved)
+    )
+    |> Multi.delete_all(
+      :delete_from_enrollment,
+      from(se in ShiftEnrollment,
+        where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_from
+      )
+    )
+    |> Multi.insert(
+      :insert_to_enrollment,
+      ShiftEnrollment.changeset(%ShiftEnrollment{}, %{
+        student_id: req.student_id,
+        shift_id: req.shift_to,
+        status: :active
+      })
+    )
   end
 end
