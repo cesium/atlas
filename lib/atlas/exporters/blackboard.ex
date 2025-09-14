@@ -37,10 +37,10 @@ defmodule Atlas.Exporters.Blackboard do
     shift_short_name = Shift.short_name(shift)
 
     [
-      shift_short_name,
+      shift_short_name <> "_gc",
       shift_short_name,
       nil,
-      shift_short_name,
+      "Turmas",
       "N"
     ]
   end
@@ -50,12 +50,12 @@ defmodule Atlas.Exporters.Blackboard do
     normalized_student_number = String.downcase(student.number)
 
     [
-      shift_short_name,
+      shift_short_name <> "_gc",
       normalized_student_number,
       normalized_student_number |> String.replace("a", "") |> String.replace("pg", ""),
       student.user.name,
       ".",
-      shift_short_name
+      "Turmas"
     ]
   end
 end
