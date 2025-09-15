@@ -110,6 +110,10 @@ defmodule AtlasWeb.Router do
             :blackboard_group_enrollments_export
       end
     end
+
+    scope "/statistics" do
+      get "/course_shifts_capacity/:course_id", StatisticsController, :course_shifts_capacity
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
