@@ -340,7 +340,9 @@ defmodule Atlas.Exchange do
             m,
             {:delete_from_enrollment_override, req.id},
             from(se in ShiftEnrollment,
-              where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_to and se.status == :override
+              where:
+                se.student_id == ^req.student_id and se.shift_id == ^req.shift_to and
+                  se.status == :override
             )
           )
 
