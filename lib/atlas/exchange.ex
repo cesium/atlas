@@ -334,6 +334,16 @@ defmodule Atlas.Exchange do
             )
           )
 
+        # Delete student override for the destination shift (in case it exists)
+        m =
+          Multi.delete_all(
+            m,
+            {:delete_from_enrollment_override, req.id},
+            from(se in ShiftEnrollment,
+              where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_to and se.status == :override
+            )
+          )
+
         # Create a new enrollment for the student in the destination shift
         new_enrollment_changeset =
           %ShiftEnrollment{}
