@@ -11,6 +11,10 @@ config :atlas,
   ecto_repos: [Atlas.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
+# Flop configuration
+config :flop,
+  repo: Atlas.Repo
+
 # Configures the endpoint
 config :atlas, AtlasWeb.Endpoint,
   url: [host: "localhost"],
