@@ -5,21 +5,50 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
+  alias Atlas.Accounts.User
   alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
   @doc """
-  Returns the list of students.
+  Returns the list of student users.
 
   ## Examples
 
       iex> list_students()
-      [%Student{}, ...]
+      [%User{}, ...]
 
   """
   def list_students do
-    Repo.all(Student)
+    User
+    |> where(type: :student)
+    |> preload(:student)
+    |> Repo.all()
+  end
+
+  def list_students(opts) when is_list(opts) do
+    User
+    |> apply_filters(opts)
+    |> where(type: :student)
+    |> preload(:student)
+    |> Repo.all()
+  end
+
+  def list_students(params) do
+    User
+    |> where(type: :student)
+    |> join(:left, [o], p in assoc(o, :student), as: :student)
+    |> preload(:student)
+    |> Flop.validate_and_run(params, for: User)
+  end
+
+  def list_students(%{} = params, opts) when is_list(opts) do
+    User
+    |> apply_filters(opts)
+    |> where(type: :student)
+    |> join(:left, [o], p in assoc(o, :student), as: :student)
+    |> preload(:student)
+    |> Flop.validate_and_run(params, for: User)
   end
 
   @doc """
