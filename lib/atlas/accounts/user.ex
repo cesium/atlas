@@ -6,6 +6,21 @@ defmodule Atlas.Accounts.User do
 
   alias Atlas.University
 
+  @derive {
+    Flop.Schema,
+    filterable: [:name, :number],
+    sortable: [:name],
+    default_limit: 20,
+    join_fields: [
+      number: [
+        binding: :student,
+        field: :number,
+        path: [:student, :number],
+        ecto_type: :string
+      ]
+    ]
+  }
+
   schema "users" do
     field :name, :string
     field :email, :string

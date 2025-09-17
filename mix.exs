@@ -41,6 +41,7 @@ defmodule Atlas.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
+      {:flop, "~> 0.26.3"},
 
       # security
       {:bcrypt_elixir, "~> 3.0"},
