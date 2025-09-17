@@ -83,6 +83,12 @@ defmodule AtlasWeb.Router do
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
     end
 
+    scope "/export" do
+      scope "/student" do
+        get "/:student_id/calendar.ics", CalendarExportController, :student_calendar
+      end
+    end
+
     pipe_through :is_at_least_professor
 
     scope "/jobs" do
