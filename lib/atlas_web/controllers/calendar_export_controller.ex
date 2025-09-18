@@ -1,8 +1,8 @@
 defmodule AtlasWeb.CalendarExportController do
   use AtlasWeb, :controller
 
-  alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.Calendar
+  alias Atlas.University.Degrees.Courses.Shifts
 
   @doc """
   Exports a student's full schedule as an `.ics` file.

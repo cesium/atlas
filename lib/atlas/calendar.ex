@@ -5,6 +5,8 @@ defmodule Atlas.Calendar do
 
   @prodid "-//Atlas//EN"
 
+  alias Atlas.University.Degrees.Courses.Shifts.Shift
+
   defp format_datetime(%NaiveDateTime{} = dt) do
     dt
     |> NaiveDateTime.to_iso8601()
@@ -99,7 +101,7 @@ defmodule Atlas.Calendar do
         "Course"
       end
 
-    "#{course_name} – #{Atlas.University.Degrees.Courses.Shifts.Shift.short_name(shift)}"
+    "#{course_name} – #{Shift.short_name(shift)}"
   end
 
   defp build_description(shift, ts) do
@@ -113,7 +115,7 @@ defmodule Atlas.Calendar do
       if is_binary(shift.professor), do: shift.professor, else: ""
 
     """
-    Shift #{Atlas.University.Degrees.Courses.Shifts.Shift.short_name(shift)}
+    Shift #{Shift.short_name(shift)}
     Time: #{time_range}
     Location: #{location_of(ts)}
     Professor: #{professor}
@@ -121,9 +123,10 @@ defmodule Atlas.Calendar do
   end
 
   defp location_of(ts) do
-    cond do
-      ts.building && ts.room -> "#{ts.building} #{ts.room}"
-      true -> "Unspecified location"
+    if ts.building && ts.room do
+      "#{ts.building} #{ts.room}"
+    else
+      "Unspecified location"
     end
   end
 
