@@ -42,6 +42,7 @@ defmodule Atlas.Calendar do
           SUMMARY:#{escape_text(build_summary(shift))}
           DESCRIPTION:#{escape_text(build_description(shift, ts))}
           LOCATION:#{escape_text(location_of(ts))}
+          RRULE:FREQ=WEEKLY;INTERVAL=1
           END:VEVENT
           """
         end)
