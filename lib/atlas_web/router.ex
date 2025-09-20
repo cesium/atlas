@@ -91,7 +91,7 @@ defmodule AtlasWeb.Router do
 
     scope "/export" do
       scope "/student" do
-        get "/calendarUrl", CalendarExportController, :calendar_url
+        get "/calendar-url", CalendarExportController, :calendar_url
       end
     end
 
