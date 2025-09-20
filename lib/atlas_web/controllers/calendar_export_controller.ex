@@ -36,7 +36,8 @@ defmodule AtlasWeb.CalendarExportController do
   Exports the current user's schedule as an `.ics` file, given a valid calendar token.
   """
   def student_calendar(conn, %{"token" => token}) do
-    with {:ok, claims} <- Guardian.decode_and_verify(token, %{"typ" => "calendar", "aud" => @audience}),
+    with {:ok, claims} <-
+           Guardian.decode_and_verify(token, %{"typ" => "calendar", "aud" => @audience}),
          {:ok, {user, _session}} <- Guardian.resource_from_claims(claims),
          student <- University.get_student_by_user_id(user.id),
          %{} = student <- student do
