@@ -24,6 +24,17 @@ config :atlas, :frontend_url, System.get_env("FRONTEND_URL", "http://localhost:3
 
 config :atlas, :kepler_api_url, System.get_env("KEPLER_API_URL", "http://localhost:8000/api/v1")
 
+atlas_api_url =
+  System.get_env("ATLAS_API_URL") ||
+    raise """
+    environment variable ATLAS_API_URL is missing.
+    It should be the base URL of your Atlas API instance, e.g.:
+      http://localhost:4000 in dev
+      https://pombo.cesium.pt/api in prod
+    """
+
+config :atlas, :api_url, atlas_api_url
+
 config :atlas,
   from_email_name: System.get_env("FROM_EMAIL_NAME") || "Pombo",
   from_email_address: System.get_env("FROM_EMAIL_ADDRESS") || "no-reply@pombo.cesium.pt"

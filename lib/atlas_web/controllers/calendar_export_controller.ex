@@ -23,7 +23,9 @@ defmodule AtlasWeb.CalendarExportController do
       token =
         AuthController.generate_token(user, session, :calendar)
 
-      url = "http://localhost:4000/v1/export/student/calendar.ics?token=#{token}" # FIX ME: Change to the actual api url 'pombo.cesium.pt/api' afaik
+      base_url = Application.get_env(:atlas, :api_url)
+
+      url = "#{base_url}/v1/export/student/calendar.ics?token=#{token}"
 
       conn
       |> json(%{calendar_url: url})
