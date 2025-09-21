@@ -209,7 +209,7 @@ defmodule AtlasWeb.AuthController do
     )
   end
 
-  defp generate_token(user, session, :access) do
+  def generate_token(user, session, :access) do
     {:ok, token, _claims} =
       Guardian.encode_and_sign({user, session}, %{aud: @audience},
         token_type: "access",
@@ -219,7 +219,17 @@ defmodule AtlasWeb.AuthController do
     token
   end
 
-  defp generate_token(user, session, :refresh) do
+  def generate_token(user, session, :calendar) do
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign({user, session}, %{aud: @audience},
+        token_type: "calendar",
+        ttl: {10, :minute}
+      )
+
+    token
+  end
+
+  def generate_token(user, session, :refresh) do
     {:ok, token, _claims} =
       Guardian.encode_and_sign({user, session}, %{aud: @audience},
         token_type: "refresh",

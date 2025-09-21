@@ -64,6 +64,7 @@ defmodule Atlas.MixProject do
       {:igniter, "~> 0.5", only: [:dev]},
       {:csv, "~> 3.2"},
       {:libgraph, "~> 0.16.0"},
+      {:icalendar, "~> 1.1.2"},
 
       # monitoring
       {:telemetry_metrics, "~> 1.0"},
