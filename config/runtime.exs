@@ -26,7 +26,9 @@ config :atlas, :kepler_api_url, System.get_env("KEPLER_API_URL", "http://localho
 
 atlas_api_url =
   case config_env() do
-    :test -> "http://localhost:4000"
+    :test ->
+      "http://localhost:4000"
+
     _ ->
       System.get_env("ATLAS_API_URL") ||
         raise """
