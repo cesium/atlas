@@ -2,10 +2,10 @@ defmodule AtlasWeb.CalendarExportController do
   use AtlasWeb, :controller
 
   alias Atlas.Accounts.Guardian
-  alias AtlasWeb.AuthController
   alias Atlas.Calendar
   alias Atlas.University
   alias Atlas.University.Degrees.Courses.Shifts
+  alias AtlasWeb.AuthController
 
   @audience "astra"
 
