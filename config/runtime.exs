@@ -25,13 +25,17 @@ config :atlas, :frontend_url, System.get_env("FRONTEND_URL", "http://localhost:3
 config :atlas, :kepler_api_url, System.get_env("KEPLER_API_URL", "http://localhost:8000/api/v1")
 
 atlas_api_url =
-  System.get_env("ATLAS_API_URL") ||
-    raise """
-    environment variable ATLAS_API_URL is missing.
-    It should be the base URL of your Atlas API instance, e.g.:
-      http://localhost:4000 in dev
-      https://pombo.cesium.pt/api in prod
-    """
+  case config_env() do
+    :test -> "http://localhost:4000"
+    _ ->
+      System.get_env("ATLAS_API_URL") ||
+        raise """
+        environment variable ATLAS_API_URL is missing.
+        It should be the base URL of your Atlas API instance, e.g.:
+          http://localhost:4000 in dev
+          https://pombo.cesium.pt/api in prod
+        """
+  end
 
 config :atlas, :api_url, atlas_api_url
 
@@ -120,6 +124,15 @@ if config_env() == :prod do
       """
 
   config :atlas, :kepler_api_url, kepler_api_url
+
+  atlas_api_url =
+    System.get_env("ATLAS_API_URL") ||
+      raise """
+      environment variable ATLAS_API_URL is missing.
+      It should be the base URL of your Atlas API instance, e.g., http://localhost:4000/api
+      """
+
+  config :atlas, :api_url, atlas_api_url
 
   # Configures CORS allowed origins
   config :atlas, :allowed_origins, frontend_url
