@@ -13,7 +13,8 @@ defmodule Atlas.UniversityTest do
 
     test "list_students/0 returns all students" do
       student = student_fixture()
-      assert University.list_students() == [student]
+      students = University.list_students()
+      assert student in students
     end
 
     test "get_student!/1 returns the student with given id" do

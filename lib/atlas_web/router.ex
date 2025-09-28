@@ -83,6 +83,8 @@ defmodule AtlasWeb.Router do
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
     end
 
+    resources "/feedbacks", FeedbacksController, except: [:new, :edit, :show]
+
     pipe_through :is_at_least_professor
 
     scope "/jobs" do
