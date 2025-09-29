@@ -1,6 +1,7 @@
 defmodule AtlasWeb.University.CourseJSON do
   alias Atlas.University.Degrees.Courses.Course
-  alias AtlasWeb.University.{CourseJSON, ShiftJSON}
+  alias AtlasWeb.University.CourseJSON
+  alias AtlasWeb.ShiftsJSON
 
   def index(%{courses: courses}) do
     %{courses: for(course <- courses, do: data(course))}
@@ -22,7 +23,7 @@ defmodule AtlasWeb.University.CourseJSON do
         end,
       shifts:
         if Ecto.assoc_loaded?(course.shifts) do
-          for(shift <- course.shifts, do: ShiftJSON.data(shift))
+          for(shift <- course.shifts, do: ShiftsJSON.data(shift))
         else
           []
         end

@@ -1,6 +1,15 @@
-defmodule AtlasWeb.University.ShiftJSON do
+defmodule AtlasWeb.ShiftsJSON do
+
   alias Atlas.University.Degrees.Courses.Shifts.Shift
   alias AtlasWeb.University.TimeslotJSON
+
+  def index(%{shifts: shifts}) do
+    %{data: for(shift <- shifts, do: data(shift))}
+  end
+
+  def show(%{shift: shift}) do
+    %{data: data(shift)}
+  end
 
   def data(%Shift{} = shift) do
     %{

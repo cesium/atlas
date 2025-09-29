@@ -19,6 +19,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.all()
+    |> Repo.preload([:timeslots, :enrollments])
   end
 
   @doc """
@@ -39,6 +40,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.get!(id)
+    |> Repo.preload([:timeslots, :enrollments])
   end
 
   @doc """
