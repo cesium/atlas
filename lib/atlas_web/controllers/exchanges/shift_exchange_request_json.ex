@@ -2,8 +2,8 @@ defmodule AtlasWeb.ShiftExchangeRequestJSON do
   @moduledoc """
   A module for rendering shift exchange request data in JSON format.
   """
-  alias AtlasWeb.University.CourseJSON
   alias AtlasWeb.ShiftsJSON
+  alias AtlasWeb.University.CourseJSON
 
   @doc """
   Renders a list of shift exchange requests as JSON.

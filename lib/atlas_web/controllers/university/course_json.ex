@@ -1,7 +1,7 @@
 defmodule AtlasWeb.University.CourseJSON do
   alias Atlas.University.Degrees.Courses.Course
-  alias AtlasWeb.University.CourseJSON
   alias AtlasWeb.ShiftsJSON
+  alias AtlasWeb.University.CourseJSON
 
   def index(%{courses: courses}) do
     %{courses: for(course <- courses, do: data(course))}

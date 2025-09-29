@@ -2,15 +2,15 @@ defmodule AtlasWeb.ShiftsController do
   use AtlasWeb, :controller
 
   alias Atlas.University.Degrees.Courses.Shifts
-  alias AtlasWeb.ShiftsJSON
 
   action_fallback AtlasWeb.FallbackController
 
   def index(conn, attrs) do
-    { user, _} = Guardian.Plug.current_resource(conn)
+    {user, _} = Guardian.Plug.current_resource(conn)
 
     if user_has_elevated_privileges?(user) do
       shifts = Shifts.list_shifts(attrs)
+
       conn
       |> render(:index, shifts: shifts)
     else
@@ -20,10 +20,9 @@ defmodule AtlasWeb.ShiftsController do
     end
   end
 
-  def update(conn, %{ "id" => id } = attrs) do
-    { user, _} = Guardian.Plug.current_resource(conn)
+  def update(conn, %{"id" => id} = attrs) do
+    {user, _} = Guardian.Plug.current_resource(conn)
     shift = Shifts.get_shift!(id)
-    IO.inspect(shift)
 
     if user_has_elevated_privileges?(user) do
       with {:ok, shift} <- Shifts.update_shift(shift, attrs) do
