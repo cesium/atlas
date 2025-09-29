@@ -5,6 +5,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   use Atlas.Context
 
   alias Atlas.University.Degrees.Courses.Shifts.Shift
+  alias Atlas.University.ShiftEnrollment
 
   @doc """
   Returns the list of shifts.
@@ -19,6 +20,33 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of shifts a student is enrolled in.
+
+  ## Examples
+
+      iex> list_shifts_for_student(123)
+      [%Shift{}, ...]
+
+      iex> list_shifts_for_student(456)
+      []
+
+  """
+  def list_shifts_for_student(student_id, opts \\ []) do
+    shift_ids =
+      from(e in ShiftEnrollment,
+        where: e.student_id == ^student_id,
+        select: e.shift_id
+      )
+      |> Repo.all()
+
+    Shift
+    |> where([s], s.id in ^shift_ids)
+    |> apply_filters(opts)
+    |> Repo.all()
+    |> Repo.preload([:course, :timeslots])
   end
 
   @doc """

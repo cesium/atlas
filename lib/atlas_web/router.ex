@@ -39,6 +39,12 @@ defmodule AtlasWeb.Router do
       post "/reset_password", AuthController, :reset_password
     end
 
+    scope "/export" do
+      scope "/student" do
+        get "/calendar.ics", CalendarExportController, :student_calendar
+      end
+    end
+
     # Authenticated routes
 
     pipe_through :auth
@@ -87,6 +93,12 @@ defmodule AtlasWeb.Router do
       end
 
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
+    end
+
+    scope "/export" do
+      scope "/student" do
+        get "/calendar-url", CalendarExportController, :calendar_url
+      end
     end
 
     pipe_through :is_at_least_professor

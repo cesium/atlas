@@ -90,6 +90,23 @@ defmodule Atlas.University do
   end
 
   @doc """
+  Gets a single student by `user_id`.
+
+  Returns `nil` if no student exists for the given user.
+
+  ## Examples
+
+      iex> get_student_by_user_id(123)
+      %Student{}
+
+      iex> get_student_by_user_id(999)
+      nil
+  """
+  def get_student_by_user_id(user_id) do
+    Repo.get_by(Student, user_id: user_id)
+  end
+
+  @doc """
   Creates a student.
 
   ## Examples
