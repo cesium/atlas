@@ -5,6 +5,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   use Atlas.Context
 
   alias Atlas.University.Degrees.Courses.Shifts.Shift
+  alias Ecto.Multi
 
   @doc """
   Returns the list of shifts.
@@ -19,6 +20,13 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.all()
+  end
+
+  def list_shifts_with_timeslots(opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.all()
+    |> Repo.preload([:timeslots])
   end
 
   @doc """
@@ -39,6 +47,13 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.get!(id)
+  end
+
+  def get_shift_with_timeslots(id, opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.get(id)
+    |> Repo.preload([:timeslots])
   end
 
   @doc """
@@ -207,5 +222,25 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   """
   def change_timeslot(%Timeslot{} = timeslot, attrs \\ %{}) do
     Timeslot.changeset(timeslot, attrs)
+  end
+
+  @doc """
+  Updates a shift that contains
+  """
+
+  def update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
+    Multi.new()
+    |> Multi.update(:shift, change_shift(shift, shift_attrs))
+    |> then(fn multi ->
+      timeslot_attrs
+      |> Enum.with_index()
+      |> Enum.reduce(multi, fn {timeslot_attr, index}, acc_multi ->
+        timeslot = get_timeslot!(timeslot_attr["id"])
+        changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
+
+        Multi.update(acc_multi, {:timeslot, index}, changeset)
+      end)
+    end)
+    |> Repo.transaction()
   end
 end
