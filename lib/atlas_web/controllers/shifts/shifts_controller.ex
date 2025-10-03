@@ -1,6 +1,7 @@
 defmodule AtlasWeb.ShiftsController do
   use AtlasWeb, :controller
 
+  alias Atlas.Repo
   alias Atlas.University.Degrees.Courses.Shifts
 
   action_fallback AtlasWeb.FallbackController
@@ -9,7 +10,7 @@ defmodule AtlasWeb.ShiftsController do
     {user, _} = Guardian.Plug.current_resource(conn)
 
     if user_has_elevated_privileges?(user) do
-      shifts = Shifts.list_shifts(attrs)
+      shifts = Shifts.list_shifts_with_timeslots(attrs)
 
       conn
       |> render(:index, shifts: shifts)
@@ -22,11 +23,22 @@ defmodule AtlasWeb.ShiftsController do
 
   def update(conn, %{"id" => id} = attrs) do
     {user, _} = Guardian.Plug.current_resource(conn)
-    shift = Shifts.get_shift!(id)
 
     if user_has_elevated_privileges?(user) do
-      with {:ok, shift} <- Shifts.update_shift(shift, attrs) do
-        render(conn, :show, shift: shift)
+      shift = Shifts.get_shift_with_timeslots(id)
+      timeslot_attrs = Map.get(attrs, "timeslots", [])
+      shift_attrs = Map.delete(attrs, "timeslots")
+
+      case Shifts.update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
+        {:ok, %{shift: updated_shift} = _results} ->
+          conn
+          |> render(:show, shift: updated_shift |> Repo.preload([:timeslots]))
+
+        {:error, _operation, changeset, _changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> put_view(json: AtlasWeb.ChangesetJSON)
+          |> render(:error, changeset: changeset)
       end
     else
       conn
