@@ -22,7 +22,7 @@ config :atlas, AtlasWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
-  debug_errors: false,
+  debug_errors: true,
   secret_key_base: "+3Sc5XJKuK4YFpwINEFjTPHT57LDXshWNe8gMha9b/KkKjXt0h7cYp64JZkoIaFK",
   watchers: []
 
