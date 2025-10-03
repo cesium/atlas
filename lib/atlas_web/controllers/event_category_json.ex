@@ -15,7 +15,7 @@ defmodule AtlasWeb.EventCategoryJSON do
     %{data: data(event_category)}
   end
 
-  defp data(%EventCategory{} = event_category) do
+  def data(%EventCategory{} = event_category) do
     %{
       id: event_category.id,
       name: event_category.name,

@@ -5,14 +5,14 @@ defmodule AtlasWeb.EventJSON do
   Renders a list of events.
   """
   def index(%{events: events}) do
-    %{data: for(event <- events, do: data(event))}
+    %{events: for(event <- events, do: data(event))}
   end
 
   @doc """
   Renders a single event.
   """
   def show(%{event: event}) do
-    %{data: data(event)}
+    %{event: data(event)}
   end
 
   defp data(%Event{} = event) do
@@ -22,7 +22,19 @@ defmodule AtlasWeb.EventJSON do
       start: event.start,
       end: event.end,
       place: event.place,
-      link: event.link
+      link: event.link,
+      category:
+        if Ecto.assoc_loaded?(event.category) do
+          AtlasWeb.EventCategoryJSON.data(event.category)
+        else
+          nil
+        end,
+      course:
+        if Ecto.assoc_loaded?(event.course) do
+          AtlasWeb.University.CourseJSON.data(event.course)
+        else
+          nil
+        end
     }
   end
 end

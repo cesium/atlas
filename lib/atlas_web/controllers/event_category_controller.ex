@@ -12,7 +12,8 @@ defmodule AtlasWeb.EventCategoryController do
   end
 
   def create(conn, %{"event_category" => event_category_params}) do
-    with {:ok, %EventCategory{} = event_category} <- Events.create_event_category(event_category_params) do
+    with {:ok, %EventCategory{} = event_category} <-
+           Events.create_event_category(event_category_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/v1/event_categories/#{event_category}")
@@ -28,7 +29,8 @@ defmodule AtlasWeb.EventCategoryController do
   def update(conn, %{"id" => id, "event_category" => event_category_params}) do
     event_category = Events.get_event_category!(id)
 
-    with {:ok, %EventCategory{} = event_category} <- Events.update_event_category(event_category, event_category_params) do
+    with {:ok, %EventCategory{} = event_category} <-
+           Events.update_event_category(event_category, event_category_params) do
       render(conn, :show, event_category: event_category)
     end
   end

@@ -7,6 +7,7 @@ defmodule Atlas.Events do
   alias Atlas.Repo
 
   alias Atlas.Events.EventCategory
+  alias Atlas.Events.Event
 
   @doc """
   Returns the list of event_categories.
@@ -102,8 +103,6 @@ defmodule Atlas.Events do
     EventCategory.changeset(event_category, attrs)
   end
 
-  alias Atlas.Events.Event
-
   @doc """
   Returns the list of events.
 
@@ -114,7 +113,9 @@ defmodule Atlas.Events do
 
   """
   def list_events do
-    Repo.all(Event)
+    Event
+    |> preload([:category, :course])
+    |> Repo.all()
   end
 
   @doc """
@@ -148,6 +149,7 @@ defmodule Atlas.Events do
   def create_event(attrs \\ %{}) do
     %Event{}
     |> Event.changeset(attrs)
+    |> preload([:category, :course])
     |> Repo.insert()
   end
 
@@ -166,6 +168,7 @@ defmodule Atlas.Events do
   def update_event(%Event{} = event, attrs) do
     event
     |> Event.changeset(attrs)
+    |> preload([:category, :course])
     |> Repo.update()
   end
 

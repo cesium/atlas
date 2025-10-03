@@ -10,8 +10,9 @@ defmodule Atlas.Events.Event do
     field :title, :string
     field :end, :utc_datetime
     field :place, :string
-    field :category_id, :binary_id
-    field :course, :binary_id
+
+    belongs_to :category, Atlas.Events.EventCategory
+    belongs_to :course, Atlas.University.Degrees.Courses.Course
 
     timestamps(type: :utc_datetime)
   end
