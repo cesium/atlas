@@ -5,10 +5,10 @@ defmodule Atlas.Events.Event do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "events" do
-    field :start, :time
+    field :start, :utc_datetime
     field :link, :string
     field :title, :string
-    field :end, :time
+    field :end, :utc_datetime
     field :place, :string
     field :category_id, :binary_id
     field :course, :binary_id

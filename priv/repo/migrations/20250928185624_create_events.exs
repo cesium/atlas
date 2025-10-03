@@ -5,8 +5,8 @@ defmodule Atlas.Repo.Migrations.CreateEvents do
     create table(:events, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :title, :string
-      add :start, :time
-      add :end, :time
+      add :start, :utc_datetime
+      add :end, :utc_datetime
       add :place, :string
       add :link, :string
       add :category_id, references(:event_categories, on_delete: :nothing, type: :binary_id)
