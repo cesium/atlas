@@ -1,9 +1,8 @@
 defmodule Atlas.Events.EventCategory do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Atlas.Schema
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  @required_fields ~w(name color)a
+
   schema "event_categories" do
     field :name, :string
     field :color, :string
@@ -14,7 +13,7 @@ defmodule Atlas.Events.EventCategory do
   @doc false
   def changeset(event_category, attrs) do
     event_category
-    |> cast(attrs, [:name, :color])
-    |> validate_required([:name, :color])
+    |> cast(attrs, @required_fields)
+    |> validate_required(@required_fields)
   end
 end

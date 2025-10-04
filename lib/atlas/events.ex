@@ -149,8 +149,11 @@ defmodule Atlas.Events do
   def create_event(attrs \\ %{}) do
     %Event{}
     |> Event.changeset(attrs)
-    |> preload([:category, :course])
     |> Repo.insert()
+    |> case do
+      {:ok, event} -> {:ok, Repo.preload(event, [:category, :course])}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -168,8 +171,11 @@ defmodule Atlas.Events do
   def update_event(%Event{} = event, attrs) do
     event
     |> Event.changeset(attrs)
-    |> preload([:category, :course])
     |> Repo.update()
+    |> case do
+      {:ok, event} -> {:ok, Repo.preload(event, [:category, :course])}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

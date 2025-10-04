@@ -24,13 +24,13 @@ defmodule AtlasWeb.EventJSON do
       place: event.place,
       link: event.link,
       category:
-        if Ecto.assoc_loaded?(event.category) do
+        if Ecto.assoc_loaded?(event.category) and event.category do
           AtlasWeb.EventCategoryJSON.data(event.category)
         else
           nil
         end,
       course:
-        if Ecto.assoc_loaded?(event.course) do
+        if Ecto.assoc_loaded?(event.course) and event.course do
           AtlasWeb.University.CourseJSON.data(event.course)
         else
           nil

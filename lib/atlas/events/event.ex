@@ -1,9 +1,9 @@
 defmodule Atlas.Events.Event do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Atlas.Schema
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  @required_fields ~w(title start end place link category_id)a
+  @optional_fields ~w(course_id)a
+
   schema "events" do
     field :start, :utc_datetime
     field :link, :string
@@ -20,7 +20,7 @@ defmodule Atlas.Events.Event do
   @doc false
   def changeset(event, attrs) do
     event
-    |> cast(attrs, [:title, :start, :end, :place, :link])
-    |> validate_required([:title, :start, :end, :place, :link])
+    |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end
