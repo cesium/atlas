@@ -28,12 +28,6 @@ defmodule AtlasWeb.EventJSON do
           AtlasWeb.EventCategoryJSON.data(event.category)
         else
           nil
-        end,
-      course:
-        if Ecto.assoc_loaded?(event.course) and event.course do
-          AtlasWeb.University.CourseJSON.data(event.course)
-        else
-          nil
         end
     }
   end

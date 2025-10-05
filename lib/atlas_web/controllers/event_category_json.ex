@@ -19,7 +19,13 @@ defmodule AtlasWeb.EventCategoryJSON do
     %{
       id: event_category.id,
       name: event_category.name,
-      color: event_category.color
+      color: event_category.color,
+      course:
+        if Ecto.assoc_loaded?(event_category.course) and event_category.course do
+          AtlasWeb.University.CourseJSON.data(event_category.course)
+        else
+          nil
+        end
     }
   end
 end

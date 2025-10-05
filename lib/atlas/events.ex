@@ -19,7 +19,9 @@ defmodule Atlas.Events do
 
   """
   def list_event_categories do
-    Repo.all(EventCategory)
+    EventCategory
+    |> preload(:course)
+    |> Repo.all()
   end
 
   @doc """
@@ -36,7 +38,11 @@ defmodule Atlas.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_event_category!(id), do: Repo.get!(EventCategory, id)
+  def get_event_category!(id) do
+    EventCategory
+    |> preload(:course)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a event_category.
@@ -54,6 +60,10 @@ defmodule Atlas.Events do
     %EventCategory{}
     |> EventCategory.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, event_category} -> {:ok, Repo.preload(event_category, :course)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -72,6 +82,10 @@ defmodule Atlas.Events do
     event_category
     |> EventCategory.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, event_category} -> {:ok, Repo.preload(event_category, :course)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -88,6 +102,10 @@ defmodule Atlas.Events do
   """
   def delete_event_category(%EventCategory{} = event_category) do
     Repo.delete(event_category)
+    |> case do
+      {:ok, event_category} -> {:ok, Repo.preload(event_category, :course)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -114,7 +132,7 @@ defmodule Atlas.Events do
   """
   def list_events do
     Event
-    |> preload([:category, :course])
+    |> preload(category: :course)
     |> Repo.all()
   end
 
@@ -132,7 +150,11 @@ defmodule Atlas.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_event!(id), do: Repo.get!(Event, id)
+  def get_event!(id) do
+    Event
+    |> preload(category: :course)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a event.
@@ -151,7 +173,7 @@ defmodule Atlas.Events do
     |> Event.changeset(attrs)
     |> Repo.insert()
     |> case do
-      {:ok, event} -> {:ok, Repo.preload(event, [:category, :course])}
+      {:ok, event} -> {:ok, Repo.preload(event, category: :course)}
       {:error, changeset} -> {:error, changeset}
     end
   end
@@ -173,7 +195,7 @@ defmodule Atlas.Events do
     |> Event.changeset(attrs)
     |> Repo.update()
     |> case do
-      {:ok, event} -> {:ok, Repo.preload(event, [:category, :course])}
+      {:ok, event} -> {:ok, Repo.preload(event, category: :course)}
       {:error, changeset} -> {:error, changeset}
     end
   end
@@ -192,6 +214,10 @@ defmodule Atlas.Events do
   """
   def delete_event(%Event{} = event) do
     Repo.delete(event)
+    |> case do
+      {:ok, event} -> {:ok, Repo.preload(event, category: :course)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
