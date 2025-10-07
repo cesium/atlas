@@ -98,6 +98,9 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/event_categories" do
+      get "/selected", EventCategoryController, :selected_index
+      post "/selected", EventCategoryController, :selected_update
+
       resources "/", EventCategoryController, only: [:index, :show]
 
       pipe_through :is_at_least_professor

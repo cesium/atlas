@@ -11,6 +11,8 @@ defmodule Atlas.Events.EventCategory do
 
     belongs_to :course, Atlas.University.Degrees.Courses.Course
 
+    has_many :users_event_categories, Atlas.Events.UserEventCategory
+
     timestamps(type: :utc_datetime)
   end
 

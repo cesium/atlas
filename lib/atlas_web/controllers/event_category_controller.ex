@@ -42,4 +42,31 @@ defmodule AtlasWeb.EventCategoryController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def selected_index(conn, _params) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    user_event_categories = Events.list_event_categories_by_user(user.id)
+    render(conn, :index, event_categories: user_event_categories)
+  end
+
+  def selected_update(conn, %{"event_categories" => event_categories}) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    case Events.update_event_categories_for_user(user.id, event_categories) do
+      {:ok, _} ->
+        event_categories = Events.list_event_categories_by_user(user.id)
+        render(conn, :index, event_categories: event_categories)
+
+      {:error, _reason} ->
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Could not update selected event categories."})
+
+      {:error, _, _, _} ->
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Could not update selected event categories."})
+    end
+  end
 end

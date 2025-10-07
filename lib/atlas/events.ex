@@ -6,8 +6,7 @@ defmodule Atlas.Events do
   import Ecto.Query, warn: false
   alias Atlas.Repo
 
-  alias Atlas.Events.EventCategory
-  alias Atlas.Events.Event
+  alias Atlas.Events.{Event, EventCategory, UserEventCategory}
 
   @doc """
   Returns the list of event_categories.
@@ -22,6 +21,59 @@ defmodule Atlas.Events do
     EventCategory
     |> preload(:course)
     |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of event categories selected by a user.
+
+  ## Examples
+
+      iex> list_event_categories_by_user(user_id)
+      [%EventCategory{}, ...]
+
+  """
+  def list_event_categories_by_user(user_id) do
+    EventCategory
+    |> join(:inner, [ec], uec in assoc(ec, :users_event_categories))
+    |> where([ec, uec], uec.user_id == ^user_id)
+    |> preload(:course)
+    |> Repo.all()
+  end
+
+  @doc """
+  Updates the event categories selected by a user.
+
+  ## Examples
+      iex> update_event_categories_for_user(user_id, category_ids)
+      {:ok, [%UserEventCategory{}, ...]}
+
+      iex> update_event_categories_for_user(user_id, bad_category_ids)
+      {:error, %Ecto.Changeset{}}
+  """
+  def update_event_categories_for_user(user_id, category_ids) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(
+      :delete_all,
+      UserEventCategory
+      |> where([uec], uec.user_id == ^user_id)
+    )
+    |> Ecto.Multi.run(:insert_all, fn repo, _changes ->
+      insert_user_event_categories(repo, user_id, category_ids)
+    end)
+    |> Repo.transact()
+  end
+
+  defp insert_user_event_categories(repo, user_id, category_ids) do
+    category_ids
+    |> Enum.reduce_while({:ok, []}, fn category_id, {:ok, acc} ->
+      %UserEventCategory{}
+      |> UserEventCategory.changeset(%{user_id: user_id, event_category_id: category_id})
+      |> repo.insert()
+      |> case do
+        {:ok, user_event_category} -> {:cont, {:ok, [user_event_category | acc]}}
+        {:error, changeset} -> {:halt, {:error, changeset}}
+      end
+    end)
   end
 
   @doc """

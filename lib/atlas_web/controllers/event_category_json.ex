@@ -1,5 +1,6 @@
 defmodule AtlasWeb.EventCategoryJSON do
   alias Atlas.Events.EventCategory
+  alias AtlasWeb.University.CourseJSON
 
   @doc """
   Renders a list of event_categories.
@@ -22,7 +23,7 @@ defmodule AtlasWeb.EventCategoryJSON do
       color: event_category.color,
       course:
         if Ecto.assoc_loaded?(event_category.course) and event_category.course do
-          AtlasWeb.University.CourseJSON.data(event_category.course)
+          CourseJSON.data(event_category.course)
         else
           nil
         end
