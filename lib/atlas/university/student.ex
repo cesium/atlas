@@ -7,6 +7,21 @@ defmodule Atlas.University.Student do
   @required_fields ~w(number degree_id)a
   @optional_fields ~w(special_status degree_year user_id)a
 
+  @derive {
+    Flop.Schema,
+    filterable: [:name, :number],
+    sortable: [:name, :number],
+    default_limit: 20,
+    join_fields: [
+      name: [
+        binding: :user,
+        field: :name,
+        path: [:user, :name],
+        ecto_type: :string
+      ]
+    ]
+  }
+
   schema "students" do
     field :number, :string
     field :special_status, :string
