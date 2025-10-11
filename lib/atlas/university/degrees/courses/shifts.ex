@@ -231,16 +231,42 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   def update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
     Multi.new()
     |> Multi.update(:shift, change_shift(shift, shift_attrs))
+    |> process_timeslots(shift, timeslot_attrs)
+    |> Repo.transact()
+  end
+
+  defp process_timeslots(multi, shift, timeslot_attrs) do
+    multi
     |> then(fn multi ->
       timeslot_attrs
       |> Enum.with_index()
       |> Enum.reduce(multi, fn {timeslot_attr, index}, acc_multi ->
-        timeslot = get_timeslot!(timeslot_attr["id"])
-        changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
-
-        Multi.update(acc_multi, {:timeslot, index}, changeset)
+        process_timeslot(acc_multi, timeslot_attr, shift.id, index)
       end)
     end)
-    |> Repo.transaction()
+  end
+
+  defp process_timeslot(multi, timeslot_attr, shift_id, index) do
+    if timeslot_attr["id"] && timeslot_exists?(timeslot_attr["id"]) do
+      timeslot = get_timeslot!(timeslot_attr["id"])
+      changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
+      Multi.update(multi, {:timeslot, index}, changeset)
+    else
+      clean_attrs =
+        timeslot_attr
+        |> Map.delete("id")
+        |> Map.put("shift_id", shift_id)
+        |> Map.replace("weekday", timeslot_attr["weekday"] |> String.to_atom())
+
+      changeset = change_timeslot(%Timeslot{}, clean_attrs)
+      Multi.insert(multi, {:timeslot, index}, changeset)
+    end
+  end
+
+  defp timeslot_exists?(id) do
+    case Repo.get(Timeslot, id) do
+      nil -> false
+      _ -> true
+    end
   end
 end

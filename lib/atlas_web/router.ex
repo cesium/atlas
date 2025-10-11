@@ -98,6 +98,10 @@ defmodule AtlasWeb.Router do
       put "/:id", ShiftsController, :update
     end
 
+    scope "/timeslots" do
+      delete "/:id", TimeslotsController, :delete
+    end
+
     scope "/jobs" do
       get "/", JobController, :index
       get "/:id", JobController, :show
