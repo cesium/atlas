@@ -9,8 +9,8 @@ defmodule Atlas.University.Student do
 
   @derive {
     Flop.Schema,
-    filterable: [:name, :number],
-    sortable: [:name, :number],
+    filterable: [:number, :name],
+    sortable: [:number, :name],
     default_limit: 20,
     join_fields: [
       name: [

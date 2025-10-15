@@ -33,15 +33,17 @@ defmodule Atlas.University do
 
   def list_students(params) do
     Student
+    |> join(:left, [o], p in assoc(o, :user), as: :user)
     |> preload(:user)
-    |> Flop.validate_and_run(params)
+    |> Flop.validate_and_run(params, for: Student)
   end
 
   def list_students(%{} = params, opts) when is_list(opts) do
     Student
     |> apply_filters(opts)
+    |> join(:left, [o], p in assoc(o, :user), as: :user)
     |> preload(:user)
-    |> Flop.validate_and_run(params)
+    |> Flop.validate_and_run(params, for: Student)
   end
 
   @doc """
