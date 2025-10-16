@@ -26,7 +26,8 @@ defmodule AtlasWeb.EventCategoryJSON do
           CourseJSON.data(event_category.course)
         else
           nil
-        end
+        end,
+      type: event_category.type
     }
   end
 end

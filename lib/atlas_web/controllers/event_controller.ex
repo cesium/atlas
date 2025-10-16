@@ -11,6 +11,13 @@ defmodule AtlasWeb.EventController do
     render(conn, :index, events: events)
   end
 
+  def selected_index(conn, _params) do
+    {user, _session} = Guardian.Plug.current_resource(conn)
+
+    events = Events.list_events_by_user(user.id)
+    render(conn, :index, events: events)
+  end
+
   def create(conn, %{"event" => event_params}) do
     with {:ok, %Event{} = event} <- Events.create_event(event_params) do
       conn

@@ -90,6 +90,7 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/events" do
+      get "/selected", EventController, :selected_index
       resources "/", EventController, only: [:index, :show]
 
       pipe_through :is_at_least_professor

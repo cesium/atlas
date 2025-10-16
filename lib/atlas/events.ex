@@ -34,8 +34,8 @@ defmodule Atlas.Events do
   """
   def list_event_categories_by_user(user_id) do
     EventCategory
-    |> join(:inner, [ec], uec in assoc(ec, :users_event_categories))
-    |> where([ec, uec], uec.user_id == ^user_id)
+    |> join(:left, [ec], uec in assoc(ec, :users_event_categories))
+    |> where([ec, uec], uec.user_id == ^user_id or ec.type == :mandatory)
     |> preload(:course)
     |> Repo.all()
   end
@@ -184,6 +184,15 @@ defmodule Atlas.Events do
   """
   def list_events do
     Event
+    |> preload(category: :course)
+    |> Repo.all()
+  end
+
+  def list_events_by_user(user_id) do
+    Event
+    |> join(:inner, [e], ec in assoc(e, :category))
+    |> join(:left, [e, ec], uec in assoc(ec, :users_event_categories))
+    |> where([e, ec, uec], uec.user_id == ^user_id or ec.type == :mandatory)
     |> preload(category: :course)
     |> Repo.all()
   end

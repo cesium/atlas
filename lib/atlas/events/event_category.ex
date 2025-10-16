@@ -1,13 +1,15 @@
 defmodule Atlas.Events.EventCategory do
   use Atlas.Schema
 
-  @required_fields ~w(name color)a
+  @types ~w(optional mandatory)a
 
+  @required_fields ~w(name color type)a
   @optional_fields ~w(course_id)a
 
   schema "event_categories" do
     field :name, :string
     field :color, :string
+    field :type, Ecto.Enum, values: @types
 
     belongs_to :course, Atlas.University.Degrees.Courses.Course
 

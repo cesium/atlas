@@ -20,5 +20,6 @@ defmodule Atlas.Events.Event do
     event
     |> cast(attrs, @required_fields)
     |> validate_required(@required_fields)
+    |> foreign_key_constraint(:category_id)
   end
 end
