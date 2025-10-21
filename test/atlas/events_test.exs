@@ -8,7 +8,7 @@ defmodule Atlas.EventsTest do
 
     import Atlas.EventsFixtures
 
-  @invalid_attrs %{name: nil, color: nil, type: nil}
+    @invalid_attrs %{name: nil, color: nil, type: nil}
 
     test "list_event_categories/0 returns all event_categories" do
       event_category = event_category_fixture()
@@ -21,7 +21,7 @@ defmodule Atlas.EventsTest do
     end
 
     test "create_event_category/1 with valid data creates a event_category" do
-  valid_attrs = %{name: "some name", color: "some color", type: "optional"}
+      valid_attrs = %{name: "some name", color: "some color", type: "optional"}
 
       assert {:ok, %EventCategory{} = event_category} = Events.create_event_category(valid_attrs)
       assert event_category.name == "some name"
@@ -94,10 +94,10 @@ defmodule Atlas.EventsTest do
       }
 
       assert {:ok, %Event{} = event} = Events.create_event(valid_attrs)
-  assert event.start == ~U[2025-01-01 14:00:00Z]
+      assert event.start == ~U[2025-01-01 14:00:00Z]
       assert event.link == "some link"
       assert event.title == "some title"
-  assert event.end == ~U[2025-01-01 14:00:00Z]
+      assert event.end == ~U[2025-01-01 14:00:00Z]
       assert event.place == "some place"
     end
 
@@ -109,18 +109,18 @@ defmodule Atlas.EventsTest do
       event = event_fixture()
 
       update_attrs = %{
-  start: ~U[2025-01-01 15:01:01Z],
+        start: ~U[2025-01-01 15:01:01Z],
         link: "some updated link",
         title: "some updated title",
-  end: ~U[2025-01-01 15:01:01Z],
+        end: ~U[2025-01-01 15:01:01Z],
         place: "some updated place"
       }
 
       assert {:ok, %Event{} = event} = Events.update_event(event, update_attrs)
-  assert event.start == ~U[2025-01-01 15:01:01Z]
+      assert event.start == ~U[2025-01-01 15:01:01Z]
       assert event.link == "some updated link"
       assert event.title == "some updated title"
-  assert event.end == ~U[2025-01-01 15:01:01Z]
+      assert event.end == ~U[2025-01-01 15:01:01Z]
       assert event.place == "some updated place"
     end
 

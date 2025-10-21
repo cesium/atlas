@@ -201,6 +201,14 @@ defmodule Atlas.Events do
     |> Repo.all()
   end
 
+  @doc """
+  Returns the list of events for a specific user.
+
+  ## Examples
+
+      iex> list_events_by_user(user_id)
+      [%Event{}, ...]
+  """
   def list_events_by_user(user_id) do
     Event
     |> join(:inner, [e], ec in assoc(e, :category))

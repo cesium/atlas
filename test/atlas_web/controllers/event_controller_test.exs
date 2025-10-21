@@ -28,8 +28,10 @@ defmodule AtlasWeb.EventControllerTest do
     create_attrs = Map.put(@create_attrs, :category_id, category.id)
     update_attrs = Map.put(@update_attrs, :category_id, category.id)
 
-    {:ok, conn: put_req_header(conn, "accept", "application/json"),
-     create_attrs: create_attrs, update_attrs: update_attrs}
+    {:ok,
+     conn: put_req_header(conn, "accept", "application/json"),
+     create_attrs: create_attrs,
+     update_attrs: update_attrs}
   end
 
   describe "index" do
@@ -57,7 +59,7 @@ defmodule AtlasWeb.EventControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-  conn = post(conn, ~p"/v1/events", event: @invalid_attrs)
+      conn = post(conn, ~p"/v1/events", event: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -65,9 +67,13 @@ defmodule AtlasWeb.EventControllerTest do
   describe "update event" do
     setup [:create_event]
 
-    test "renders event when data is valid", %{conn: conn, event: %Event{id: id} = event, update_attrs: update_attrs} do
-  conn = put(conn, ~p"/v1/events/#{event}", event: update_attrs)
-  assert %{"id" => ^id} = json_response(conn, 200)["event"]
+    test "renders event when data is valid", %{
+      conn: conn,
+      event: %Event{id: id} = event,
+      update_attrs: update_attrs
+    } do
+      conn = put(conn, ~p"/v1/events/#{event}", event: update_attrs)
+      assert %{"id" => ^id} = json_response(conn, 200)["event"]
 
       conn = get(conn, ~p"/v1/events/#{id}")
 
