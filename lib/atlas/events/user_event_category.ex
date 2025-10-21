@@ -1,4 +1,7 @@
 defmodule Atlas.Events.UserEventCategory do
+  @moduledoc """
+  User event category schema.
+  """
   use Atlas.Schema
 
   @required_fields ~w(user_id event_category_id)a

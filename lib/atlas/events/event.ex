@@ -1,4 +1,7 @@
 defmodule Atlas.Events.Event do
+  @moduledoc """
+  Event schema.
+  """
   use Atlas.Schema
 
   @required_fields ~w(title start end place link category_id)a

@@ -1,4 +1,7 @@
 defmodule Atlas.Events.EventCategory do
+  @moduledoc """
+  Event category schema.
+  """
   use Atlas.Schema
 
   @types ~w(optional mandatory)a

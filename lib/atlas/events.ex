@@ -66,14 +66,27 @@ defmodule Atlas.Events do
   defp insert_user_event_categories(repo, user_id, category_ids) do
     category_ids
     |> Enum.reduce_while({:ok, []}, fn category_id, {:ok, acc} ->
-      %UserEventCategory{}
-      |> UserEventCategory.changeset(%{user_id: user_id, event_category_id: category_id})
-      |> repo.insert()
-      |> case do
-        {:ok, user_event_category} -> {:cont, {:ok, [user_event_category | acc]}}
-        {:error, changeset} -> {:halt, {:error, changeset}}
+      case repo.get(EventCategory, category_id) do
+        nil ->
+          {:halt, {:error, "EventCategory not found: #{category_id}"}}
+
+        %EventCategory{type: :mandatory} ->
+          {:cont, {:ok, acc}}
+
+        _category ->
+          insert_user_event_category(repo, user_id, category_id, acc)
       end
     end)
+  end
+
+  defp insert_user_event_category(repo, user_id, category_id, acc) do
+    %UserEventCategory{}
+    |> UserEventCategory.changeset(%{user_id: user_id, event_category_id: category_id})
+    |> repo.insert()
+    |> case do
+      {:ok, user_event_category} -> {:cont, {:ok, [user_event_category | acc]}}
+      {:error, changeset} -> {:halt, {:error, changeset}}
+    end
   end
 
   @doc """

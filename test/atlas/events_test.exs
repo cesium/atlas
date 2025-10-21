@@ -8,7 +8,7 @@ defmodule Atlas.EventsTest do
 
     import Atlas.EventsFixtures
 
-    @invalid_attrs %{name: nil, color: nil}
+  @invalid_attrs %{name: nil, color: nil, type: nil}
 
     test "list_event_categories/0 returns all event_categories" do
       event_category = event_category_fixture()
@@ -21,7 +21,7 @@ defmodule Atlas.EventsTest do
     end
 
     test "create_event_category/1 with valid data creates a event_category" do
-      valid_attrs = %{name: "some name", color: "some color"}
+  valid_attrs = %{name: "some name", color: "some color", type: "optional"}
 
       assert {:ok, %EventCategory{} = event_category} = Events.create_event_category(valid_attrs)
       assert event_category.name == "some name"
@@ -36,14 +36,19 @@ defmodule Atlas.EventsTest do
       event_category = event_category_fixture()
       update_attrs = %{name: "some updated name", color: "some updated color"}
 
-      assert {:ok, %EventCategory{} = event_category} = Events.update_event_category(event_category, update_attrs)
+      assert {:ok, %EventCategory{} = event_category} =
+               Events.update_event_category(event_category, update_attrs)
+
       assert event_category.name == "some updated name"
       assert event_category.color == "some updated color"
     end
 
     test "update_event_category/2 with invalid data returns error changeset" do
       event_category = event_category_fixture()
-      assert {:error, %Ecto.Changeset{}} = Events.update_event_category(event_category, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Events.update_event_category(event_category, @invalid_attrs)
+
       assert event_category == Events.get_event_category!(event_category.id)
     end
 
@@ -77,13 +82,22 @@ defmodule Atlas.EventsTest do
     end
 
     test "create_event/1 with valid data creates a event" do
-      valid_attrs = %{start: ~T[14:00:00], link: "some link", title: "some title", end: ~T[14:00:00], place: "some place"}
+      category = event_category_fixture()
+
+      valid_attrs = %{
+        start: ~U[2025-01-01 14:00:00Z],
+        link: "some link",
+        title: "some title",
+        end: ~U[2025-01-01 14:00:00Z],
+        place: "some place",
+        category_id: category.id
+      }
 
       assert {:ok, %Event{} = event} = Events.create_event(valid_attrs)
-      assert event.start == ~T[14:00:00]
+  assert event.start == ~U[2025-01-01 14:00:00Z]
       assert event.link == "some link"
       assert event.title == "some title"
-      assert event.end == ~T[14:00:00]
+  assert event.end == ~U[2025-01-01 14:00:00Z]
       assert event.place == "some place"
     end
 
@@ -93,13 +107,20 @@ defmodule Atlas.EventsTest do
 
     test "update_event/2 with valid data updates the event" do
       event = event_fixture()
-      update_attrs = %{start: ~T[15:01:01], link: "some updated link", title: "some updated title", end: ~T[15:01:01], place: "some updated place"}
+
+      update_attrs = %{
+  start: ~U[2025-01-01 15:01:01Z],
+        link: "some updated link",
+        title: "some updated title",
+  end: ~U[2025-01-01 15:01:01Z],
+        place: "some updated place"
+      }
 
       assert {:ok, %Event{} = event} = Events.update_event(event, update_attrs)
-      assert event.start == ~T[15:01:01]
+  assert event.start == ~U[2025-01-01 15:01:01Z]
       assert event.link == "some updated link"
       assert event.title == "some updated title"
-      assert event.end == ~T[15:01:01]
+  assert event.end == ~U[2025-01-01 15:01:01Z]
       assert event.place == "some updated place"
     end
 
