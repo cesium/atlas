@@ -89,6 +89,26 @@ defmodule AtlasWeb.Router do
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
     end
 
+    scope "/events" do
+      get "/selected", EventController, :selected_index
+      resources "/", EventController, only: [:index, :show]
+
+      pipe_through :is_at_least_professor
+
+      resources "/", EventController, only: [:create, :update, :delete]
+    end
+
+    scope "/event_categories" do
+      get "/selected", EventCategoryController, :selected_index
+      post "/selected", EventCategoryController, :selected_update
+
+      resources "/", EventCategoryController, only: [:index, :show]
+
+      pipe_through :is_at_least_professor
+
+      resources "/", EventCategoryController, only: [:create, :update, :delete]
+    end
+
     pipe_through :is_at_least_professor
 
     get "/students", University.StudentsController, :index
