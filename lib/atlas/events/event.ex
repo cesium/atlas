@@ -8,9 +8,9 @@ defmodule Atlas.Events.Event do
 
   schema "events" do
     field :start, :utc_datetime
+    field :end, :utc_datetime
     field :link, :string
     field :title, :string
-    field :end, :utc_datetime
     field :place, :string
 
     belongs_to :category, Atlas.Events.EventCategory
