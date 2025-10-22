@@ -4,7 +4,8 @@ defmodule Atlas.Events.Event do
   """
   use Atlas.Schema
 
-  @required_fields ~w(title start end place link category_id)a
+  @required_fields ~w(title start end category_id)a
+  @optional_fields ~w(place link)a
 
   schema "events" do
     field :start, :utc_datetime
@@ -21,7 +22,7 @@ defmodule Atlas.Events.Event do
   @doc false
   def changeset(event, attrs) do
     event
-    |> cast(attrs, @required_fields)
+    |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> foreign_key_constraint(:category_id)
   end
