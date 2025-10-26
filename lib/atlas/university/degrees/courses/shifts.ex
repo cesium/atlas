@@ -5,6 +5,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   use Atlas.Context
 
   alias Atlas.University.Degrees.Courses.Shifts.Shift
+  alias Ecto.Multi
 
   @doc """
   Returns the list of shifts.
@@ -19,6 +20,13 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.all()
+  end
+
+  def list_shifts_with_timeslots(opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.all()
+    |> Repo.preload([:timeslots])
   end
 
   @doc """
@@ -39,6 +47,13 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     Shift
     |> apply_filters(opts)
     |> Repo.get!(id)
+  end
+
+  def get_shift_with_timeslots(id, opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.get(id)
+    |> Repo.preload([:timeslots])
   end
 
   @doc """
@@ -207,5 +222,51 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   """
   def change_timeslot(%Timeslot{} = timeslot, attrs \\ %{}) do
     Timeslot.changeset(timeslot, attrs)
+  end
+
+  @doc """
+  Updates a shift that contains
+  """
+
+  def update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
+    Multi.new()
+    |> Multi.update(:shift, change_shift(shift, shift_attrs))
+    |> process_timeslots(shift, timeslot_attrs)
+    |> Repo.transact()
+  end
+
+  defp process_timeslots(multi, shift, timeslot_attrs) do
+    multi
+    |> then(fn multi ->
+      timeslot_attrs
+      |> Enum.with_index()
+      |> Enum.reduce(multi, fn {timeslot_attr, index}, acc_multi ->
+        process_timeslot(acc_multi, timeslot_attr, shift.id, index)
+      end)
+    end)
+  end
+
+  defp process_timeslot(multi, timeslot_attr, shift_id, index) do
+    if timeslot_attr["id"] && timeslot_exists?(timeslot_attr["id"]) do
+      timeslot = get_timeslot!(timeslot_attr["id"])
+      changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
+      Multi.update(multi, {:timeslot, index}, changeset)
+    else
+      clean_attrs =
+        timeslot_attr
+        |> Map.delete("id")
+        |> Map.put("shift_id", shift_id)
+        |> Map.replace("weekday", timeslot_attr["weekday"] |> String.to_atom())
+
+      changeset = change_timeslot(%Timeslot{}, clean_attrs)
+      Multi.insert(multi, {:timeslot, index}, changeset)
+    end
+  end
+
+  defp timeslot_exists?(id) do
+    case Repo.get(Timeslot, id) do
+      nil -> false
+      _ -> true
+    end
   end
 end
