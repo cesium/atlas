@@ -16,7 +16,6 @@ defmodule AtlasWeb.University.StudentController do
   end
 
   def show(conn, %{"id" => student_id}) do
-
     student = University.get_student!(student_id, preloads: [:user])
 
     conn
@@ -69,5 +68,4 @@ defmodule AtlasWeb.University.StudentController do
         |> json(%{error: "Could not update schedule."})
     end
   end
-
 end

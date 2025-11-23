@@ -66,7 +66,6 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/student", University do
-
       scope "/schedule" do
         get "/", StudentController, :schedule_index
         post "/", StudentController, :schedule_update
@@ -79,7 +78,6 @@ defmodule AtlasWeb.Router do
       pipe_through :is_at_least_professor
 
       get "/:id", StudentController, :show
-
     end
 
     scope "/shift_exchanges" do

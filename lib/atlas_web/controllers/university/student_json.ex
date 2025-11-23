@@ -15,11 +15,12 @@ defmodule AtlasWeb.University.StudentJSON do
 
   def data(%Student{} = student) do
     %{
-        id: student.id,
-        number: student.number,
-        special_status: student.special_status,
-        degree_year: student.degree_year,
-        user: if Ecto.assoc_loaded?(student.user) && student.user do
+      id: student.id,
+      number: student.number,
+      special_status: student.special_status,
+      degree_year: student.degree_year,
+      user:
+        if Ecto.assoc_loaded?(student.user) && student.user do
           AtlasWeb.UserJSON.data(student.user)
         else
           nil
