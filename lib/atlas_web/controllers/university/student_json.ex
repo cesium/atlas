@@ -1,6 +1,6 @@
 defmodule AtlasWeb.University.StudentJSON do
-  alias AtlasWeb.MetaJSON
   alias Atlas.University.Student
+  alias AtlasWeb.MetaJSON
 
   def index(%{students: students, meta: meta}) do
     %{
