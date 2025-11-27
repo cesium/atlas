@@ -7,16 +7,15 @@ defmodule AtlasWeb.FeedbacksController do
   action_fallback AtlasWeb.FallbackController
 
   def index(conn, _attrs) do
-    {user, _session} = Guardian.Plug.current_resource(conn)
-
-    feedbacks =
-      if user_has_elevated_privileges?(user) do
-        Feedbacks.list_feedbacks()
-      else
-        Feedbacks.list_feedbacks(where: [user_id: user.id])
-      end
+    feedbacks = Feedbacks.list_feedbacks()
 
     render(conn, :index, feedbacks: feedbacks)
+  end
+
+  def show(conn, %{"id" => id}) do
+    feedback = Feedbacks.get_feedback!(id)
+
+    render(conn, :show, feedback: feedback)
   end
 
   def create(conn, attrs) do
@@ -37,28 +36,19 @@ defmodule AtlasWeb.FeedbacksController do
   end
 
   def delete(conn, %{"id" => id}) do
-    {user, _session} = Guardian.Plug.current_resource(conn)
+    {_user, _session} = Guardian.Plug.current_resource(conn)
 
-    if user_has_elevated_privileges?(user) do
-      case Feedbacks.get_feedback!(id) do
-        nil ->
-          conn
-          |> put_status(:not_found)
-          |> json(%{error: "Feedback not found"})
+    case Feedbacks.get_feedback!(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Feedback not found"})
 
-        feedback ->
-          with {:ok, %Feedback{}} <- Feedbacks.delete_feedback(feedback) do
-            send_resp(conn, :no_content, "")
-          end
-      end
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> json(%{error: "Unauthorized"})
+      feedback ->
+        with {:ok, %Feedback{}} <- Feedbacks.delete_feedback(feedback) do
+          send_resp(conn, :no_content, "")
+        end
     end
-  end
 
-  defp user_has_elevated_privileges?(user) do
-    (user && user.type == :admin) || user.type == :professor
   end
 end
