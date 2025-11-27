@@ -25,6 +25,7 @@ defmodule Atlas.Events.EventCategory do
   def changeset(event_category, attrs) do
     event_category
     |> cast(attrs, @required_fields ++ @optional_fields)
+    |> validate_format(:color, ~r/^#[0-9a-fA-F]{6}$/, message: "Invalid color format!(e.g., #RRGGBB)")
     |> validate_required(@required_fields)
   end
 end
