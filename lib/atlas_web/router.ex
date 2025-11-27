@@ -23,6 +23,10 @@ defmodule AtlasWeb.Router do
     plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin]
   end
 
+  pipeline :is_at_least_department do
+    plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin, :department]
+  end
+
   scope "/", AtlasWeb do
     get "/", PageController, :index
   end
