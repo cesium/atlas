@@ -9,7 +9,7 @@ defmodule Atlas.Repo.Migrations.CreateEvents do
       add :end, :utc_datetime
       add :place, :string
       add :link, :string
-      add :category_id, references(:event_categories, on_delete: :delete_all, type: :binary_id)
+      add :category_id, references(:event_categories, on_delete: :nothing, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end
