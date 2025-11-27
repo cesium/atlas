@@ -90,7 +90,6 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/feedbacks" do
-
       post "/", FeedbacksController, :create
 
       pipe_through :is_at_least_professor
