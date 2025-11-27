@@ -97,7 +97,7 @@ defmodule AtlasWeb.Router do
       get "/selected", EventController, :selected_index
       resources "/", EventController, only: [:index, :show]
 
-      pipe_through :is_at_least_professor
+      pipe_through :is_at_least_department
 
       resources "/", EventController, only: [:create, :update, :delete]
     end
