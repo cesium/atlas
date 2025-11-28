@@ -11,8 +11,8 @@ defmodule Atlas.EventsFixtures do
     {:ok, event_category} =
       attrs
       |> Enum.into(%{
-        color: "some color",
         name: "some name",
+        color: "#abcdef",
         type: "optional"
       })
       |> Atlas.Events.create_event_category()
@@ -26,18 +26,16 @@ defmodule Atlas.EventsFixtures do
   def event_fixture(attrs \\ %{}) do
     category = event_category_fixture()
 
-    defaults = %{
-      end: ~N[2025-01-01 14:00:00],
-      link: "some link",
-      place: "some place",
-      start: ~N[2025-01-01 14:00:00],
-      title: "some title",
-      category_id: category.id
-    }
-
     {:ok, event} =
       attrs
-      |> Enum.into(defaults)
+      |> Enum.into(%{
+        title: "some title",
+        start: ~U[2025-01-01T14:00:00Z],
+        end: ~U[2025-01-01T15:00:00Z],
+        place: "some place",
+        link: "some link",
+        category_id: category.id
+      })
       |> Atlas.Events.create_event()
 
     event
