@@ -26,5 +26,6 @@ defmodule Atlas.Events.EventCategory do
     event_category
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> foreign_key_constraint(:course_id)
   end
 end
