@@ -7,14 +7,14 @@ defmodule AtlasWeb.EventCategoryControllerTest do
 
   @create_attrs %{
     name: "some name",
-    color: "some color"
+    color: "#abcdef",
+    type: "optional"
   }
   @update_attrs %{
     name: "some updated name",
-    color: "some updated color"
+    color: "#123456",
+    type: "mandatory"
   }
-  @create_attrs Map.put(@create_attrs, :type, "optional")
-  @update_attrs Map.put(@update_attrs, :type, "optional")
   @invalid_attrs %{name: nil, color: nil, type: nil}
 
   setup %{conn: _conn} do
@@ -38,7 +38,7 @@ defmodule AtlasWeb.EventCategoryControllerTest do
 
       assert %{
                "id" => ^id,
-               "color" => "some color",
+               "color" => "#abcdef",
                "name" => "some name"
              } = json_response(conn, 200)["event_category"]
     end
@@ -63,7 +63,7 @@ defmodule AtlasWeb.EventCategoryControllerTest do
 
       assert %{
                "id" => ^id,
-               "color" => "some updated color",
+               "color" => "#123456",
                "name" => "some updated name"
              } = json_response(conn, 200)["event_category"]
     end

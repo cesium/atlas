@@ -21,11 +21,11 @@ defmodule Atlas.EventsTest do
     end
 
     test "create_event_category/1 with valid data creates a event_category" do
-      valid_attrs = %{name: "some name", color: "some color", type: "optional"}
+      valid_attrs = %{name: "some name", color: "#abcdef", type: "optional"}
 
       assert {:ok, %EventCategory{} = event_category} = Events.create_event_category(valid_attrs)
       assert event_category.name == "some name"
-      assert event_category.color == "some color"
+      assert event_category.color == "#abcdef"
     end
 
     test "create_event_category/1 with invalid data returns error changeset" do
@@ -34,13 +34,13 @@ defmodule Atlas.EventsTest do
 
     test "update_event_category/2 with valid data updates the event_category" do
       event_category = event_category_fixture()
-      update_attrs = %{name: "some updated name", color: "some updated color"}
+      update_attrs = %{name: "some updated name", color: "#123456"}
 
       assert {:ok, %EventCategory{} = event_category} =
                Events.update_event_category(event_category, update_attrs)
 
       assert event_category.name == "some updated name"
-      assert event_category.color == "some updated color"
+      assert event_category.color == "#123456"
     end
 
     test "update_event_category/2 with invalid data returns error changeset" do
