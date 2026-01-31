@@ -1,4 +1,4 @@
-defmodule AtlasWeb.University.StudentsController do
+defmodule AtlasWeb.University.StudentController do
   use AtlasWeb, :controller
 
   alias Atlas.University
@@ -13,6 +13,13 @@ defmodule AtlasWeb.University.StudentsController do
         conn
         |> put_status(:internal_server_error)
     end
+  end
+
+  def show(conn, %{"id" => student_id}) do
+    student = University.get_student!(student_id, preloads: [:user])
+
+    conn
+    |> render(:show, student: student)
   end
 
   def schedule_index(conn, params) do

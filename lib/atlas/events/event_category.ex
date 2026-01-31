@@ -29,5 +29,6 @@ defmodule Atlas.Events.EventCategory do
       message: "Invalid color format!(e.g., #RRGGBB)"
     )
     |> validate_required(@required_fields)
+    |> foreign_key_constraint(:course_id)
   end
 end
