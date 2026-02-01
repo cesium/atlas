@@ -81,7 +81,8 @@ defmodule Atlas.Exchange do
       |> Repo.insert()
       |> case do
         {:ok, request} ->
-          execute_create_shift_exchange_request(request)
+          enqueue_shift_exchange_solver_job()
+          {:ok, request}
 
         {:error, changeset} ->
           {:error, changeset}
@@ -90,32 +91,6 @@ defmodule Atlas.Exchange do
       {:error,
        Ecto.Changeset.change(%ShiftExchangeRequest{})
        |> Ecto.Changeset.add_error(:shift_from, "Student is not enrolled in the origin shift")}
-    end
-  end
-
-  defp execute_create_shift_exchange_request(request) do
-    # Try auto approve
-    case Repo.transaction(maybe_auto_approve_request(request)) do
-      {:ok, _changes} ->
-        # Reload student and shift for notification email
-        user = University.get_student!(request.student_id, preloads: [:user]).user
-        shift_to = Shifts.get_shift!(request.shift_to, preloads: [:course])
-
-        UserNotifier.deliver_shift_exchange_request_fulfilled(
-          user,
-          shift_to.course.name,
-          Shifts.Shift.short_name(shift_to)
-        )
-
-        {:ok, %{request | status: :approved}}
-
-      {:error, :shift_has_space, :no_space, _} ->
-        # Couldn't auto approve → enqueue solver
-        enqueue_shift_exchange_solver_job()
-        {:ok, request}
-
-      {:error, _step, _reason, _changes} ->
-        {:ok, request}
     end
   end
 
@@ -260,6 +235,32 @@ defmodule Atlas.Exchange do
         {:error, _reason} ->
           # If a cycle approval fails, we skip it. Others can still succeed.
           acc
+      end
+    end)
+  end
+
+  def maybe_auto_approve_pending_requests(opts \\ []) do
+    pending_requests = list_unique_pending_shift_exchange_requests(opts)
+
+    Enum.each(pending_requests, fn req ->
+      case Repo.transaction(maybe_auto_approve_request(req)) do
+        {:ok, _changes} ->
+          # Reload student and shift for notification email
+          user = University.get_student!(req.student_id, preloads: [:user]).user
+          shift_to = Shifts.get_shift!(req.shift_to, preloads: [:course])
+
+          UserNotifier.deliver_shift_exchange_request_fulfilled(
+            user,
+            shift_to.course.name,
+            Shifts.Shift.short_name(shift_to)
+          )
+
+        {:error, :shift_has_space, :no_space, _} ->
+          # Couldn't auto approve → do nothing
+          :ok
+
+        {:error, _step, _reason, _changes} ->
+          :ok
       end
     end)
   end
@@ -416,11 +417,18 @@ defmodule Atlas.Exchange do
         )
 
       shift = Shifts.get_shift!(req.shift_to)
+      from_shift = Shifts.get_shift!(req.shift_from)
+      from_shift_occupation = University.get_shift_enrollment_count(req.shift_from)
 
-      if enrolled_count < shift.capacity do
-        {:ok, :has_space}
-      else
-        {:error, :no_space}
+      cond do
+        from_shift_occupation - 1 <= from_shift.capacity * 0.8 ->
+          {:error, :shift_from_underoccupied}
+
+        enrolled_count < shift.capacity ->
+          {:ok, :has_space}
+
+        true ->
+          {:error, :no_space}
       end
     end)
     |> Multi.update(
