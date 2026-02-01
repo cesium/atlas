@@ -47,6 +47,23 @@ defmodule Atlas.Exchange do
   end
 
   @doc """
+  Returns the list of pending shift exchange requests.
+
+  ## Examples
+
+      iex> list_pending_shift_exchange_requests()
+      [%ShiftExchangeRequest{}, ...]
+
+  """
+  def list_pending_shift_exchange_requests(opts \\ []) do
+    ShiftExchangeRequest
+    |> apply_filters(opts)
+    |> where([r], r.status == :pending)
+    |> order_by([r], asc: r.inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single shift_exchange_request.
 
   Raises `Ecto.NoResultsError` if the Shift exchange request does not exist.
@@ -239,6 +256,32 @@ defmodule Atlas.Exchange do
     end)
   end
 
+  def maybe_auto_approve_pending_requests(opts \\ []) do
+    pending_requests = list_pending_shift_exchange_requests(opts)
+
+    Enum.each(pending_requests, fn req ->
+      case Repo.transaction(maybe_auto_approve_request(req)) do
+        {:ok, _changes} ->
+          # Reload student and shift for notification email
+          user = University.get_student!(req.student_id, preloads: [:user]).user
+          shift_to = Shifts.get_shift!(req.shift_to, preloads: [:course])
+
+          UserNotifier.deliver_shift_exchange_request_fulfilled(
+            user,
+            shift_to.course.name,
+            Shifts.Shift.short_name(shift_to)
+          )
+
+        {:error, :shift_has_space, :no_space, _} ->
+          # Couldn't auto approve → do nothing
+          :ok
+
+        {:error, _step, _reason, _changes} ->
+          :ok
+      end
+    end)
+  end
+
   ## Graph-related utility functions
 
   defp build_graph(requests) do
@@ -377,5 +420,51 @@ defmodule Atlas.Exchange do
       {:error, _op, _changeset, _sofar} ->
         {:error, :transaction_failed}
     end
+  end
+
+  defp maybe_auto_approve_request(%ShiftExchangeRequest{} = req) do
+    Multi.new()
+    |> Multi.run(:shift_has_space, fn _repo, _changes ->
+      enrolled_count =
+        Repo.one(
+          from(se in ShiftEnrollment,
+            where: se.shift_id == ^req.shift_to and se.status in [:active, :inactive],
+            select: count(se.student_id, :distinct)
+          )
+        )
+
+      shift = Shifts.get_shift!(req.shift_to)
+      from_shift = Shifts.get_shift!(req.shift_from)
+      from_shift_occupation = University.get_shift_enrollment_count(req.shift_from)
+
+      cond do
+        from_shift_occupation - 1 <= round(from_shift.capacity * 0.8) ->
+          {:error, :shift_from_underoccupied}
+
+        enrolled_count < shift.capacity ->
+          {:ok, :has_space}
+
+        true ->
+          {:error, :no_space}
+      end
+    end)
+    |> Multi.update(
+      :approve_request,
+      Ecto.Changeset.change(req, status: :approved)
+    )
+    |> Multi.delete_all(
+      :delete_from_enrollment,
+      from(se in ShiftEnrollment,
+        where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_from
+      )
+    )
+    |> Multi.insert(
+      :insert_to_enrollment,
+      ShiftEnrollment.changeset(%ShiftEnrollment{}, %{
+        student_id: req.student_id,
+        shift_id: req.shift_to,
+        status: :active
+      })
+    )
   end
 end
