@@ -47,6 +47,23 @@ defmodule Atlas.Exchange do
   end
 
   @doc """
+  Returns the list of pending shift exchange requests.
+
+  ## Examples
+
+      iex> list_pending_shift_exchange_requests()
+      [%ShiftExchangeRequest{}, ...]
+
+  """
+  def list_pending_shift_exchange_requests(opts \\ []) do
+    ShiftExchangeRequest
+    |> apply_filters(opts)
+    |> where([r], r.status == :pending)
+    |> order_by([r], asc: r.inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single shift_exchange_request.
 
   Raises `Ecto.NoResultsError` if the Shift exchange request does not exist.
@@ -240,7 +257,7 @@ defmodule Atlas.Exchange do
   end
 
   def maybe_auto_approve_pending_requests(opts \\ []) do
-    pending_requests = list_unique_pending_shift_exchange_requests(opts)
+    pending_requests = list_pending_shift_exchange_requests(opts)
 
     Enum.each(pending_requests, fn req ->
       case Repo.transaction(maybe_auto_approve_request(req)) do
@@ -421,7 +438,7 @@ defmodule Atlas.Exchange do
       from_shift_occupation = University.get_shift_enrollment_count(req.shift_from)
 
       cond do
-        from_shift_occupation - 1 <= from_shift.capacity * 0.8 ->
+        from_shift_occupation - 1 <= round(from_shift.capacity * 0.8) ->
           {:error, :shift_from_underoccupied}
 
         enrolled_count < shift.capacity ->
