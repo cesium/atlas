@@ -13,7 +13,8 @@ defmodule Atlas.Exporters.Blackboard do
     |> order_by([s], asc: s.type, asc: s.number)
     |> Repo.all()
     |> Enum.map(&format_course_group_row/1)
-    |> CSV.encode(separator: ?;)
+    |> then(&[["Group Code", "Title", "Description", "Group Set", "Self Enroll"] | &1])
+    |> CSV.encode(force_escaping: true)
   end
 
   def blackboard_course_group_enrollments_csv(course_id) do
@@ -23,27 +24,24 @@ defmodule Atlas.Exporters.Blackboard do
     |> where([se, s], s.course_id == ^course_id)
     |> order_by([se, s], asc: s.type, asc: s.number)
     |> preload([se, s], [:student, :shift])
+    |> preload([se, s], student: [:user])
     |> Repo.all()
     |> Enum.map(&format_course_group_enrollment_row/1)
-    |> CSV.encode(separator: ?;, force_escaping: true)
+    |> then(
+      &[["Group Code", "User Name", "Student Id", "First Name", "Last Name", "Group Set"] | &1]
+    )
+    |> CSV.encode(force_escaping: true)
   end
 
   defp format_course_group_row(shift) do
     shift_short_name = Shift.short_name(shift)
 
     [
+      shift_short_name <> "_gc",
       shift_short_name,
-      shift_short_name,
       nil,
-      nil,
-      "S",
-      nil,
-      "N",
-      nil,
-      nil,
-      nil,
-      nil,
-      nil
+      "Turmas (#{Shift.short_type(shift)})",
+      "N"
     ]
   end
 
@@ -52,11 +50,12 @@ defmodule Atlas.Exporters.Blackboard do
     normalized_student_number = String.downcase(student.number)
 
     [
-      shift_short_name,
+      shift_short_name <> "_gc",
       normalized_student_number,
       normalized_student_number |> String.replace("a", "") |> String.replace("pg", ""),
-      normalized_student_number,
-      "."
+      student.user.name,
+      ".",
+      "Turmas (#{Shift.short_type(shift)})"
     ]
   end
 end

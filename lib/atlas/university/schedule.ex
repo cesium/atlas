@@ -147,7 +147,8 @@ defmodule Atlas.University.Schedule do
     |> where(
       [s, c, shift_enrollment, shift, shift_course],
       is_nil(shift_enrollment.id) or
-        (shift_course.degree_id == c.degree_id and shift_course.semester == c.semester)
+        (shift_course.degree_id == c.degree_id and shift_course.semester == c.semester and
+           is_nil(shift_course.parent_course_id))
     )
     |> build_students_filter(opts)
     |> preload([s, c, shift_enrollment, shift, shift_course],
