@@ -410,8 +410,8 @@ defmodule Atlas.Exchange do
       enrolled_count =
         Repo.one(
           from(se in ShiftEnrollment,
-            where: se.shift_id == ^req.shift_to and se.status == :active,
-            select: count(se.id)
+            where: se.shift_id == ^req.shift_to and se.status in [:active, :inactive],
+            select: count(se.student_id, :distinct)
           )
         )
 
