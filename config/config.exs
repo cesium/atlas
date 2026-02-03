@@ -51,6 +51,13 @@ config :atlas, Oban,
     imports: 1,
     exchanges: 1,
     schedule_generator: 1
+  ],
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       # Run every 5 minutes
+       {"*/5 * * * *", Atlas.Workers.ShiftExchange}
+     ]}
   ]
 
 # Import environment specific config. This must remain at the bottom
