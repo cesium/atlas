@@ -9,7 +9,7 @@ defmodule Atlas.Workers.ShiftExchange do
   @impl Oban.Worker
   def perform(_job) do
     Exchange.solve_exchanges()
-    Exchange.maybe_auto_approve_pending_requests()
+    # Exchange.maybe_auto_approve_pending_requests()
 
     :ok
   end

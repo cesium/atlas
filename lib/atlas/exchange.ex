@@ -236,28 +236,100 @@ defmodule Atlas.Exchange do
     Constants.set("exchange_period_end", nil)
   end
 
+  defp student_has_shift(student_id, shift_id) do
+    Repo.exists?(
+      from(se in ShiftEnrollment,
+        where:
+          se.student_id == ^student_id and se.shift_id == ^shift_id and
+            se.status in [:active, :inactive]
+      )
+    )
+  end
+
   @doc """
   Attempts to solve pending shift exchange requests by finding cycles in the exchange graph and approving them.
   """
   def solve_exchanges(opts \\ []) do
-    pending = list_unique_pending_shift_exchange_requests(opts)
-    graph = build_graph(pending)
+    # Get ALL pending requests where student is in their source shift
+    all_pending =
+      list_pending_shift_exchange_requests(opts)
+      |> Enum.filter(fn req -> student_has_shift(req.student_id, req.shift_from) end)
+
+    # Build graph with unique edges (one edge per shift pair)
+    unique_by_shift_pair =
+      all_pending
+      |> Enum.uniq_by(fn req -> {req.shift_from, req.shift_to} end)
+
+    graph = build_graph(unique_by_shift_pair)
     cycles = find_cycles(graph)
 
-    Enum.reduce(cycles, %{cycles_found: length(cycles), requests_approved: 0}, fn cycle, acc ->
-      case approve_cycle(graph, cycle) do
-        {:ok, approved_count} ->
-          %{acc | requests_approved: acc.requests_approved + approved_count}
+    # Track students already used across all cycles
+    {all_approved_requests, _} =
+      Enum.reduce(cycles, {[], MapSet.new()}, fn cycle, {acc_requests, used_students} ->
+        cycle_set = MapSet.new(cycle)
 
-        {:error, _reason} ->
-          # If a cycle approval fails, we skip it. Others can still succeed.
-          acc
-      end
-    end)
+        # Get shift pairs in this cycle
+        shift_pairs =
+          graph
+          |> Graph.edges()
+          |> Enum.filter(fn e -> e.v1 in cycle_set and e.v2 in cycle_set end)
+          |> Enum.map(fn e -> {e.v1, e.v2} end)
+
+        # Get ALL available requests for each shift pair (excluding used students)
+        requests_by_pair =
+          shift_pairs
+          |> Enum.map(fn pair ->
+            requests =
+              all_pending
+              |> Enum.filter(fn req ->
+                {req.shift_from, req.shift_to} == pair and req.student_id not in used_students
+              end)
+            {pair, requests}
+          end)
+          |> Enum.into(%{})
+
+        # Determine how many complete cycles we can form
+        # Limited by the shift pair with fewest available students
+        max_cycles =
+          requests_by_pair
+          |> Map.values()
+          |> Enum.map(&length/1)
+          |> Enum.min(fn -> 0 end)
+
+        if max_cycles > 0 do
+          # Select max_cycles students per shift pair
+          selected_requests =
+            requests_by_pair
+            |> Enum.flat_map(fn {_pair, requests} ->
+              Enum.take(requests, max_cycles)
+            end)
+
+          new_used_students =
+            selected_requests
+            |> Enum.map(& &1.student_id)
+            |> MapSet.new()
+            |> MapSet.union(used_students)
+
+          {[selected_requests | acc_requests], new_used_students}
+        else
+          {acc_requests, used_students}
+        end
+      end)
+
+    # Approve all requests in a single transaction
+    case approve_all_requests(Enum.concat(all_approved_requests)) do
+      {:ok, approved_count} ->
+        %{cycles_found: length(cycles), requests_approved: approved_count}
+
+      {:error, _reason} ->
+        %{cycles_found: length(cycles), requests_approved: 0}
+    end
   end
 
   def maybe_auto_approve_pending_requests(opts \\ []) do
-    pending_requests = list_pending_shift_exchange_requests(opts)
+    pending_requests = list_pending_shift_exchange_requests(opts) |> Enum.filter(fn req ->
+      student_has_shift(req.student_id, req.shift_from)
+    end)
 
     Enum.each(pending_requests, fn req ->
       case Repo.transaction(maybe_auto_approve_request(req)) do
@@ -357,6 +429,12 @@ defmodule Atlas.Exchange do
       |> Enum.map(& &1.label)
       |> Enum.filter(&match?(%ShiftExchangeRequest{}, &1))
 
+    approve_all_requests(requests)
+  end
+
+  defp approve_all_requests([]), do: {:ok, 0}
+
+  defp approve_all_requests(requests) do
     multi =
       Enum.reduce(requests, Multi.new(), fn %ShiftExchangeRequest{} = req, m ->
         # Update the request status to approved
@@ -403,8 +481,10 @@ defmodule Atlas.Exchange do
 
     case Repo.transaction(multi) do
       {:ok, _changes} ->
-        # Send notification emails
-        Enum.each(requests, fn req ->
+        # Send notification emails - one per student to avoid spam
+        requests
+        |> Enum.uniq_by(& &1.student_id)
+        |> Enum.each(fn req ->
           user = University.get_student!(req.student_id, preloads: [:user]).user
           shift_to = Shifts.get_shift!(req.shift_to, preloads: [:course])
 
