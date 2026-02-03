@@ -357,8 +357,49 @@ defmodule Atlas.Exchange do
       |> Enum.map(& &1.label)
       |> Enum.filter(&match?(%ShiftExchangeRequest{}, &1))
 
+    # Build the multi with locking to prevent race conditions
     multi =
-      Enum.reduce(requests, Multi.new(), fn %ShiftExchangeRequest{} = req, m ->
+      Multi.new()
+      # First, lock all shifts involved in the cycle to serialize concurrent operations
+      |> Multi.run(:lock_shifts, fn _repo, _changes ->
+        shift_ids = MapSet.to_list(cycle_set)
+
+        locked_shifts =
+          Repo.all(
+            from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+              where: s.id in ^shift_ids,
+              lock: "FOR UPDATE",
+              order_by: s.id
+            )
+          )
+
+        {:ok, locked_shifts}
+      end)
+      # Then, lock and verify all requests are still pending
+      |> Multi.run(:verify_requests_pending, fn _repo, _changes ->
+        request_ids = Enum.map(requests, & &1.id)
+
+        current_requests =
+          Repo.all(
+            from(r in ShiftExchangeRequest,
+              where: r.id in ^request_ids,
+              lock: "FOR UPDATE"
+            )
+          )
+
+        # Check that all requests are still pending
+        all_pending = Enum.all?(current_requests, &(&1.status == :pending))
+
+        if all_pending and length(current_requests) == length(requests) do
+          {:ok, current_requests}
+        else
+          {:error, :requests_already_processed}
+        end
+      end)
+
+    # Add the actual operations for each request
+    multi =
+      Enum.reduce(requests, multi, fn %ShiftExchangeRequest{} = req, m ->
         # Update the request status to approved
         m =
           Multi.update(
@@ -367,7 +408,7 @@ defmodule Atlas.Exchange do
             Ecto.Changeset.change(req, status: :approved)
           )
 
-        # Delete the student’s enrollment in the origin shift
+        # Delete the student's enrollment in the origin shift
         m =
           Multi.delete_all(
             m,
@@ -424,7 +465,43 @@ defmodule Atlas.Exchange do
 
   defp maybe_auto_approve_request(%ShiftExchangeRequest{} = req) do
     Multi.new()
+    |> Multi.run(:verify_request_pending, fn _repo, _changes ->
+      # Lock the request and verify it's still pending
+      # This prevents race conditions with cycle approval
+      current_request =
+        Repo.one(
+          from(r in ShiftExchangeRequest,
+            where: r.id == ^req.id,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      case current_request do
+        nil -> {:error, :request_not_found}
+        %{status: :pending} -> {:ok, current_request}
+        _ -> {:error, :request_already_processed}
+      end
+    end)
     |> Multi.run(:shift_has_space, fn _repo, _changes ->
+      # Lock both shifts to prevent concurrent modifications
+      # This ensures that capacity checks are serialized
+      from_shift =
+        Repo.one!(
+          from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+            where: s.id == ^req.shift_from,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      to_shift =
+        Repo.one!(
+          from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+            where: s.id == ^req.shift_to,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      # Now count enrollments while holding the locks
       enrolled_count =
         Repo.one(
           from(se in ShiftEnrollment,
@@ -433,15 +510,19 @@ defmodule Atlas.Exchange do
           )
         )
 
-      shift = Shifts.get_shift!(req.shift_to)
-      from_shift = Shifts.get_shift!(req.shift_from)
-      from_shift_occupation = University.get_shift_enrollment_count(req.shift_from)
+      from_shift_occupation =
+        Repo.one(
+          from(se in ShiftEnrollment,
+            where: se.shift_id == ^req.shift_from and se.status in [:active, :inactive],
+            select: count(se.student_id, :distinct)
+          )
+        )
 
       cond do
         from_shift_occupation - 1 <= round(from_shift.capacity * 0.8) ->
           {:error, :shift_from_underoccupied}
 
-        enrolled_count < shift.capacity ->
+        enrolled_count < to_shift.capacity ->
           {:ok, :has_space}
 
         true ->
