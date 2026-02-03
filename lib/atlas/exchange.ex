@@ -236,10 +236,58 @@ defmodule Atlas.Exchange do
     Constants.set("exchange_period_end", nil)
   end
 
+  # Advisory lock key for exchange solving - must be unique across the application
+  @exchange_lock_key 736_849_275
+
+  @doc """
+  Processes all pending exchange requests: first solves cycles, then auto-approves eligible requests.
+  Uses an advisory lock to prevent concurrent execution which could cause race conditions.
+  """
+  def process_exchanges(opts \\ []) do
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          solve_result = do_solve_exchanges(opts)
+          do_maybe_auto_approve_pending_requests(opts)
+          solve_result
+        after
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_held}
+
+      {:error, _} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_error}
+    end
+  end
+
   @doc """
   Attempts to solve pending shift exchange requests by finding cycles in the exchange graph and approving them.
+  Uses an advisory lock to prevent concurrent execution which could cause race conditions.
   """
   def solve_exchanges(opts \\ []) do
+    # Use pg_try_advisory_lock to attempt to acquire an exclusive lock
+    # If another worker is already processing, we skip this run
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          do_solve_exchanges(opts)
+        after
+          # Always release the lock when done
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        # Another worker is already processing exchanges, skip this run
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_held}
+
+      {:error, _} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_error}
+    end
+  end
+
+  defp do_solve_exchanges(opts) do
     pending = list_unique_pending_shift_exchange_requests(opts)
     graph = build_graph(pending)
     cycles = find_cycles(graph)
@@ -257,6 +305,25 @@ defmodule Atlas.Exchange do
   end
 
   def maybe_auto_approve_pending_requests(opts \\ []) do
+    # Use the same advisory lock as solve_exchanges to prevent concurrent modifications
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          do_maybe_auto_approve_pending_requests(opts)
+        after
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        # Another worker is already processing exchanges, skip
+        :skipped
+
+      {:error, _} ->
+        :error
+    end
+  end
+
+  defp do_maybe_auto_approve_pending_requests(opts) do
     pending_requests = list_pending_shift_exchange_requests(opts)
 
     Enum.each(pending_requests, fn req ->
@@ -347,22 +414,41 @@ defmodule Atlas.Exchange do
   end
 
   defp approve_cycle(g, cycle_vertices) do
-    cycle_set = MapSet.new(cycle_vertices)
+    # Get only the edges that form this specific cycle path
+    # For cycle [A, B, C], the edges are: A→B, B→C, C→A
+    cycle_edges =
+      cycle_vertices
+      |> Enum.with_index()
+      |> Enum.map(fn {vertex, idx} ->
+        next_vertex = Enum.at(cycle_vertices, rem(idx + 1, length(cycle_vertices)))
+        {vertex, next_vertex}
+      end)
+      |> MapSet.new()
 
-    # Get all requests whose edges are inside the cycle
+    # Get only the requests for edges that are part of this specific cycle
     requests =
       g
       |> Graph.edges()
-      |> Enum.filter(fn e -> e.v1 in cycle_set and e.v2 in cycle_set end)
+      |> Enum.filter(fn e -> MapSet.member?(cycle_edges, {e.v1, e.v2}) end)
       |> Enum.map(& &1.label)
       |> Enum.filter(&match?(%ShiftExchangeRequest{}, &1))
 
+    # Validate that we have exactly one request per edge in the cycle
+    # If not, the cycle is incomplete and should not be approved
+    if length(requests) != length(cycle_vertices) do
+      {:error, :incomplete_cycle}
+    else
+      approve_complete_cycle(g, cycle_vertices, requests)
+    end
+  end
+
+  defp approve_complete_cycle(_g, cycle_vertices, requests) do
     # Build the multi with locking to prevent race conditions
     multi =
       Multi.new()
       # First, lock all shifts involved in the cycle to serialize concurrent operations
       |> Multi.run(:lock_shifts, fn _repo, _changes ->
-        shift_ids = MapSet.to_list(cycle_set)
+        shift_ids = cycle_vertices
 
         locked_shifts =
           Repo.all(
