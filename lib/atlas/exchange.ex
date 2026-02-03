@@ -42,7 +42,7 @@ defmodule Atlas.Exchange do
     |> apply_filters(opts)
     |> where([r], r.status == :pending)
     |> distinct([r], [r.shift_from, r.shift_to])
-    |> order_by([r], asc: r.inserted_at)
+    |> order_by([r], asc: r.shift_from, asc: r.shift_to, asc: r.inserted_at)
     |> Repo.all()
   end
 
