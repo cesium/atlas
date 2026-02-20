@@ -13,6 +13,7 @@ defmodule AtlasWeb.ShiftsController do
       shifts = Shifts.list_shifts_with_timeslots(attrs)
 
       conn
+      |> put_view(AtlasWeb.University.ShiftJSON)
       |> render(:index, shifts: shifts)
     else
       conn
@@ -32,6 +33,7 @@ defmodule AtlasWeb.ShiftsController do
       case Shifts.update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
         {:ok, %{shift: updated_shift} = _results} ->
           conn
+          |> put_view(AtlasWeb.University.ShiftJSON)
           |> render(:show, shift: updated_shift |> Repo.preload([:timeslots]))
 
         {:error, _operation, changeset, _changeset} ->

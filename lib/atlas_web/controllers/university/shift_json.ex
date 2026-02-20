@@ -1,4 +1,4 @@
-defmodule AtlasWeb.ShiftsJSON do
+defmodule AtlasWeb.University.ShiftJSON do
   alias Atlas.University.Degrees.Courses.Shifts.Shift
   alias AtlasWeb.University.TimeslotJSON
 
