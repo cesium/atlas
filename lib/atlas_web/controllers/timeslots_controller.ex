@@ -1,13 +1,13 @@
 defmodule AtlasWeb.TimeslotsController do
   use AtlasWeb, :controller
 
+  alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.University.Degrees.Courses.Shifts.Timeslot
-  alias Atlas.University.Degrees.Courses.Timeslots
 
   def delete(conn, %{"id" => id}) do
-    timeslot = Timeslots.get_timeslot!(id)
+    timeslot = Shifts.get_timeslot!(id)
 
-    with {:ok, %Timeslot{}} <- Timeslots.delete_timeslot(timeslot) do
+    with {:ok, %Timeslot{}} <- Shifts.delete_timeslot(timeslot) do
       send_resp(conn, :no_content, "")
     end
   end
