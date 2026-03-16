@@ -5,7 +5,6 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
-  alias Atlas.Accounts.User
   alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
@@ -20,35 +19,31 @@ defmodule Atlas.University do
 
   """
   def list_students do
-    User
-    |> where(type: :student)
-    |> preload(:student)
+    Student
+    |> preload(:user)
     |> Repo.all()
   end
 
   def list_students(opts) when is_list(opts) do
-    User
+    Student
     |> apply_filters(opts)
-    |> where(type: :student)
-    |> preload(:student)
+    |> preload(:user)
     |> Repo.all()
   end
 
   def list_students(params) do
-    User
-    |> where(type: :student)
-    |> join(:left, [o], p in assoc(o, :student), as: :student)
-    |> preload(:student)
-    |> Flop.validate_and_run(params, for: User)
+    Student
+    |> join(:left, [o], p in assoc(o, :user), as: :user)
+    |> preload(:user)
+    |> Flop.validate_and_run(params, for: Student)
   end
 
   def list_students(%{} = params, opts) when is_list(opts) do
-    User
+    Student
     |> apply_filters(opts)
-    |> where(type: :student)
-    |> join(:left, [o], p in assoc(o, :student), as: :student)
-    |> preload(:student)
-    |> Flop.validate_and_run(params, for: User)
+    |> join(:left, [o], p in assoc(o, :user), as: :user)
+    |> preload(:user)
+    |> Flop.validate_and_run(params, for: Student)
   end
 
   @doc """
