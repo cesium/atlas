@@ -8,7 +8,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
 
   @required_fields ~w(start end weekday shift_id)a
 
-  @optional_fields ~w(building room)a
+  @optional_fields ~w(building room scraped_id)a
 
   schema "timeslots" do
     field :start, :time
@@ -16,6 +16,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
     field :weekday, Ecto.Enum, values: @weekdays
     field :building, :string
     field :room, :string
+    field :scraped_id, :binary_id
 
     belongs_to :shift, Atlas.University.Degrees.Courses.Shifts.Shift
 
@@ -31,5 +32,33 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
 
   def weekdays do
     @weekdays
+  end
+
+  def parse_building(location) do
+    case location do
+      "" ->
+        nil
+
+      location ->
+        location
+        |> String.split("-")
+        |> Enum.at(1)
+        |> String.trim()
+        |> String.split()
+        |> Enum.at(1)
+    end
+  end
+
+  def parse_room(location) do
+    case location do
+      "" ->
+        nil
+
+      location ->
+        location
+        |> String.split("-")
+        |> Enum.at(2)
+        |> String.trim()
+    end
   end
 end

@@ -22,6 +22,7 @@ services:
       PHX_HOST: ${PHX_HOST:-localhost}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       KEPLER_API_URL: ${KEPLER_API_URL:-http://localhost:8000/api/v1}
+      TELESCOPIUM_API_URL: ${TELESCOPIUM_API_URL:-http://localhost:5000/api/v1}
     build:
       context: .
       dockerfile: Dockerfile
