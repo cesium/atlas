@@ -12,6 +12,9 @@ defmodule Atlas.University.Telescopium do
       {:ok, %Finch.Response{status: 200, body: body}} ->
         {:ok, Jason.decode!(body)}
 
+      {:ok, %Finch.Response{status: 500}} ->
+        {:error, :scraper_server_error}
+
       {:ok, %Finch.Response{status: status, body: body}} ->
         {:error, %{status: status, body: Jason.decode!(body)}}
 
@@ -51,8 +54,11 @@ defmodule Atlas.University.Telescopium do
             {:error, %{body: other}}
         end
 
-      {:ok, %Finch.Response{status: 404, body: body}} ->
-        {:error, Jason.decode!(body)["error"]}
+      {:ok, %Finch.Response{status: 500}} ->
+        {:error, :scraper_server_error}
+
+      {:ok, %Finch.Response{status: status, body: body}} ->
+        {:error, %{status: status, body: Jason.decode!(body)}}
 
       {:error, reason} ->
         {:error, reason}
@@ -76,6 +82,12 @@ defmodule Atlas.University.Telescopium do
 
       {:ok, %Finch.Response{status: 404, body: body}} ->
         {:error, Jason.decode!(body)["error"]}
+
+      {:ok, %Finch.Response{status: 500}} ->
+        {:error, :scraper_server_error}
+
+      {:ok, %Finch.Response{status: status, body: body}} ->
+        {:error, %{status: status, body: Jason.decode!(body)}}
 
       {:error, reason} ->
         {:error, reason}

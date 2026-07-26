@@ -2,7 +2,7 @@ defmodule Atlas.Workers.SyncTimeslots do
   @moduledoc """
   Worker to sync shift's timeslots using Telescopium.
   """
-  use Oban.Worker, queue: :schedule_generator
+  use Oban.Worker, queue: :scraper_jobs
 
   alias Atlas.University.Sync
   alias Atlas.University.Telescopium
@@ -11,34 +11,29 @@ defmodule Atlas.Workers.SyncTimeslots do
   def perform(%Oban.Job{args: args} = _job) do
     config = Map.get(args, "config", %{})
 
-    case Telescopium.request_scrape_job(config) do
-      {:ok, _} ->
-        case poll_until_ready() do
-          {:ok, parsed_shifts} ->
-            case Sync.sync_timeslots_from_parsed(parsed_shifts) do
-              {:ok, _result} ->
-                :ok
+    with {:ok, _} <- Telescopium.request_scrape_job(config),
+         {:ok, parsed_shifts} <- poll_until_ready(),
+         {:ok, _result} <- Sync.sync_timeslots_from_parsed(parsed_shifts) do
+      # Todo Não temos o update_job antes da 2.20
 
-              # Todo Não temos o update_job antes da 2.20
+      # Oban.update_job(job, fn job ->
+      #   %{
+      #     meta:
+      #       Map.merge(job.meta || %{}, %{
+      #         "status" => "completed",
+      #         "updated_count" => result.updated,
+      #         "unmatched_count" => length(result.unmatched)
+      #       })
+      #   }
+      # end)
 
-              # Oban.update_job(job, fn job ->
-              #   %{
-              #     meta:
-              #       Map.merge(job.meta || %{}, %{
-              #         "status" => "completed",
-              #         "updated_count" => result.updated,
-              #         "unmatched_count" => length(result.unmatched)
-              #       })
-              #   }
-              # end)
+      :ok
+    else
+      {:error, %Mint.TransportError{reason: :econnrefused}} ->
+        {:discard, :service_unavailable}
 
-              {:error, reason} ->
-                {:error, reason}
-            end
-
-          {:error, reason} ->
-            {:error, reason}
-        end
+      {:error, :scraper_server_error} ->
+        {:discard, :scraper_server_error}
 
       {:error, reason} ->
         {:error, reason}

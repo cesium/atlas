@@ -1,16 +1,17 @@
 defmodule Atlas.University.Sync do
   @moduledoc false
 
-  alias Atlas.Repo
+  alias Atlas.{Constants, Repo}
   alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.University.Degrees.Courses.Shifts.Shift
   alias Atlas.University.Degrees.Courses.Shifts.Timeslot
   alias Atlas.University.Telescopium
-  alias Atlas.Workers.LinkTimeslots
-  alias Atlas.Workers.SyncTimeslots
+  alias Atlas.Workers.{LinkTimeslots, SyncTimeslots}
 
-  def queue_link_timeslots(config \\ %{}) do
-    LinkTimeslots.new(%{"config" => config})
+  def queue_link_timeslots(config \\ %{}, user) do
+    LinkTimeslots.new(%{"config" => config},
+      meta: %{user_id: user.id, type: :scrape_and_link_timeslots}
+    )
     |> Oban.insert()
   end
 
@@ -18,8 +19,10 @@ defmodule Atlas.University.Sync do
     run_pipeline(parsed_shifts, &match_by_natural_key/1)
   end
 
-  def queue_sync_timeslots(config \\ %{}) do
-    SyncTimeslots.new(%{"config" => config})
+  def queue_sync_timeslots(config \\ %{}, user) do
+    SyncTimeslots.new(%{"config" => config},
+      meta: %{user_id: user.id, type: :scrape_and_sync_timeslots}
+    )
     |> Oban.insert()
   end
 
@@ -131,5 +134,25 @@ defmodule Atlas.University.Sync do
   defp weekday_from_date(date) do
     Timeslot.weekdays()
     |> Enum.at(Date.day_of_week(date) - 1)
+  end
+
+  def toggle_auto_sync do
+    case get_auto_sync_state() do
+      {:ok, state} when is_boolean(state) ->
+        Constants.set("auto_sync", !state)
+
+      nil ->
+        Constants.set("auto_sync", true)
+
+      {:ok, _invalid_state} ->
+        {:error, "invalid auto_sync state"}
+    end
+  end
+
+  def get_auto_sync_state do
+    case Constants.get("auto_sync") do
+      {:ok, state} -> {:ok, state}
+      _ -> nil
+    end
   end
 end
