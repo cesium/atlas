@@ -117,7 +117,7 @@ if config_env() == :prod do
   telescopium_api_url =
     System.get_env("TELESCOPIUM_API_URL") ||
       raise """
-      environment variable TELESCOPIUN_API_URL is missing.
+      environment variable TELESCOPIUM_API_URL is missing.
       It should be the base URL of your Kepler API instance, e.g., http://localhost:8000/api/v1
       """
 
