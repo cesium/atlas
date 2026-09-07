@@ -3,7 +3,7 @@ defmodule AtlasWeb.University.ScraperController do
 
   alias Atlas.University
 
-  def link_timeslots(conn, config \\ %{}) do
+  def link_timeslots(conn, %{"config" => config}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
     case University.Sync.queue_link_timeslots(config, user) do
@@ -23,7 +23,7 @@ defmodule AtlasWeb.University.ScraperController do
     end
   end
 
-  def sync_timeslots(conn, config \\ %{}) do
+  def sync_timeslots(conn, %{"config" => config}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
     case University.Sync.queue_sync_timeslots(config, user) do
