@@ -8,7 +8,13 @@ defmodule Atlas.Workers.SyncTimeslots do
   alias Atlas.University.Telescopium
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: args} = _job) do
+  def perform(%Oban.Job{meta: %{"cron" => true}} = job) do
+    if Sync.auto_sync_enabled?(), do: sync_timeslots(job), else: :ok
+  end
+
+  def perform(%Oban.Job{} = job), do: sync_timeslots(job)
+
+  defp sync_timeslots(%Oban.Job{args: args}) do
     config = Map.get(args, "config", %{})
 
     with {:ok, _} <- Telescopium.request_scrape_job(config),

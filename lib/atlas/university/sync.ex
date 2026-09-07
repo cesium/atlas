@@ -155,4 +155,8 @@ defmodule Atlas.University.Sync do
       _ -> nil
     end
   end
+
+  def auto_sync_enabled? do
+    get_auto_sync_state() == {:ok, true}
+  end
 end
