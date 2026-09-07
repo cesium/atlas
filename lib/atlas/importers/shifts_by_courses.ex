@@ -88,8 +88,8 @@ defmodule Atlas.Importers.ShiftsByCourses do
         Enum.at(row, 21)
         |> String.to_integer()
         |> then(fn day -> Enum.at(Timeslot.weekdays(), day) end),
-      building: Enum.at(row, 10) |> parse_building(),
-      room: Enum.at(row, 10) |> parse_room()
+      building: Enum.at(row, 10) |> Timeslot.parse_building(),
+      room: Enum.at(row, 10) |> Timeslot.parse_room()
     }
   end
 
@@ -164,34 +164,6 @@ defmodule Atlas.Importers.ShiftsByCourses do
        |> Enum.any?(fn keyword -> String.contains?(professor, keyword) end)
        |> Kernel.not() do
       professor
-    end
-  end
-
-  defp parse_building(location) do
-    case location do
-      "" ->
-        nil
-
-      location ->
-        location
-        |> String.split("-")
-        |> Enum.at(1)
-        |> String.trim()
-        |> String.split()
-        |> Enum.at(1)
-    end
-  end
-
-  defp parse_room(location) do
-    case location do
-      "" ->
-        nil
-
-      location ->
-        location
-        |> String.split("-")
-        |> Enum.at(2)
-        |> String.trim()
     end
   end
 end

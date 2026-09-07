@@ -7,6 +7,15 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
   @required_fields ~w(type number course_id capacity)a
   @optional_fields ~w(professor)a
 
+  @shift_type_letters %{
+    :theoretical => "T",
+    :theoretical_practical => "TP",
+    :practical_laboratory => "PL",
+    :tutorial_guidance => "OT"
+  }
+
+  @shift_types Map.new(@shift_type_letters, fn {k, v} -> {v, k} end)
+
   schema "shifts" do
     field :type, Ecto.Enum,
       values: [:theoretical, :theoretical_practical, :practical_laboratory, :tutorial_guidance]
@@ -36,12 +45,24 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
     "#{short_type}#{shift.number}"
   end
 
-  def short_type(shift) do
-    case shift.type do
-      :theoretical -> "T"
-      :theoretical_practical -> "TP"
-      :practical_laboratory -> "PL"
-      :tutorial_guidance -> "OT"
+  def parse_short_name(short_name) do
+    case Regex.run(~r/^([A-Z]+)(\d+)$/, short_name) do
+      [_, type, number] ->
+        %{
+          type: type_from_short(type),
+          number: String.to_integer(number)
+        }
+
+      _ ->
+        nil
     end
+  end
+
+  def short_type(shift) do
+    Map.get(@shift_type_letters, shift.type)
+  end
+
+  def type_from_short(short) do
+    Map.get(@shift_types, short)
   end
 end
