@@ -151,8 +151,17 @@ defmodule Atlas.University.Sync do
 
   def get_auto_sync_state do
     case Constants.get("auto_sync") do
-      {:ok, state} -> {:ok, state}
-      _ -> nil
+      {:ok, state} ->
+        {:ok, state}
+
+      {:error, _} ->
+        case Constants.set("auto_sync", false) do
+          {:ok, _pair} -> {:ok, false}
+          {:error, _reason} -> nil
+        end
+
+      _ ->
+        nil
     end
   end
 
