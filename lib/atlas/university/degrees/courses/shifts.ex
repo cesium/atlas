@@ -2,6 +2,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   @moduledoc """
   The Shifts context.
   """
+  alias Atlas.University.Degrees.Courses.Course
   use Atlas.Context
 
   alias Atlas.University.Degrees.Courses.Shifts.Shift
@@ -143,6 +144,54 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
 
   """
   def get_timeslot!(id), do: Repo.get!(Timeslot, id)
+
+  @doc """
+  Gets a single timeslot by scraped id.
+
+  ## Examples
+
+      iex> get_timeslot_by_scraped_id(123)
+      %Timeslot{}
+
+  """
+  def get_timeslot_by_scraped_id(scraped_id) do
+    Timeslot
+    |> where([t], t.scraped_id == ^scraped_id)
+    |> Repo.one()
+  end
+
+  @doc """
+  Gets a single timeslot by natural key match.
+
+  ## Examples
+
+      iex> get_timeslot_by_natural_key("name", "PL", 2, ~T[09:00:00], ~T[10:00:00], :monday)
+      %Timeslot{}
+
+  """
+  def get_timeslot_by_natural_key(
+        course_name,
+        shift_type,
+        shift_number,
+        start_time,
+        end_time,
+        weekday
+      ) do
+    Course
+    |> join(:inner, [c], s in assoc(c, :shifts))
+    |> join(:inner, [c, s], t in assoc(s, :timeslots))
+    |> where(
+      [c, s, t],
+      c.name == ^course_name and
+        s.type == ^shift_type and
+        s.number == ^shift_number and
+        t.start == ^start_time and
+        t.end == ^end_time and
+        t.weekday == ^weekday
+    )
+    |> select([c, s, t], t)
+    |> Repo.one()
+  end
 
   @doc """
   Creates a timeslot.

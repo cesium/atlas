@@ -11,15 +11,6 @@ defmodule Atlas.University.Schedule do
   alias Atlas.University.Student
   alias Atlas.Workers
 
-  @shift_type_letters %{
-    :theoretical => "T",
-    :theoretical_practical => "TP",
-    :practical_laboratory => "PL",
-    :tutorial_guidance => "OT"
-  }
-
-  @shift_types Map.new(@shift_type_letters, fn {k, v} -> {v, k} end)
-
   def request_schedule_generation(opts \\ %{}) do
     kepler_api_url = Application.fetch_env!(:atlas, :kepler_api_url)
 
@@ -107,7 +98,7 @@ defmodule Atlas.University.Schedule do
           shift =
             Courses.Shifts.get_shift_by_course_type_number(
               fetched_course.id,
-              Map.get(@shift_types, shift_type),
+              Shift.type_from_short(shift_type),
               shift_number
             )
 
@@ -167,7 +158,7 @@ defmodule Atlas.University.Schedule do
         Enum.map(student.shift_enrollments, fn se ->
           %{
             course: se.shift.course.code,
-            shift_type: Map.get(@shift_type_letters, se.shift.type),
+            shift_type: Shift.short_type(se.shift.type),
             shift_number: se.shift.number
           }
         end),
@@ -196,7 +187,7 @@ defmodule Atlas.University.Schedule do
 
   defp format_shifts_for_api(%Shift{} = shift) do
     %{
-      type: Map.get(@shift_type_letters, shift.type),
+      type: Shift.short_type(shift.type),
       number: shift.number,
       timeslots:
         Enum.map(shift.timeslots, fn ts ->
