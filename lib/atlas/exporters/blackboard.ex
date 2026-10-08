@@ -40,7 +40,7 @@ defmodule Atlas.Exporters.Blackboard do
       shift_short_name <> "_gc",
       shift_short_name,
       nil,
-      "Turmas",
+      "Turmas (#{Shift.short_type(shift)})",
       "N"
     ]
   end
@@ -55,7 +55,7 @@ defmodule Atlas.Exporters.Blackboard do
       normalized_student_number |> String.replace("a", "") |> String.replace("pg", ""),
       student.user.name,
       ".",
-      "Turmas"
+      "Turmas (#{Shift.short_type(shift)})"
     ]
   end
 end

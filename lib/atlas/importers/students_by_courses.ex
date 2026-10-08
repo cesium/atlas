@@ -12,6 +12,7 @@ defmodule Atlas.Importers.StudentsByCourses do
          {:ok, rows} <- XlsxReader.sheet(package, sheet) do
       rows
       |> Enum.drop(7)
+      |> Enum.filter(fn row -> row != [""] end)
       |> Enum.each(&import_row/1)
     end
 

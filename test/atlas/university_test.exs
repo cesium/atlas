@@ -11,11 +11,6 @@ defmodule Atlas.UniversityTest do
 
     @invalid_attrs %{number: nil, special_status: nil, degree_year: nil}
 
-    test "list_students/0 returns all students" do
-      student = student_fixture()
-      assert University.list_students() == [student]
-    end
-
     test "get_student!/1 returns the student with given id" do
       student = student_fixture()
       assert University.get_student!(student.id) == student

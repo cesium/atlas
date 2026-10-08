@@ -23,6 +23,10 @@ defmodule AtlasWeb.Router do
     plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin]
   end
 
+  pipeline :is_at_least_department do
+    plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin, :department]
+  end
+
   scope "/", AtlasWeb do
     get "/", PageController, :index
   end
@@ -72,8 +76,14 @@ defmodule AtlasWeb.Router do
     end
 
     scope "/student", University do
-      get "/schedule", StudentsController, :schedule_index
-      post "/schedule", StudentsController, :schedule_update
+      scope "/schedule" do
+        get "/", StudentsController, :schedule_index
+        post "/", StudentsController, :schedule_update
+
+        pipe_through :is_at_least_professor
+
+        get "/:id", StudentsController, :student_schedule_index
+      end
     end
 
     scope "/shift_exchanges" do
@@ -93,9 +103,30 @@ defmodule AtlasWeb.Router do
       scope "/student" do
         get "/calendar-url", CalendarExportController, :calendar_url
       end
+
+    scope "/events" do
+      get "/selected", EventController, :selected_index
+      resources "/", EventController, only: [:index, :show]
+
+      pipe_through :is_at_least_department
+
+      resources "/", EventController, only: [:create, :update, :delete]
+    end
+
+    scope "/event_categories" do
+      get "/selected", EventCategoryController, :selected_index
+      post "/selected", EventCategoryController, :selected_update
+
+      resources "/", EventCategoryController, only: [:index, :show]
+
+      pipe_through :is_at_least_professor
+
+      resources "/", EventCategoryController, only: [:create, :update, :delete]
     end
 
     pipe_through :is_at_least_professor
+
+    get "/students", University.StudentsController, :index
 
     scope "/jobs" do
       get "/", JobController, :index
@@ -121,6 +152,10 @@ defmodule AtlasWeb.Router do
             ExportController,
             :blackboard_group_enrollments_export
       end
+    end
+
+    scope "/statistics" do
+      get "/course_shifts_capacity/:course_id", StatisticsController, :course_shifts_capacity
     end
   end
 

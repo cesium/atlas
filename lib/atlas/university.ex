@@ -5,21 +5,50 @@ defmodule Atlas.University do
 
   use Atlas.Context
 
+  alias Atlas.Accounts.User
   alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
 
   @doc """
-  Returns the list of students.
+  Returns the list of student users.
 
   ## Examples
 
       iex> list_students()
-      [%Student{}, ...]
+      [%User{}, ...]
 
   """
   def list_students do
-    Repo.all(Student)
+    User
+    |> where(type: :student)
+    |> preload(:student)
+    |> Repo.all()
+  end
+
+  def list_students(opts) when is_list(opts) do
+    User
+    |> apply_filters(opts)
+    |> where(type: :student)
+    |> preload(:student)
+    |> Repo.all()
+  end
+
+  def list_students(params) do
+    User
+    |> where(type: :student)
+    |> join(:left, [o], p in assoc(o, :student), as: :student)
+    |> preload(:student)
+    |> Flop.validate_and_run(params, for: User)
+  end
+
+  def list_students(%{} = params, opts) when is_list(opts) do
+    User
+    |> apply_filters(opts)
+    |> where(type: :student)
+    |> join(:left, [o], p in assoc(o, :student), as: :student)
+    |> preload(:student)
+    |> Flop.validate_and_run(params, for: User)
   end
 
   @doc """
@@ -383,6 +412,22 @@ defmodule Atlas.University do
   """
   def change_shift_enrollment(%ShiftEnrollment{} = shift_enrollment, attrs \\ %{}) do
     ShiftEnrollment.changeset(shift_enrollment, attrs)
+  end
+
+  @doc """
+  Gets the count of active enrollments for a specific shift.
+
+  ## Examples
+
+      iex> get_shift_enrollment_count(123)
+      25
+
+  """
+  def get_shift_enrollment_count(shift_id) do
+    ShiftEnrollment
+    |> where([se], se.shift_id == ^shift_id and se.status in [:active, :inactive])
+    |> select([se], count(se.id))
+    |> Repo.one()
   end
 
   @doc """

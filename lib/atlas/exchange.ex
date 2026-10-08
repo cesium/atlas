@@ -42,6 +42,23 @@ defmodule Atlas.Exchange do
     |> apply_filters(opts)
     |> where([r], r.status == :pending)
     |> distinct([r], [r.shift_from, r.shift_to])
+    |> order_by([r], asc: r.shift_from, asc: r.shift_to, asc: r.inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of pending shift exchange requests.
+
+  ## Examples
+
+      iex> list_pending_shift_exchange_requests()
+      [%ShiftExchangeRequest{}, ...]
+
+  """
+  def list_pending_shift_exchange_requests(opts \\ []) do
+    ShiftExchangeRequest
+    |> apply_filters(opts)
+    |> where([r], r.status == :pending)
     |> order_by([r], asc: r.inserted_at)
     |> Repo.all()
   end
@@ -219,10 +236,58 @@ defmodule Atlas.Exchange do
     Constants.set("exchange_period_end", nil)
   end
 
+  # Advisory lock key for exchange solving - must be unique across the application
+  @exchange_lock_key 736_849_275
+
+  @doc """
+  Processes all pending exchange requests: first solves cycles, then auto-approves eligible requests.
+  Uses an advisory lock to prevent concurrent execution which could cause race conditions.
+  """
+  def process_exchanges(opts \\ []) do
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          solve_result = do_solve_exchanges(opts)
+          do_maybe_auto_approve_pending_requests(opts)
+          solve_result
+        after
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_held}
+
+      {:error, _} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_error}
+    end
+  end
+
   @doc """
   Attempts to solve pending shift exchange requests by finding cycles in the exchange graph and approving them.
+  Uses an advisory lock to prevent concurrent execution which could cause race conditions.
   """
   def solve_exchanges(opts \\ []) do
+    # Use pg_try_advisory_lock to attempt to acquire an exclusive lock
+    # If another worker is already processing, we skip this run
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          do_solve_exchanges(opts)
+        after
+          # Always release the lock when done
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        # Another worker is already processing exchanges, skip this run
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_held}
+
+      {:error, _} ->
+        %{cycles_found: 0, requests_approved: 0, skipped: :lock_error}
+    end
+  end
+
+  defp do_solve_exchanges(opts) do
     pending = list_unique_pending_shift_exchange_requests(opts)
     graph = build_graph(pending)
     cycles = find_cycles(graph)
@@ -235,6 +300,51 @@ defmodule Atlas.Exchange do
         {:error, _reason} ->
           # If a cycle approval fails, we skip it. Others can still succeed.
           acc
+      end
+    end)
+  end
+
+  def maybe_auto_approve_pending_requests(opts \\ []) do
+    # Use the same advisory lock as solve_exchanges to prevent concurrent modifications
+    case Repo.query("SELECT pg_try_advisory_lock($1)", [@exchange_lock_key]) do
+      {:ok, %{rows: [[true]]}} ->
+        try do
+          do_maybe_auto_approve_pending_requests(opts)
+        after
+          Repo.query("SELECT pg_advisory_unlock($1)", [@exchange_lock_key])
+        end
+
+      {:ok, %{rows: [[false]]}} ->
+        # Another worker is already processing exchanges, skip
+        :skipped
+
+      {:error, _} ->
+        :error
+    end
+  end
+
+  defp do_maybe_auto_approve_pending_requests(opts) do
+    pending_requests = list_pending_shift_exchange_requests(opts)
+
+    Enum.each(pending_requests, fn req ->
+      case Repo.transaction(maybe_auto_approve_request(req)) do
+        {:ok, _changes} ->
+          # Reload student and shift for notification email
+          user = University.get_student!(req.student_id, preloads: [:user]).user
+          shift_to = Shifts.get_shift!(req.shift_to, preloads: [:course])
+
+          UserNotifier.deliver_shift_exchange_request_fulfilled(
+            user,
+            shift_to.course.name,
+            Shifts.Shift.short_name(shift_to)
+          )
+
+        {:error, :shift_has_space, :no_space, _} ->
+          # Couldn't auto approve → do nothing
+          :ok
+
+        {:error, _step, _reason, _changes} ->
+          :ok
       end
     end)
   end
@@ -304,18 +414,78 @@ defmodule Atlas.Exchange do
   end
 
   defp approve_cycle(g, cycle_vertices) do
-    cycle_set = MapSet.new(cycle_vertices)
+    # Get only the edges that form this specific cycle path
+    # For cycle [A, B, C], the edges are: A→B, B→C, C→A
+    cycle_edges =
+      cycle_vertices
+      |> Enum.with_index()
+      |> Enum.map(fn {vertex, idx} ->
+        next_vertex = Enum.at(cycle_vertices, rem(idx + 1, length(cycle_vertices)))
+        {vertex, next_vertex}
+      end)
+      |> MapSet.new()
 
-    # Get all requests whose edges are inside the cycle
+    # Get only the requests for edges that are part of this specific cycle
     requests =
       g
       |> Graph.edges()
-      |> Enum.filter(fn e -> e.v1 in cycle_set and e.v2 in cycle_set end)
+      |> Enum.filter(fn e -> MapSet.member?(cycle_edges, {e.v1, e.v2}) end)
       |> Enum.map(& &1.label)
       |> Enum.filter(&match?(%ShiftExchangeRequest{}, &1))
 
+    # Validate that we have exactly one request per edge in the cycle
+    # If not, the cycle is incomplete and should not be approved
+    if length(requests) != length(cycle_vertices) do
+      {:error, :incomplete_cycle}
+    else
+      approve_complete_cycle(g, cycle_vertices, requests)
+    end
+  end
+
+  defp approve_complete_cycle(_g, cycle_vertices, requests) do
+    # Build the multi with locking to prevent race conditions
     multi =
-      Enum.reduce(requests, Multi.new(), fn %ShiftExchangeRequest{} = req, m ->
+      Multi.new()
+      # First, lock all shifts involved in the cycle to serialize concurrent operations
+      |> Multi.run(:lock_shifts, fn _repo, _changes ->
+        shift_ids = cycle_vertices
+
+        locked_shifts =
+          Repo.all(
+            from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+              where: s.id in ^shift_ids,
+              lock: "FOR UPDATE",
+              order_by: s.id
+            )
+          )
+
+        {:ok, locked_shifts}
+      end)
+      # Then, lock and verify all requests are still pending
+      |> Multi.run(:verify_requests_pending, fn _repo, _changes ->
+        request_ids = Enum.map(requests, & &1.id)
+
+        current_requests =
+          Repo.all(
+            from(r in ShiftExchangeRequest,
+              where: r.id in ^request_ids,
+              lock: "FOR UPDATE"
+            )
+          )
+
+        # Check that all requests are still pending
+        all_pending = Enum.all?(current_requests, &(&1.status == :pending))
+
+        if all_pending and length(current_requests) == length(requests) do
+          {:ok, current_requests}
+        else
+          {:error, :requests_already_processed}
+        end
+      end)
+
+    # Add the actual operations for each request
+    multi =
+      Enum.reduce(requests, multi, fn %ShiftExchangeRequest{} = req, m ->
         # Update the request status to approved
         m =
           Multi.update(
@@ -324,13 +494,25 @@ defmodule Atlas.Exchange do
             Ecto.Changeset.change(req, status: :approved)
           )
 
-        # Delete the student’s enrollment in the origin shift
+        # Delete the student's enrollment in the origin shift
         m =
           Multi.delete_all(
             m,
             {:delete_from_enrollment, req.id},
             from(se in ShiftEnrollment,
               where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_from
+            )
+          )
+
+        # Delete student override for the destination shift (in case it exists)
+        m =
+          Multi.delete_all(
+            m,
+            {:delete_from_enrollment_override, req.id},
+            from(se in ShiftEnrollment,
+              where:
+                se.student_id == ^req.student_id and se.shift_id == ^req.shift_to and
+                  se.status == :override
             )
           )
 
@@ -365,5 +547,91 @@ defmodule Atlas.Exchange do
       {:error, _op, _changeset, _sofar} ->
         {:error, :transaction_failed}
     end
+  end
+
+  defp maybe_auto_approve_request(%ShiftExchangeRequest{} = req) do
+    Multi.new()
+    |> Multi.run(:verify_request_pending, fn _repo, _changes ->
+      # Lock the request and verify it's still pending
+      # This prevents race conditions with cycle approval
+      current_request =
+        Repo.one(
+          from(r in ShiftExchangeRequest,
+            where: r.id == ^req.id,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      case current_request do
+        nil -> {:error, :request_not_found}
+        %{status: :pending} -> {:ok, current_request}
+        _ -> {:error, :request_already_processed}
+      end
+    end)
+    |> Multi.run(:shift_has_space, fn _repo, _changes ->
+      # Lock both shifts to prevent concurrent modifications
+      # This ensures that capacity checks are serialized
+      from_shift =
+        Repo.one!(
+          from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+            where: s.id == ^req.shift_from,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      to_shift =
+        Repo.one!(
+          from(s in Atlas.University.Degrees.Courses.Shifts.Shift,
+            where: s.id == ^req.shift_to,
+            lock: "FOR UPDATE"
+          )
+        )
+
+      # Now count enrollments while holding the locks
+      enrolled_count =
+        Repo.one(
+          from(se in ShiftEnrollment,
+            where: se.shift_id == ^req.shift_to and se.status in [:active, :inactive],
+            select: count(se.student_id, :distinct)
+          )
+        )
+
+      from_shift_occupation =
+        Repo.one(
+          from(se in ShiftEnrollment,
+            where: se.shift_id == ^req.shift_from and se.status in [:active, :inactive],
+            select: count(se.student_id, :distinct)
+          )
+        )
+
+      cond do
+        from_shift_occupation - 1 <= round(from_shift.capacity * 0.8) ->
+          {:error, :shift_from_underoccupied}
+
+        enrolled_count < to_shift.capacity ->
+          {:ok, :has_space}
+
+        true ->
+          {:error, :no_space}
+      end
+    end)
+    |> Multi.update(
+      :approve_request,
+      Ecto.Changeset.change(req, status: :approved)
+    )
+    |> Multi.delete_all(
+      :delete_from_enrollment,
+      from(se in ShiftEnrollment,
+        where: se.student_id == ^req.student_id and se.shift_id == ^req.shift_from
+      )
+    )
+    |> Multi.insert(
+      :insert_to_enrollment,
+      ShiftEnrollment.changeset(%ShiftEnrollment{}, %{
+        student_id: req.student_id,
+        shift_id: req.shift_to,
+        status: :active
+      })
+    )
   end
 end
