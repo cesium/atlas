@@ -3,14 +3,13 @@ defmodule AtlasWeb.CalendarExportController do
 
   alias Atlas.Accounts.Guardian
   alias Atlas.Calendar
-  alias Atlas.University
-  alias Atlas.University.Degrees.Courses.Shifts
+  alias Atlas.Events
   alias AtlasWeb.AuthController
 
   @audience "astra"
 
   @doc """
-  Returns a short-lived signed URL to export the current user's calendar.
+  Returns a short-lived signed URL to export the current user's events calendar.
   """
   def calendar_url(conn, _params) do
     {user, session} = Guardian.Plug.current_resource(conn)
@@ -33,18 +32,16 @@ defmodule AtlasWeb.CalendarExportController do
   end
 
   @doc """
-  Exports the current user's schedule as an `.ics` file, given a valid calendar token.
+  Exports the current user's events as an `.ics` file, given a valid calendar token.
   """
   def student_calendar(conn, %{"token" => token}) do
     with {:ok, claims} <-
            Guardian.decode_and_verify(token, %{"typ" => "calendar", "aud" => @audience}),
-         {:ok, {user, _session}} <- Guardian.resource_from_claims(claims),
-         student <- University.get_student_by_user_id(user.id),
-         %{} = student <- student do
-      shifts = Shifts.list_shifts_for_student(student.id)
+         {:ok, {user, _session}} <- Guardian.resource_from_claims(claims) do
+      events = Events.list_events_by_user(user.id)
 
       ics_content =
-        Calendar.shifts_to_ics(shifts, calendar_name: "Student #{user.name} Schedule")
+        Calendar.events_to_ics(events, calendar_name: "Student #{user.name} Events")
 
       conn
       |> put_resp_content_type("text/calendar; charset=utf-8")

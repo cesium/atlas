@@ -46,6 +46,7 @@ defmodule AtlasWeb.Router do
     scope "/export" do
       scope "/student" do
         get "/calendar.ics", CalendarExportController, :student_calendar
+        get "/schedule.ics", ScheduleExportController, :student_schedule
       end
     end
 
@@ -99,10 +100,21 @@ defmodule AtlasWeb.Router do
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
     end
 
+    scope "/classes_period", University do
+      get "/:semester", ClassesPeriodController, :get_classes_period
+
+      pipe_through :is_at_least_professor
+
+      post "/:semester", ClassesPeriodController, :set_classes_period
+      delete "/:semester", ClassesPeriodController, :delete_classes_period
+    end
+
     scope "/export" do
       scope "/student" do
         get "/calendar-url", CalendarExportController, :calendar_url
+        get "/schedule-url", ScheduleExportController, :schedule_url
       end
+    end
 
     scope "/events" do
       get "/selected", EventController, :selected_index
