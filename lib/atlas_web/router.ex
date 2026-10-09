@@ -128,6 +128,16 @@ defmodule AtlasWeb.Router do
       post "/import_schedule_result", ScheduleController, :import_schedule_result
     end
 
+    scope "/scraper", University do
+      post "/link", ScraperController, :link_timeslots
+
+      scope "/sync" do
+        post "/", ScraperController, :sync_timeslots
+        post "/auto_sync", ScraperController, :toggle_auto_sync
+        get "/auto_sync", ScraperController, :get_auto_sync_state
+      end
+    end
+
     scope "/import" do
       post "/students_by_courses", ImportController, :students_by_courses
       post "/shifts_by_courses", ImportController, :shifts_by_courses
