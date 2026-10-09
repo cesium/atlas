@@ -43,6 +43,8 @@ defmodule Atlas.Calendar do
     uid_prefix = Keyword.get(opts, :uid_prefix, "atlas")
     calendar_name = Keyword.get(opts, :calendar_name, "Atlas Schedule")
 
+    opts = maybe_preload_classes_periods(shifts, opts)
+
     shifts
     |> Enum.with_index()
     |> Enum.flat_map(fn {shift, index} ->
@@ -99,7 +101,7 @@ defmodule Atlas.Calendar do
         optional_property("URL", event.link)
       ])
     end)
-    |> wrap_calendar(calendar_name, [])
+    |> wrap_calendar(calendar_name, [@vtimezone])
   end
 
   defp wrap_calendar(event_blocks, calendar_name, extra_components) do
@@ -128,10 +130,40 @@ defmodule Atlas.Calendar do
     end
   end
 
-  defp weekly_rrule(nil), do: "RRULE:FREQ=WEEKLY"
+  defp weekly_rrule(nil), do: "RRULE:FREQ=WEEKLY;INTERVAL=1"
 
   defp weekly_rrule(period_end) do
-    "RRULE:FREQ=WEEKLY;UNTIL=#{Calendar.strftime(period_end, "%Y%m%d")}T235959Z"
+    "RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=#{Calendar.strftime(period_end, "%Y%m%d")}T235959Z"
+  end
+
+  defp maybe_preload_classes_periods(shifts, opts) do
+    cond do
+      Keyword.has_key?(opts, :classes_period) ->
+        opts
+
+      Keyword.has_key?(opts, :classes_periods) ->
+        opts
+
+      true ->
+        semesters =
+          shifts
+          |> Enum.map(&(&1.course && &1.course.semester))
+          |> Enum.filter(&(&1 in [1, 2]))
+          |> Enum.uniq()
+
+        case semesters do
+          [] ->
+            opts
+
+          _ ->
+            periods =
+              Map.new(semesters, fn sem ->
+                {sem, University.get_classes_period(sem)}
+              end)
+
+            Keyword.put(opts, :classes_periods, periods)
+        end
+    end
   end
 
   defp resolve_classes_period(shift, opts) do

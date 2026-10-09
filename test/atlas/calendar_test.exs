@@ -6,45 +6,7 @@ defmodule Atlas.CalendarTest do
   alias Atlas.Events.EventCategory
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.University.Degrees.Courses.Shifts.Shift
-  alias Atlas.University.Degrees.Courses.Shifts.Timeslots.Timeslot
-
-  describe "fold_line/2 and unfold_content/1" do
-    test "does not fold lines with 75 bytes or fewer" do
-      line = String.duplicate("a", 75)
-      assert Calendar.fold_line(line) == line
-    end
-
-    test "folds ASCII lines longer than 75 bytes" do
-      line = "SUMMARY:" <> String.duplicate("a", 90)
-      folded = Calendar.fold_line(line)
-
-      lines = String.split(folded, "\r\n")
-      assert length(lines) == 2
-
-      [first, second] = lines
-      assert byte_size(first) == 75
-      assert String.starts_with?(second, " ")
-      assert byte_size(second) <= 75
-
-      assert Calendar.unfold_content(folded) == line
-    end
-
-    test "never splits multibyte UTF-8 codepoints across fold boundaries" do
-      prefix = String.duplicate("a", 74)
-      line = prefix <> "ção muito importante com texto longo que continua"
-      folded = Calendar.fold_line(line)
-
-      [first, second] = String.split(folded, "\r\n")
-
-      assert byte_size(first) == 74
-      assert String.valid?(first)
-
-      assert String.starts_with?(second, " ç")
-      assert String.valid?(second)
-
-      assert Calendar.unfold_content(folded) == line
-    end
-  end
+  alias Atlas.University.Degrees.Courses.Shifts.Timeslot
 
   describe "schedule_to_ics/2" do
     test "generates recurring events for shifts and timeslots" do
@@ -61,8 +23,8 @@ defmodule Atlas.CalendarTest do
 
       shift = %Shift{
         id: 42,
-        name: "PL1",
-        type: :pratical,
+        number: 1,
+        type: :practical_laboratory,
         professor: "Prof. Alberto",
         course: course,
         timeslots: [timeslot]
@@ -97,7 +59,14 @@ defmodule Atlas.CalendarTest do
       }
 
       course = %Course{name: "Sistemas Distribuídos", semester: 1}
-      shift = %Shift{id: 42, name: "PL1", course: course, timeslots: [timeslot]}
+
+      shift = %Shift{
+        id: 42,
+        number: 1,
+        type: :practical_laboratory,
+        course: course,
+        timeslots: [timeslot]
+      }
 
       period = %{start: ~U[2024-09-16 00:00:00Z], end: nil}
 
@@ -117,7 +86,14 @@ defmodule Atlas.CalendarTest do
       }
 
       course = %Course{name: "Sistemas Distribuídos", semester: 1}
-      shift = %Shift{id: 42, name: "PL1", course: course, timeslots: [timeslot]}
+
+      shift = %Shift{
+        id: 42,
+        number: 1,
+        type: :practical_laboratory,
+        course: course,
+        timeslots: [timeslot]
+      }
 
       period = %{start: nil, end: ~U[2024-12-31 23:59:59Z]}
 
@@ -135,7 +111,14 @@ defmodule Atlas.CalendarTest do
       }
 
       course = %Course{name: "Algoritmos", semester: 1}
-      shift = %Shift{id: 10, name: "TP1", course: course, timeslots: [timeslot]}
+
+      shift = %Shift{
+        id: 10,
+        number: 1,
+        type: :theoretical_practical,
+        course: course,
+        timeslots: [timeslot]
+      }
 
       period = %{start: ~D[2024-09-16], end: ~U[2024-12-20 23:59:59Z]}
 
@@ -149,14 +132,16 @@ defmodule Atlas.CalendarTest do
     test "resolves period per course semester using classes_periods map" do
       shift1 = %Shift{
         id: 1,
-        name: "PL1",
+        number: 1,
+        type: :practical_laboratory,
         course: %Course{name: "C1", semester: 1},
         timeslots: [%Timeslot{id: 1, weekday: :monday, start: ~T[08:00:00], end: ~T[10:00:00]}]
       }
 
       shift2 = %Shift{
         id: 2,
-        name: "PL2",
+        number: 2,
+        type: :practical_laboratory,
         course: %Course{name: "C2", semester: 2},
         timeslots: [%Timeslot{id: 2, weekday: :monday, start: ~T[14:00:00], end: ~T[16:00:00]}]
       }

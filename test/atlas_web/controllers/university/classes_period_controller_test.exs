@@ -26,7 +26,7 @@ defmodule AtlasWeb.University.ClassesPeriodControllerTest do
       assert json_response(conn, 404)["error"] =~ "No classes period set"
     end
 
-    test "returns 200 when period is set", %{prof_conn: prof_conn, student_conn: student_conn} do
+    test "returns 200 when period is set", %{student_conn: student_conn} do
       start_time = ~U[2024-09-16 00:00:00Z]
       end_time = ~U[2024-12-20 23:59:59Z]
       {:ok, _} = University.set_classes_period(1, start_time, end_time)
