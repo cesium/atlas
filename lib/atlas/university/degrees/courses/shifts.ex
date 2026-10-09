@@ -35,9 +35,11 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
 
   """
   def list_shifts_for_student(student_id, opts \\ []) do
+    statuses = Keyword.get(opts, :statuses, [:active, :override])
+
     shift_ids =
       from(e in ShiftEnrollment,
-        where: e.student_id == ^student_id,
+        where: e.student_id == ^student_id and e.status in ^statuses,
         select: e.shift_id
       )
       |> Repo.all()
