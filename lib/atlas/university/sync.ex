@@ -43,6 +43,10 @@ defmodule Atlas.University.Sync do
     end
   end
 
+  defp match_by_natural_key(%{type: nil, number: nil} = scraped_shift) do
+    %{timeslot: nil, scraped_shift: scraped_shift}
+  end
+
   defp match_by_natural_key(scraped_shift) do
     timeslot =
       Shifts.get_timeslot_by_natural_key(
@@ -105,7 +109,21 @@ defmodule Atlas.University.Sync do
   end
 
   defp parse_scraped_shift(scraped_shift) do
-    %{type: type, number: number} = scraped_shift.shift |> Shift.parse_short_name()
+    %{type: type, number: number} =
+      case scraped_shift.shift do
+        nil ->
+          %{type: nil, number: nil}
+
+        shift ->
+          case Shift.parse_short_name(shift) do
+            %{type: type, number: number} when not is_nil(type) ->
+              %{type: type, number: number}
+
+            _ ->
+              %{type: nil, number: nil}
+          end
+      end
+
     {start_date, start_time} = parse_scraped_datetime(scraped_shift.start_time)
     {_end_date, end_time} = parse_scraped_datetime(scraped_shift.end_time)
 
@@ -159,9 +177,6 @@ defmodule Atlas.University.Sync do
           {:ok, _pair} -> {:ok, false}
           {:error, _reason} -> nil
         end
-
-      _ ->
-        nil
     end
   end
 
