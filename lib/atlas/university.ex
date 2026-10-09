@@ -6,6 +6,7 @@ defmodule Atlas.University do
   use Atlas.Context
 
   alias Atlas.Accounts.User
+  alias Atlas.Constants
   alias Atlas.University.{CourseEnrollment, ShiftEnrollment, Student}
   alias Atlas.University.Degrees.Courses.Course
   alias Atlas.Workers
@@ -87,6 +88,23 @@ defmodule Atlas.University do
   """
   def get_student_by_number!(number) do
     Repo.get_by!(Student, number: number)
+  end
+
+  @doc """
+  Gets a single student by `user_id`.
+
+  Returns `nil` if no student exists for the given user.
+
+  ## Examples
+
+      iex> get_student_by_user_id(123)
+      %Student{}
+
+      iex> get_student_by_user_id(999)
+      nil
+  """
+  def get_student_by_user_id(user_id) do
+    Repo.get_by(Student, user_id: user_id)
   end
 
   @doc """
@@ -572,5 +590,69 @@ defmodule Atlas.University do
           se.status in [:active, :inactive]
       )
     )
+  end
+
+  @doc """
+  Sets the interval during which classes occur for a specific semester (1 or 2).
+
+  ## Examples
+
+      iex> set_classes_period(1, ~U[2024-09-01 00:00:00Z], ~U[2024-12-31 23:59:59Z])
+      {:ok, _}
+
+      iex> set_classes_period(1, ~U[2025-01-01 00:00:00Z], ~U[2024-12-31 23:59:59Z])
+      {:error, "Start time must be before end time"}
+
+  """
+  def set_classes_period(semester, start_time, end_time) when semester in [1, 2] do
+    if DateTime.compare(start_time, end_time) != :lt do
+      {:error, "Start time must be before end time"}
+    else
+      Constants.set("semester_#{semester}_classes_period_start", start_time)
+      Constants.set("semester_#{semester}_classes_period_end", end_time)
+    end
+  end
+
+  def set_classes_period(_semester, _start_time, _end_time) do
+    {:error, "Invalid semester. Expected 1 or 2"}
+  end
+
+  @doc """
+  Gets the current classes period for a specific semester (1 or 2).
+
+  Returns `nil` when neither start nor end is set.
+  Returns `%{start: start_time, end: end_time}` if at least one value is set.
+  """
+  def get_classes_period(semester) when semester in [1, 2] do
+    start_time =
+      case Constants.get("semester_#{semester}_classes_period_start") do
+        {:ok, time} -> time
+        _ -> nil
+      end
+
+    end_time =
+      case Constants.get("semester_#{semester}_classes_period_end") do
+        {:ok, time} -> time
+        _ -> nil
+      end
+
+    case {start_time, end_time} do
+      {nil, nil} -> nil
+      _ -> %{start: start_time, end: end_time}
+    end
+  end
+
+  def get_classes_period(_semester), do: nil
+
+  @doc """
+  Deletes the classes period for a specific semester (1 or 2).
+  """
+  def delete_classes_period(semester) when semester in [1, 2] do
+    Constants.set("semester_#{semester}_classes_period_start", nil)
+    Constants.set("semester_#{semester}_classes_period_end", nil)
+  end
+
+  def delete_classes_period(_semester) do
+    {:error, "Invalid semester. Expected 1 or 2"}
   end
 end
