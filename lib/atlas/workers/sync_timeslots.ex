@@ -4,6 +4,9 @@ defmodule Atlas.Workers.SyncTimeslots do
   """
   use Oban.Worker, queue: :scraper_jobs
 
+  import Ecto.Query
+
+  alias Atlas.Repo
   alias Atlas.University.Sync
   alias Atlas.University.Telescopium
 
@@ -14,24 +17,21 @@ defmodule Atlas.Workers.SyncTimeslots do
 
   def perform(%Oban.Job{} = job), do: sync_timeslots(job)
 
-  defp sync_timeslots(%Oban.Job{args: args}) do
+  defp sync_timeslots(%Oban.Job{args: args} = job) do
     config = Map.get(args, "config", %{})
 
     with {:ok, _} <- Telescopium.request_scrape_job(config),
          {:ok, parsed_shifts} <- poll_until_ready(),
-         {:ok, _result} <- Sync.sync_timeslots_from_parsed(parsed_shifts) do
-      # Todo Não temos o update_job antes da 2.20
+         {:ok, result} <- Sync.sync_timeslots_from_parsed(parsed_shifts) do
+      meta_updates = %{
+        "updated_count" => result.updated,
+        "unmatched_count" => length(result.unmatched)
+      }
 
-      # Oban.update_job(job, fn job ->
-      #   %{
-      #     meta:
-      #       Map.merge(job.meta || %{}, %{
-      #         "status" => "completed",
-      #         "updated_count" => result.updated,
-      #         "unmatched_count" => length(result.unmatched)
-      #       })
-      #   }
-      # end)
+      new_meta = (job.meta || %{}) |> Map.merge(meta_updates)
+
+      from(j in Oban.Job, where: j.id == ^job.id)
+      |> Repo.update_all(set: [meta: new_meta])
 
       :ok
     else

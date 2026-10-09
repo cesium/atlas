@@ -35,7 +35,8 @@ defmodule Atlas.Workers do
       completed_at: j.completed_at,
       inserted_at: j.inserted_at,
       type: fragment("meta ->> 'type'"),
-      user_id: fragment("meta ->> 'user_id'")
+      user_id: fragment("meta ->> 'user_id'"),
+      metadata: j.meta
     })
   end
 end
