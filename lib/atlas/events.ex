@@ -219,6 +219,18 @@ defmodule Atlas.Events do
   end
 
   @doc """
+  Returns all public events belonging to CeSIUM categories.
+  Events are ordered by start date ascending.
+  """
+  def list_cesium_events do
+    Event
+    |> join(:inner, [e], ec in assoc(e, :category))
+    |> where([_e, ec], fragment("lower(?)", ec.name) == "cesium")
+    |> order_by([e], asc: e.start)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single event.
 
   Raises `Ecto.NoResultsError` if the Event does not exist.
