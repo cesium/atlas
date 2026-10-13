@@ -108,7 +108,7 @@ defmodule AtlasWeb.Router do
 
       resources "/", EventCategoryController, only: [:index, :show]
 
-      pipe_through :is_at_least_professor
+      pipe_through :is_at_least_department
 
       resources "/", EventCategoryController, only: [:create, :update, :delete]
     end
