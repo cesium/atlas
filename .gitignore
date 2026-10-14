@@ -44,3 +44,6 @@ npm-debug.log
 # Ignore all excel files to prevent sensitive data leak
 *.xlsx
 *.xls
+
+# Nix
+.direnv/
