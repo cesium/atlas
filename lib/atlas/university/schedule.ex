@@ -158,7 +158,7 @@ defmodule Atlas.University.Schedule do
         Enum.map(student.shift_enrollments, fn se ->
           %{
             course: se.shift.course.code,
-            shift_type: Shift.short_type(se.shift.type),
+            shift_type: Shift.short_type(se.shift),
             shift_number: se.shift.number
           }
         end),

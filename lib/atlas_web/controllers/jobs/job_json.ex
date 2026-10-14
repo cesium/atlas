@@ -29,7 +29,8 @@ defmodule AtlasWeb.JobJSON do
       inserted_at: job.inserted_at,
       type: job.type || "none",
       user_id: job.user_id,
-      metadata: job.metadata
+      updated_count: job.updated_count,
+      unmatched_count: job.unmatched_count
     }
   end
 end
