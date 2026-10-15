@@ -36,7 +36,12 @@ defmodule Atlas.University.Sync do
 
     case update_pairs(matched) do
       {:ok, count} ->
-        {:ok, %{updated: count, unmatched: Enum.map(unmatched, & &1.scraped_shift)}}
+        {:ok,
+         %{
+           matched: length(matched),
+           updated: count,
+           unmatched: Enum.map(unmatched, & &1.scraped_shift)
+         }}
 
       {:error, reason} ->
         {:error, reason}
@@ -69,21 +74,28 @@ defmodule Atlas.University.Sync do
   end
 
   defp update_pairs(shift_pairs) do
-    shift_pairs
-    |> Enum.reduce(Ecto.Multi.new(), fn %{timeslot: timeslot, scraped_shift: scraped_shift},
-                                        multi ->
-      changeset =
-        Timeslot.changeset(timeslot, %{
-          scraped_id: scraped_shift.id,
-          room: scraped_shift.room,
-          building: scraped_shift.building
-        })
+    changesets =
+      shift_pairs
+      |> Enum.map(fn %{timeslot: timeslot, scraped_shift: scraped_shift} ->
+        attrs =
+          %{
+            scraped_id: scraped_shift.id,
+            room: scraped_shift.room,
+            building: scraped_shift.building
+          }
+          |> Map.reject(fn {_, value} -> is_nil(value) or value == "" end)
 
-      Ecto.Multi.update(multi, {:update, timeslot.id}, changeset)
+        Timeslot.changeset(timeslot, attrs)
+      end)
+      |> Enum.filter(&(&1.changes != %{}))
+
+    changesets
+    |> Enum.reduce(Ecto.Multi.new(), fn changeset, multi ->
+      Ecto.Multi.update(multi, {:update, changeset.data.id}, changeset)
     end)
     |> Repo.transaction()
     |> case do
-      {:ok, _} -> {:ok, length(shift_pairs)}
+      {:ok, _} -> {:ok, length(changesets)}
       {:error, _, reason, _changed} -> {:error, reason}
     end
   end
@@ -124,34 +136,21 @@ defmodule Atlas.University.Sync do
           end
       end
 
-    {start_date, start_time} = parse_scraped_datetime(scraped_shift.start_time)
-    {_end_date, end_time} = parse_scraped_datetime(scraped_shift.end_time)
-
     %{
       id: scraped_shift.id,
       course: scraped_shift.name,
       type: type,
       number: number,
-      start: start_time,
-      end: end_time,
-      weekday: weekday_from_date(start_date),
+      start: Time.from_iso8601!(scraped_shift.start_time),
+      end: Time.from_iso8601!(scraped_shift.end_time),
+      weekday: parse_weekday(scraped_shift.weekday),
       building: scraped_shift.location |> Timeslot.parse_building(),
       room: scraped_shift.location |> Timeslot.parse_room()
     }
   end
 
-  defp parse_scraped_datetime(datetime) do
-    {:ok, parsed_datetime} =
-      datetime
-      |> String.replace(" ", "T")
-      |> NaiveDateTime.from_iso8601()
-
-    {NaiveDateTime.to_date(parsed_datetime), NaiveDateTime.to_time(parsed_datetime)}
-  end
-
-  defp weekday_from_date(date) do
-    Timeslot.weekdays()
-    |> Enum.at(Date.day_of_week(date) - 1)
+  defp parse_weekday(weekday) do
+    Enum.find(Timeslot.weekdays(), &(Atom.to_string(&1) == weekday))
   end
 
   def toggle_auto_sync do

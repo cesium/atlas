@@ -34,31 +34,27 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
     @weekdays
   end
 
-  def parse_building(location) do
-    case location do
-      "" ->
-        nil
+  def parse_building(location) when is_binary(location) do
+    case String.split(location, "-") do
+      [_, part | _] ->
+        case String.split(part) do
+          [_, building | _] -> building
+          _ -> nil
+        end
 
-      location ->
-        location
-        |> String.split("-")
-        |> Enum.at(1)
-        |> String.trim()
-        |> String.split()
-        |> Enum.at(1)
+      _ ->
+        nil
     end
   end
 
-  def parse_room(location) do
-    case location do
-      "" ->
-        nil
+  def parse_building(_), do: nil
 
-      location ->
-        location
-        |> String.split("-")
-        |> Enum.at(2)
-        |> String.trim()
+  def parse_room(location) when is_binary(location) do
+    case String.split(location, "-") do
+      [_, _, room | _] -> String.trim(room)
+      _ -> nil
     end
   end
+
+  def parse_room(_), do: nil
 end

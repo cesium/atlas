@@ -36,6 +36,7 @@ defmodule Atlas.Workers do
       inserted_at: j.inserted_at,
       type: j.meta["type"],
       user_id: j.meta["user_id"],
+      matched_count: j.meta["matched_count"],
       updated_count: j.meta["updated_count"],
       unmatched_count: j.meta["unmatched_count"]
     })

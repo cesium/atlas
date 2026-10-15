@@ -18,6 +18,7 @@ defmodule Atlas.Workers.LinkTimeslots do
          {:ok, parsed_shifts} <- poll_until_ready(),
          {:ok, result} <- Sync.link_timeslots_from_parsed(parsed_shifts) do
       meta_updates = %{
+        "matched_count" => result.matched,
         "updated_count" => result.updated,
         "unmatched_count" => length(result.unmatched)
       }
