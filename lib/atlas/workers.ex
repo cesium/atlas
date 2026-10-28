@@ -34,8 +34,11 @@ defmodule Atlas.Workers do
       attempted_at: j.attempted_at,
       completed_at: j.completed_at,
       inserted_at: j.inserted_at,
-      type: fragment("meta ->> 'type'"),
-      user_id: fragment("meta ->> 'user_id'")
+      type: j.meta["type"],
+      user_id: j.meta["user_id"],
+      matched_count: j.meta["matched_count"],
+      updated_count: j.meta["updated_count"],
+      unmatched_count: j.meta["unmatched_count"]
     })
   end
 end
