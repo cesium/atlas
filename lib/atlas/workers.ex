@@ -11,6 +11,12 @@ defmodule Atlas.Workers do
     |> Repo.all()
   end
 
+  def list_all_jobs do
+    Oban.Job
+    |> select_job_fields()
+    |> Repo.all()
+  end
+
   def list_user_jobs(user) do
     Oban.Job
     |> where(fragment("meta ->> 'user_id' = ?", ^to_string(user.id)))

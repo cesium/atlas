@@ -5,14 +5,14 @@ defmodule AtlasWeb.JobController do
 
   action_fallback AtlasWeb.FallbackController
 
-  def index(conn, _params) do
+  def index(conn, params) do
     {user, _session} = Guardian.Plug.current_resource(conn)
 
     jobs =
-      if user_can_list_all_jobs?(user) do
-        Workers.list_jobs()
-      else
-        Workers.list_user_jobs(user)
+      cond do
+        !user_can_list_all_jobs?(user) -> Workers.list_user_jobs(user)
+        params["cron"] == "true" -> Workers.list_all_jobs()
+        true -> Workers.list_jobs()
       end
 
     render(conn, :index, jobs: jobs)
