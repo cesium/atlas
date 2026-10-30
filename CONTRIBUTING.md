@@ -1,4 +1,4 @@
-[asdf-vm]: https://asdf-vm.com/
+[mise]: https://mise.jdx.dev/
 
 # 🚀 Getting Started
 
@@ -9,14 +9,16 @@ local machine for development and testing purposes.
 
 The following software is required to be installed on your system:
 
-- [Erlang 26+](https://www.erlang.org/downloads)
-- [Elixir 1.17+](https://elixir-lang.org/install.html)
-- [PostgreSQL 13+](https://www.postgresql.org/download/)(see [this section](#-docker) for setting up with docker)
+- [Erlang 27+](https://www.erlang.org/downloads)
+- [Elixir 1.18+](https://elixir-lang.org/install.html)
+- [PostgreSQL 14+](https://www.postgresql.org/download/) (see
+  [this section](#-docker) for setting it up with Docker)
 
-We recommend using [asdf version manager][asdf-vm] to install and manage all
-the programming languages' requirements.
+We recommend using [mise][mise] to install and manage all the programming
+languages' requirements. The required versions are listed in the
+`.tool-versions` file, which mise reads.
 
-If you prefer to use docker, see the [section below](#-docker).
+If you prefer to use Docker, see the [section below](#-docker).
 
 ## 🔧 Setup
 
@@ -27,19 +29,37 @@ git clone git@github.com:cesium/atlas.git
 cd atlas
 ```
 
-Then, run the setup script to get all dependencies configured. Make sure the database is up and running.
+Then, if you are using mise, install the required tools:
 
 ```
-bin/setup
+mise install
 ```
 
-Then you should change the `.env.dev` file as needed. Run this script again if
-needed.
+Create your environment file and change it as needed:
+
+```
+cp .env.dev.sample .env.dev
+```
+
+| Variable              | Description                                                             |
+| --------------------- | ----------------------------------------------------------------------- |
+| `FRONTEND_URL`        | URL of the frontend (defaults to `http://localhost:3000`)               |
+| `KEPLER_API_URL`      | URL of the Kepler API (defaults to `http://localhost:8000/api/v1`)      |
+| `TELESCOPIUM_API_URL` | URL of the Telescopium API (defaults to `http://localhost:5000/api/v1`) |
+
+Finally, make sure the database is up and running and run the setup script to
+get all dependencies configured:
+
+```
+bin/setup --local
+```
+
+Run this script again if you change the `.env.dev` file.
 
 ## 🔨 Development
 
-Start the development server and then you can send requests to `http://localhost:4000`.
-
+Start the development server and then you can send requests to
+`http://localhost:4000`.
 
 ```
 bin/server
@@ -68,32 +88,33 @@ bin/format
 For data persistence this project uses a PostgreSQL database. You should have
 PostgreSQL up and running.
 
-If you want to setup the required database using docker containers you can
-easily do it with [docker-compose](https://docs.docker.com/compose/install/).
+If you want to set up the required database using Docker containers you can
+easily do it with [Docker Compose](https://docs.docker.com/compose/install/).
 
-Create and start the database containers. You should use `linux.yml` if running on Linux and `darwin.yml` if running on macOS.
+Create the environment file, then create and start the database container. You
+should use `linux.yml` if running on Linux and `darwin.yml` if running on macOS.
 
 ```
 cp .env.dev.sample .env.dev
-docker-compose -f docker-compose.dev.yml -f {linux,darwin}.yml up db
+docker compose -f compose.dev.yaml -f {linux,darwin}.yml up db
 ```
 
 Start the previously created containers.
 
 ```
-docker-compose -f docker-compose.dev.yml -f {linux,darwin}.yml start
+docker compose -f compose.dev.yaml -f {linux,darwin}.yml start
 ```
 
 Stop the containers.
 
 ```
-docker-compose -f docker-compose.dev.yml -f {linux,darwin}.yml stop
+docker compose -f compose.dev.yaml -f {linux,darwin}.yml stop
 ```
 
 Destroy the containers and volumes created.
 
 ```
-docker-compose -f docker-compose.dev.yml -f {linux,darwin}.yml down -v
+docker compose -f compose.dev.yaml -f {linux,darwin}.yml down -v
 ```
 
 ## 🔗 References
