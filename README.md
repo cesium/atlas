@@ -8,6 +8,19 @@
 
 [![CI Style][ci-style-status]][ci-style-workflow]
 
+Atlas is the backend used by [Pombo](https://pombo.di.uminho.pt/), CeSIUM's platform for LEI students at UMinho. Built with [Elixir](https://elixir-lang.org/) and the [Phoenix Framework](https://www.phoenixframework.org/), it acts as the primary data source and central API for the entire platform.
+
+It is responsible for storing and managing university courses, shifts, student enrollments, shift exchanges, and schedules, as well as integrating with Kepler for schedule generation and Telescopium for cross-checking classroom and timetable data.
+
+## How it fits in Pombo
+
+Pombo is made of four repositories:
+
+- [Astra](https://github.com/cesium/astra): frontend
+- **Atlas**: backend
+- [Kepler](https://github.com/cesium/kepler): schedule generation
+- [Telescopium](https://github.com/cesium/telescopium): scraper used to update and cross-check data
+
 ## 🤝 Contributing
 
 When contributing to this repository, please first discuss the change you wish
