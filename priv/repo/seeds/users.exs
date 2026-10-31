@@ -4,6 +4,7 @@ defmodule Atlas.Repo.Seeds.Accounts do
 
   @first_names File.read!("priv/fake/first_names.txt") |> String.split("\n", trim: true)
   @last_names File.read!("priv/fake/last_names.txt") |> String.split("\n", trim: true)
+  @department_names File.read!("priv/fake/department_names.txt") |> String.split("\n", trim: true)
 
   def run do
     case Accounts.list_users() do
@@ -15,10 +16,11 @@ defmodule Atlas.Repo.Seeds.Accounts do
     end
   end
 
-  def seed_users(students \\ 100, professors \\ 15, admins \\ 15) do
+  def seed_users(students \\ 100, professors \\ 15, admins \\ 15, departments \\ 5) do
     seed_students(students)
     seed_professors(professors)
     seed_admins(admins)
+    seed_departments(departments)
   end
 
   defp seed_students(count) do
@@ -47,6 +49,23 @@ defmodule Atlas.Repo.Seeds.Accounts do
 
           create_user(student, :student, i)
         end
+    end
+  end
+
+  defp seed_departments(count) do
+    for i <- 1..count do
+      department_name = Enum.at(@department_names, i - 1)
+
+      email = "#{department_name |> String.downcase() |> String.replace(" ", ".")}@atlas.pt"
+
+      department = %{
+        name: department_name,
+        email: email,
+        password: "password1234",
+        type: :department
+      }
+
+      create_user(department, :department, i)
     end
   end
 

@@ -398,6 +398,22 @@ defmodule Atlas.University do
   end
 
   @doc """
+  Gets the count of active enrollments for a specific shift.
+
+  ## Examples
+
+      iex> get_shift_enrollment_count(123)
+      25
+
+  """
+  def get_shift_enrollment_count(shift_id) do
+    ShiftEnrollment
+    |> where([se], se.shift_id == ^shift_id and se.status in [:active, :inactive])
+    |> select([se], count(se.id))
+    |> Repo.one()
+  end
+
+  @doc """
   Lists the schedule for a student.
 
   ## Examples

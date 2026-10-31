@@ -23,6 +23,10 @@ defmodule AtlasWeb.Router do
     plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin]
   end
 
+  pipeline :is_at_least_department do
+    plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin, :department]
+  end
+
   scope "/", AtlasWeb do
     get "/", PageController, :index
   end
@@ -89,6 +93,26 @@ defmodule AtlasWeb.Router do
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
     end
 
+    scope "/events" do
+      get "/selected", EventController, :selected_index
+      resources "/", EventController, only: [:index, :show]
+
+      pipe_through :is_at_least_department
+
+      resources "/", EventController, only: [:create, :update, :delete]
+    end
+
+    scope "/event_categories" do
+      get "/selected", EventCategoryController, :selected_index
+      post "/selected", EventCategoryController, :selected_update
+
+      resources "/", EventCategoryController, only: [:index, :show]
+
+      pipe_through :is_at_least_department
+
+      resources "/", EventCategoryController, only: [:create, :update, :delete]
+    end
+
     pipe_through :is_at_least_professor
 
     get "/students", University.StudentsController, :index
@@ -111,6 +135,16 @@ defmodule AtlasWeb.Router do
       post "/generate", ScheduleController, :generate_schedule
       post "/build_request", ScheduleController, :build_schedule_generation_request
       post "/import_schedule_result", ScheduleController, :import_schedule_result
+    end
+
+    scope "/scraper", University do
+      post "/link", ScraperController, :link_timeslots
+
+      scope "/sync" do
+        post "/", ScraperController, :sync_timeslots
+        post "/auto_sync", ScraperController, :toggle_auto_sync
+        get "/auto_sync", ScraperController, :get_auto_sync_state
+      end
     end
 
     scope "/import" do
