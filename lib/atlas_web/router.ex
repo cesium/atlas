@@ -130,6 +130,7 @@ defmodule AtlasWeb.Router do
 
     scope "/scraper", University do
       post "/link", ScraperController, :link_timeslots
+      get "/last_runs", ScraperController, :last_runs
 
       scope "/sync" do
         post "/", ScraperController, :sync_timeslots

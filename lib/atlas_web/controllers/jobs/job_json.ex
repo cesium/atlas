@@ -20,6 +20,8 @@ defmodule AtlasWeb.JobJSON do
   @doc """
   Renders a job as JSON.
   """
+  def data(nil), do: nil
+
   def data(job) do
     %{
       id: job.id,
