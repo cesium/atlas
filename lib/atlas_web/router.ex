@@ -118,11 +118,11 @@ defmodule AtlasWeb.Router do
     get "/students", University.StudentsController, :index
 
     scope "/shifts" do
-      get "/", ShiftsController, :index
-      put "/:id", ShiftsController, :update
+      get "/", University.ShiftsController, :index
+      put "/:id", University.ShiftsController, :update
 
       scope "/timeslots" do
-        delete "/:id", TimeslotsController, :delete
+        delete "/:id", University.TimeslotsController, :delete
       end
     end
 

@@ -1,8 +1,10 @@
-defmodule AtlasWeb.TimeslotsController do
+defmodule AtlasWeb.University.TimeslotsController do
   use AtlasWeb, :controller
 
   alias Atlas.University.Degrees.Courses.Shifts
   alias Atlas.University.Degrees.Courses.Shifts.Timeslot
+
+  action_fallback AtlasWeb.FallbackController
 
   def delete(conn, %{"id" => id}) do
     timeslot = Shifts.get_timeslot!(id)

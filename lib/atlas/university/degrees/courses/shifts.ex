@@ -282,7 +282,14 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     |> Multi.update(:shift, change_shift(shift, shift_attrs))
     |> process_timeslots(shift, timeslot_attrs)
     |> Repo.transact()
+    |> preload_updated_shift()
   end
+
+  defp preload_updated_shift({:ok, %{shift: updated_shift} = results}) do
+    {:ok, %{results | shift: Repo.preload(updated_shift, [:timeslots], force: true)}}
+  end
+
+  defp preload_updated_shift(error), do: error
 
   defp process_timeslots(multi, shift, timeslot_attrs) do
     multi
@@ -296,8 +303,10 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   end
 
   defp process_timeslot(multi, timeslot_attr, shift_id, index) do
-    if timeslot_attr["id"] && timeslot_exists?(timeslot_attr["id"]) do
-      timeslot = get_timeslot!(timeslot_attr["id"])
+    timeslot =
+      timeslot_attr["id"] && Repo.get_by(Timeslot, id: timeslot_attr["id"], shift_id: shift_id)
+
+    if timeslot do
       changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
       Multi.update(multi, {:timeslot, index}, changeset)
     else
@@ -305,17 +314,9 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
         timeslot_attr
         |> Map.delete("id")
         |> Map.put("shift_id", shift_id)
-        |> Map.replace("weekday", timeslot_attr["weekday"] |> String.to_atom())
 
       changeset = change_timeslot(%Timeslot{}, clean_attrs)
       Multi.insert(multi, {:timeslot, index}, changeset)
-    end
-  end
-
-  defp timeslot_exists?(id) do
-    case Repo.get(Timeslot, id) do
-      nil -> false
-      _ -> true
     end
   end
 end
