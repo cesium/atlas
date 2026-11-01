@@ -4,8 +4,17 @@ defmodule AtlasWeb.University.ShiftsController do
 
   action_fallback AtlasWeb.FallbackController
 
-  def index(conn, attrs) do
-    shifts = Shifts.list_shifts_with_timeslots(attrs)
+  def index(conn, params) do
+    opts =
+      case params do
+        %{"course_id" => course_id} when is_binary(course_id) and course_id != "" ->
+          [where: [course_id: course_id], order_by: [asc: :type, asc: :number]]
+
+        _ ->
+          [order_by: [asc: :type, asc: :number]]
+      end
+
+    shifts = Shifts.list_shifts_with_timeslots(opts)
 
     conn
     |> put_view(AtlasWeb.University.ShiftJSON)

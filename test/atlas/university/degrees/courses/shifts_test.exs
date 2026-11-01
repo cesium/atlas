@@ -16,6 +16,50 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       assert Shifts.list_shifts() == [shift]
     end
 
+    test "list_shifts_with_timeslots/1 with where filter returns only matching shifts" do
+      degree1 = DegreesFixtures.degree_fixture(%{code: "DEG-#{System.unique_integer()}"})
+      degree2 = DegreesFixtures.degree_fixture(%{code: "DEG-#{System.unique_integer()}"})
+
+      course1 =
+        DegreesFixtures.course_fixture(%{
+          code: "C1-#{System.unique_integer()}",
+          degree_id: degree1.id
+        })
+
+      course2 =
+        DegreesFixtures.course_fixture(%{
+          code: "C2-#{System.unique_integer()}",
+          degree_id: degree2.id
+        })
+
+      shift1 = shift_fixture(%{course_id: course1.id, number: 1})
+      _shift2 = shift_fixture(%{course_id: course2.id, number: 2})
+
+      results = Shifts.list_shifts_with_timeslots(where: [course_id: course1.id])
+      assert length(results) == 1
+      assert hd(results).id == shift1.id
+      assert Ecto.assoc_loaded?(hd(results).timeslots)
+    end
+
+    test "list_courses_with_no_parent/1 supports include_shifts: false" do
+      degree = DegreesFixtures.degree_fixture(%{code: "DEG-#{System.unique_integer()}"})
+
+      course =
+        DegreesFixtures.course_fixture(%{
+          code: "C-#{System.unique_integer()}",
+          degree_id: degree.id
+        })
+
+      _shift = shift_fixture(%{course_id: course.id})
+
+      courses =
+        Atlas.University.Degrees.Courses.list_courses_with_no_parent(include_shifts: false)
+
+      assert Enum.any?(courses, fn c -> c.id == course.id end)
+      target_course = Enum.find(courses, fn c -> c.id == course.id end)
+      refute Ecto.assoc_loaded?(target_course.shifts)
+    end
+
     test "get_shift!/1 returns the shift with given id" do
       shift = shift_fixture()
       assert Shifts.get_shift!(shift.id) == shift
