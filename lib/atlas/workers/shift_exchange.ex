@@ -8,7 +8,7 @@ defmodule Atlas.Workers.ShiftExchange do
 
   @impl Oban.Worker
   def perform(_job) do
-    Exchange.solve_exchanges()
+    Exchange.process_exchanges()
 
     :ok
   end

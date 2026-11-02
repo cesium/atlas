@@ -11,6 +11,21 @@ defmodule Atlas.Workers do
     |> Repo.all()
   end
 
+  def get_last_job(worker) do
+    Oban.Job
+    |> where([j], j.worker == ^Oban.Worker.to_string(worker))
+    |> order_by(desc_nulls_last: :attempted_at)
+    |> limit(1)
+    |> select_job_fields()
+    |> Repo.one()
+  end
+
+  def completed_job?(worker) do
+    Oban.Job
+    |> where([j], j.worker == ^Oban.Worker.to_string(worker) and j.state == "completed")
+    |> Repo.exists?()
+  end
+
   def list_user_jobs(user) do
     Oban.Job
     |> where(fragment("meta ->> 'user_id' = ?", ^to_string(user.id)))
@@ -34,8 +49,11 @@ defmodule Atlas.Workers do
       attempted_at: j.attempted_at,
       completed_at: j.completed_at,
       inserted_at: j.inserted_at,
-      type: fragment("meta ->> 'type'"),
-      user_id: fragment("meta ->> 'user_id'")
+      type: j.meta["type"],
+      user_id: j.meta["user_id"],
+      matched_count: j.meta["matched_count"],
+      updated_count: j.meta["updated_count"],
+      unmatched_count: j.meta["unmatched_count"]
     })
   end
 end
