@@ -13,8 +13,7 @@ defmodule Atlas.DegreesTest do
 
     test "list_degrees/0 returns all degrees" do
       degree = degree_fixture()
-      degrees = Degrees.list_degrees()
-      assert degree in degrees
+      assert Degrees.list_degrees() == [degree]
     end
 
     test "get_degree!/1 returns the degree with given id" do

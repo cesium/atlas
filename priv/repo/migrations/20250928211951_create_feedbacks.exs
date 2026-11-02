@@ -4,9 +4,9 @@ defmodule Atlas.Repo.Migrations.CreateFeedbacks do
   def change do
     create table(:feedbacks, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :subject, :string
-      add :message, :string
-      add :user_id, references(:users, on_delete: :nothing, type: :binary_id)
+      add :subject, :string, null: false
+      add :message, :text, null: false
+      add :user_id, references(:users, on_delete: :nothing, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

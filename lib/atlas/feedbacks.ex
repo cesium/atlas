@@ -9,7 +9,7 @@ defmodule Atlas.Feedbacks do
   alias Atlas.Feedbacks.Feedback
 
   @doc """
-  Returns the list of feedbacks.
+  Returns the list of feedbacks, newest first unless `:order_by` is given.
 
   ## Examples
 
@@ -18,6 +18,8 @@ defmodule Atlas.Feedbacks do
 
   """
   def list_feedbacks(opts \\ []) do
+    opts = Keyword.put_new(opts, :order_by, desc: :inserted_at)
+
     Feedback
     |> apply_filters(opts)
     |> Repo.all()
@@ -26,18 +28,23 @@ defmodule Atlas.Feedbacks do
   @doc """
   Gets a single feedback.
 
-  Raises `Ecto.NoResultsError` if the Feedback does not exist.
+  Returns `nil` if the feedback does not exist or `id` is not a valid UUID.
 
   ## Examples
 
-      iex> get_feedback!(123)
+      iex> get_feedback("0b5a6c1e-...")
       %Feedback{}
 
-      iex> get_feedback!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_feedback("not-a-uuid")
+      nil
 
   """
-  def get_feedback!(id), do: Repo.get(Feedback, id)
+  def get_feedback(id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, uuid} -> Repo.get(Feedback, uuid)
+      :error -> nil
+    end
+  end
 
   @doc """
   Creates a feedback.
