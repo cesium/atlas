@@ -2,6 +2,9 @@ defmodule AtlasWeb.University.ScraperController do
   use AtlasWeb, :controller
 
   alias Atlas.University
+  alias Atlas.Workers
+  alias Atlas.Workers.{LinkTimeslots, SyncTimeslots}
+  alias AtlasWeb.JobJSON
 
   def link_timeslots(conn, %{"config" => config}) do
     {user, _session} = Guardian.Plug.current_resource(conn)
@@ -41,6 +44,14 @@ defmodule AtlasWeb.University.ScraperController do
         |> put_status(:internal_server_error)
         |> json(%{error: "Could not queue Scrape & Sync job: #{reason}."})
     end
+  end
+
+  def last_runs(conn, _params) do
+    json(conn, %{
+      link: JobJSON.data(Workers.get_last_job(LinkTimeslots)),
+      sync: JobJSON.data(Workers.get_last_job(SyncTimeslots)),
+      link_completed: Workers.completed_job?(LinkTimeslots)
+    })
   end
 
   def toggle_auto_sync(conn, _params) do
