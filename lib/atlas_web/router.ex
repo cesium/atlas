@@ -23,6 +23,10 @@ defmodule AtlasWeb.Router do
     plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin]
   end
 
+  pipeline :is_admin do
+    plug AtlasWeb.Plugs.UserRequires, user_type: :admin
+  end
+
   pipeline :is_at_least_department do
     plug AtlasWeb.Plugs.UserRequires, user_types: [:professor, :admin, :department]
   end
@@ -91,6 +95,14 @@ defmodule AtlasWeb.Router do
       end
 
       resources "/", ShiftExchangeRequestController, only: [:index, :create, :show, :delete]
+    end
+
+    scope "/feedbacks" do
+      post "/", FeedbacksController, :create
+
+      pipe_through :is_admin
+
+      resources "/", FeedbacksController, only: [:index, :show, :delete]
     end
 
     scope "/events" do
