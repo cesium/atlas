@@ -12,7 +12,8 @@ defmodule Atlas.Feedbacks.Feedback do
   schema "feedbacks" do
     field :message, :string
     field :subject, :string
-    field :user_id, :binary_id
+
+    belongs_to :user, Atlas.Accounts.User
 
     timestamps(type: :utc_datetime)
   end

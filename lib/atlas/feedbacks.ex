@@ -9,7 +9,7 @@ defmodule Atlas.Feedbacks do
   alias Atlas.Feedbacks.Feedback
 
   @doc """
-  Returns the list of feedbacks, newest first unless `:order_by` is given.
+  Returns the list of feedbacks with their user, newest first unless `:order_by` is given.
 
   ## Examples
 
@@ -18,7 +18,10 @@ defmodule Atlas.Feedbacks do
 
   """
   def list_feedbacks(opts \\ []) do
-    opts = Keyword.put_new(opts, :order_by, desc: :inserted_at)
+    opts =
+      opts
+      |> Keyword.put_new(:order_by, desc: :inserted_at)
+      |> Keyword.put_new(:preloads, :user)
 
     Feedback
     |> apply_filters(opts)
@@ -26,7 +29,7 @@ defmodule Atlas.Feedbacks do
   end
 
   @doc """
-  Gets a single feedback.
+  Gets a single feedback with its user.
 
   Returns `nil` if the feedback does not exist or `id` is not a valid UUID.
 
@@ -41,13 +44,13 @@ defmodule Atlas.Feedbacks do
   """
   def get_feedback(id) do
     case Ecto.UUID.cast(id) do
-      {:ok, uuid} -> Repo.get(Feedback, uuid)
+      {:ok, uuid} -> Feedback |> Repo.get(uuid) |> Repo.preload(:user)
       :error -> nil
     end
   end
 
   @doc """
-  Creates a feedback.
+  Creates a feedback and returns it with its user.
 
   ## Examples
 
@@ -59,9 +62,9 @@ defmodule Atlas.Feedbacks do
 
   """
   def create_feedback(attrs \\ %{}) do
-    %Feedback{}
-    |> Feedback.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, feedback} <- %Feedback{} |> Feedback.changeset(attrs) |> Repo.insert() do
+      {:ok, Repo.preload(feedback, :user)}
+    end
   end
 
   @doc """

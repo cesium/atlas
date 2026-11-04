@@ -20,7 +20,10 @@ defmodule AtlasWeb.FeedbacksJSON do
       id: feedback.id,
       subject: feedback.subject,
       message: feedback.message,
-      user_id: feedback.user_id,
+      user: %{
+        id: feedback.user.id,
+        name: feedback.user.name
+      },
       inserted_at: feedback.inserted_at
     }
   end
