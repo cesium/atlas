@@ -2,6 +2,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
   use Atlas.DataCase
 
   alias Atlas.DegreesFixtures
+  alias Atlas.University.Degrees.Courses
   alias Atlas.University.Degrees.Courses.Shifts
 
   describe "shifts" do
@@ -53,7 +54,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
       _shift = shift_fixture(%{course_id: course.id})
 
       courses =
-        Atlas.University.Degrees.Courses.list_courses_with_no_parent(include_shifts: false)
+        Courses.list_courses_with_no_parent(include_shifts: false)
 
       assert Enum.any?(courses, fn c -> c.id == course.id end)
       target_course = Enum.find(courses, fn c -> c.id == course.id end)
@@ -239,6 +240,52 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
 
       # Verify ts2 was deleted from database
       assert_raise Ecto.NoResultsError, fn -> Shifts.get_timeslot!(ts2.id) end
+    end
+
+    test "preloading timeslots orders chronologically by weekday (Monday-Sunday) and start time" do
+      shift = shift_fixture()
+
+      # Insert out of chronological and alphabetical order: Friday, Tuesday, Monday (afternoon), Monday (morning)
+      _ts_friday =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :friday,
+          start: ~T[09:00:00],
+          end: ~T[11:00:00]
+        })
+
+      _ts_tuesday =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :tuesday,
+          start: ~T[10:00:00],
+          end: ~T[12:00:00]
+        })
+
+      _ts_monday_afternoon =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :monday,
+          start: ~T[14:00:00],
+          end: ~T[16:00:00]
+        })
+
+      _ts_monday_morning =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :monday,
+          start: ~T[08:00:00],
+          end: ~T[10:00:00]
+        })
+
+      loaded_shift = Shifts.get_shift_with_timeslots(shift.id)
+
+      assert Enum.map(loaded_shift.timeslots, fn ts -> {ts.weekday, ts.start} end) == [
+               {:monday, ~T[08:00:00]},
+               {:monday, ~T[14:00:00]},
+               {:tuesday, ~T[10:00:00]},
+               {:friday, ~T[09:00:00]}
+             ]
     end
   end
 end

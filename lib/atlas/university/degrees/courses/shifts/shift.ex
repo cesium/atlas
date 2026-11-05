@@ -27,7 +27,7 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
     belongs_to :course, Atlas.University.Degrees.Courses.Course
 
     has_many :timeslots, Atlas.University.Degrees.Courses.Shifts.Timeslot,
-      preload_order: [asc: :weekday, asc: :start]
+      preload_order: {Atlas.University.Degrees.Courses.Shifts.Timeslot, :preload_order, []}
 
     has_many :enrollments, Atlas.University.ShiftEnrollment
 
