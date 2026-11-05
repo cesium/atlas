@@ -225,7 +225,7 @@ defmodule Atlas.Events do
   def list_cesium_events do
     Event
     |> join(:inner, [e], ec in assoc(e, :category))
-    |> where([_e, ec], fragment("lower(?)", ec.name) == "cesium")
+    |> where([_e, ec], ilike(ec.name, "cesium"))
     |> order_by([e], asc: e.start)
     |> Repo.all()
   end
