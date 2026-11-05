@@ -57,6 +57,13 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
     |> Repo.preload([:timeslots])
   end
 
+  def get_shift_with_timeslots!(id, opts \\ []) do
+    Shift
+    |> apply_filters(opts)
+    |> Repo.get!(id)
+    |> Repo.preload([:timeslots])
+  end
+
   @doc """
   Creates a shift.
 
@@ -278,9 +285,20 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   """
 
   def update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
-    Multi.new()
-    |> Multi.update(:shift, change_shift(shift, shift_attrs))
-    |> process_timeslots(shift, timeslot_attrs)
+    shift = Repo.preload(shift, [:timeslots])
+
+    multi =
+      Multi.new()
+      |> Multi.update(:shift, change_shift(shift, shift_attrs))
+
+    multi =
+      if is_list(timeslot_attrs) do
+        process_timeslots(multi, shift, timeslot_attrs)
+      else
+        multi
+      end
+
+    multi
     |> Repo.transact()
     |> preload_updated_shift()
   end
@@ -292,28 +310,44 @@ defmodule Atlas.University.Degrees.Courses.Shifts do
   defp preload_updated_shift(error), do: error
 
   defp process_timeslots(multi, shift, timeslot_attrs) do
-    multi
-    |> then(fn multi ->
+    incoming_ids =
       timeslot_attrs
+      |> Enum.map(fn attr -> Map.get(attr, "id") || Map.get(attr, :id) end)
+      |> Enum.reject(&is_nil/1)
+
+    existing_timeslots = shift.timeslots || []
+
+    multi_with_deletes =
+      existing_timeslots
+      |> Enum.filter(fn ts -> ts.id not in incoming_ids end)
       |> Enum.with_index()
-      |> Enum.reduce(multi, fn {timeslot_attr, index}, acc_multi ->
-        process_timeslot(acc_multi, timeslot_attr, shift.id, index)
+      |> Enum.reduce(multi, fn {timeslot, index}, acc_multi ->
+        Multi.delete(acc_multi, {:delete_timeslot, index}, timeslot)
       end)
+
+    timeslot_attrs
+    |> Enum.with_index()
+    |> Enum.reduce(multi_with_deletes, fn {timeslot_attr, index}, acc_multi ->
+      process_timeslot(acc_multi, timeslot_attr, shift, index)
     end)
   end
 
-  defp process_timeslot(multi, timeslot_attr, shift_id, index) do
-    timeslot =
-      timeslot_attr["id"] && Repo.get_by(Timeslot, id: timeslot_attr["id"], shift_id: shift_id)
+  defp process_timeslot(multi, timeslot_attr, shift, index) do
+    timeslot_id = Map.get(timeslot_attr, "id") || Map.get(timeslot_attr, :id)
+
+    timeslot = timeslot_id && Enum.find(shift.timeslots, &(&1.id == timeslot_id))
 
     if timeslot do
-      changeset = change_timeslot(timeslot, Map.delete(timeslot_attr, "id"))
+      changeset =
+        change_timeslot(timeslot, timeslot_attr |> Map.delete("id") |> Map.delete(:id))
+
       Multi.update(multi, {:timeslot, index}, changeset)
     else
       clean_attrs =
         timeslot_attr
         |> Map.delete("id")
-        |> Map.put("shift_id", shift_id)
+        |> Map.delete(:id)
+        |> Map.put("shift_id", shift.id)
 
       changeset = change_timeslot(%Timeslot{}, clean_attrs)
       Multi.insert(multi, {:timeslot, index}, changeset)

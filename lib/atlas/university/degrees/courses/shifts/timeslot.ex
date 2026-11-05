@@ -28,6 +28,18 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
     timeslot
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> validate_time_range()
+  end
+
+  defp validate_time_range(changeset) do
+    start_time = get_field(changeset, :start)
+    end_time = get_field(changeset, :end)
+
+    if start_time && end_time && Time.compare(start_time, end_time) != :lt do
+      add_error(changeset, :end, "must be after the start time")
+    else
+      changeset
+    end
   end
 
   def weekdays do

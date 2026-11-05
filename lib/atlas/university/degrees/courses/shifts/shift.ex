@@ -25,7 +25,10 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Shift do
     field :professor, :string
 
     belongs_to :course, Atlas.University.Degrees.Courses.Course
-    has_many :timeslots, Atlas.University.Degrees.Courses.Shifts.Timeslot
+
+    has_many :timeslots, Atlas.University.Degrees.Courses.Shifts.Timeslot,
+      preload_order: [asc: :weekday, asc: :start]
+
     has_many :enrollments, Atlas.University.ShiftEnrollment
 
     timestamps(type: :utc_datetime)

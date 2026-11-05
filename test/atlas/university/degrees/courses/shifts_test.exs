@@ -140,7 +140,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
     test "create_timeslot/1 with valid data creates a timeslot" do
       valid_attrs = %{
         start: ~T[14:00:00],
-        end: ~T[14:00:00],
+        end: ~T[16:00:00],
         weekday: :monday,
         building: "some building",
         room: "some room",
@@ -149,7 +149,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
 
       assert {:ok, %Timeslot{} = timeslot} = Shifts.create_timeslot(valid_attrs)
       assert timeslot.start == ~T[14:00:00]
-      assert timeslot.end == ~T[14:00:00]
+      assert timeslot.end == ~T[16:00:00]
       assert timeslot.weekday == :monday
       assert timeslot.building == "some building"
       assert timeslot.room == "some room"
@@ -164,7 +164,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
 
       update_attrs = %{
         start: ~T[15:01:01],
-        end: ~T[15:01:01],
+        end: ~T[17:01:01],
         weekday: :wednesday,
         building: "some updated building",
         room: "some updated room"
@@ -172,7 +172,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
 
       assert {:ok, %Timeslot{} = timeslot} = Shifts.update_timeslot(timeslot, update_attrs)
       assert timeslot.start == ~T[15:01:01]
-      assert timeslot.end == ~T[15:01:01]
+      assert timeslot.end == ~T[17:01:01]
       assert timeslot.weekday == :wednesday
       assert timeslot.building == "some updated building"
       assert timeslot.room == "some updated room"
@@ -193,6 +193,52 @@ defmodule Atlas.University.Degrees.Courses.ShiftsTest do
     test "change_timeslot/1 returns a timeslot changeset" do
       timeslot = timeslot_fixture()
       assert %Ecto.Changeset{} = Shifts.change_timeslot(timeslot)
+    end
+
+    test "update_shift_with_timeslots/3 updates, inserts, and deletes omitted timeslots" do
+      shift = shift_fixture()
+
+      ts1 =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :monday,
+          start: ~T[09:00:00],
+          end: ~T[11:00:00]
+        })
+
+      ts2 =
+        timeslot_fixture(%{
+          shift_id: shift.id,
+          weekday: :tuesday,
+          start: ~T[14:00:00],
+          end: ~T[16:00:00]
+        })
+
+      loaded_shift = Shifts.get_shift_with_timeslots(shift.id)
+      assert length(loaded_shift.timeslots) == 2
+
+      # We omit ts2 (should be deleted), update ts1, and insert a new slot
+      timeslot_attrs = [
+        %{"id" => ts1.id, "weekday" => "wednesday", "start" => "10:00:00", "end" => "12:00:00"},
+        %{"weekday" => "friday", "start" => "08:00:00", "end" => "10:00:00"}
+      ]
+
+      assert {:ok, %{shift: updated_shift}} =
+               Shifts.update_shift_with_timeslots(
+                 loaded_shift,
+                 %{"professor" => "Updated Prof"},
+                 timeslot_attrs
+               )
+
+      assert updated_shift.professor == "Updated Prof"
+      assert length(updated_shift.timeslots) == 2
+
+      timeslot_ids = Enum.map(updated_shift.timeslots, & &1.id)
+      assert ts1.id in timeslot_ids
+      refute ts2.id in timeslot_ids
+
+      # Verify ts2 was deleted from database
+      assert_raise Ecto.NoResultsError, fn -> Shifts.get_timeslot!(ts2.id) end
     end
   end
 end

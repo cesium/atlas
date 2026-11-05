@@ -32,7 +32,7 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
       attrs
       |> Map.new()
       |> Map.put_new(:building, "some building")
-      |> Map.put_new(:end, ~T[14:00:00])
+      |> Map.put_new(:end, ~T[16:00:00])
       |> Map.put_new(:room, "some room")
       |> Map.put_new(:start, ~T[14:00:00])
       |> Map.put_new(:weekday, :monday)

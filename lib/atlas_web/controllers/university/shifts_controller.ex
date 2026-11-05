@@ -4,15 +4,8 @@ defmodule AtlasWeb.University.ShiftsController do
 
   action_fallback AtlasWeb.FallbackController
 
-  def index(conn, params) do
-    opts =
-      case params do
-        %{"course_id" => course_id} when is_binary(course_id) and course_id != "" ->
-          [where: [course_id: course_id], order_by: [asc: :type, asc: :number]]
-
-        _ ->
-          [order_by: [asc: :type, asc: :number]]
-      end
+  def index(conn, %{"course_id" => course_id}) when is_binary(course_id) and course_id != "" do
+    opts = [where: [course_id: course_id], order_by: [asc: :type, asc: :number]]
 
     shifts = Shifts.list_shifts_with_timeslots(opts)
 
@@ -21,9 +14,16 @@ defmodule AtlasWeb.University.ShiftsController do
     |> render(:index, shifts: shifts)
   end
 
+  def index(conn, _params) do
+    conn
+    |> put_status(:bad_request)
+    |> json(%{error: "Missing required query parameter: course_id"})
+  end
+
   def update(conn, %{"id" => id} = attrs) do
-    shift = Shifts.get_shift_with_timeslots(id)
-    timeslot_attrs = Map.get(attrs, "timeslots", [])
+    shift = Shifts.get_shift_with_timeslots!(id)
+
+    timeslot_attrs = Map.get(attrs, "timeslots")
     shift_attrs = Map.delete(attrs, "timeslots")
 
     case Shifts.update_shift_with_timeslots(shift, shift_attrs, timeslot_attrs) do
