@@ -10,16 +10,16 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
   Generate a shift.
   """
   def shift_fixture(attrs \\ %{}) do
-    {:ok, shift} =
+    attrs =
       attrs
-      |> Enum.into(%{
-        capacity: 42,
-        number: 42,
-        professor: "some professor",
-        type: :theoretical,
-        course_id: DegreesFixtures.course_fixture().id
-      })
-      |> Shifts.create_shift()
+      |> Map.new()
+      |> Map.put_new(:capacity, 42)
+      |> Map.put_new_lazy(:number, fn -> System.unique_integer([:positive]) end)
+      |> Map.put_new(:professor, "some professor")
+      |> Map.put_new(:type, :theoretical)
+      |> Map.put_new_lazy(:course_id, fn -> DegreesFixtures.course_fixture().id end)
+
+    {:ok, shift} = Shifts.create_shift(attrs)
 
     shift
   end
@@ -28,17 +28,17 @@ defmodule Atlas.University.Degrees.Courses.ShiftsFixtures do
   Generate a timeslot.
   """
   def timeslot_fixture(attrs \\ %{}) do
-    {:ok, timeslot} =
+    attrs =
       attrs
-      |> Enum.into(%{
-        building: "some building",
-        end: ~T[14:00:00],
-        room: "some room",
-        start: ~T[14:00:00],
-        weekday: :monday,
-        shift_id: shift_fixture().id
-      })
-      |> Shifts.create_timeslot()
+      |> Map.new()
+      |> Map.put_new(:building, "some building")
+      |> Map.put_new(:end, ~T[16:00:00])
+      |> Map.put_new(:room, "some room")
+      |> Map.put_new(:start, ~T[14:00:00])
+      |> Map.put_new(:weekday, :monday)
+      |> Map.put_new_lazy(:shift_id, fn -> shift_fixture().id end)
+
+    {:ok, timeslot} = Shifts.create_timeslot(attrs)
 
     timeslot
   end

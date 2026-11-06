@@ -10,13 +10,13 @@ defmodule Atlas.DegreesFixtures do
   Generate a degree.
   """
   def degree_fixture(attrs \\ %{}) do
-    {:ok, degree} =
+    attrs =
       attrs
-      |> Enum.into(%{
-        code: "code",
-        name: "some name"
-      })
-      |> Degrees.create_degree()
+      |> Map.new()
+      |> Map.put_new_lazy(:code, fn -> "deg_#{System.unique_integer([:positive])}" end)
+      |> Map.put_new(:name, "some name")
+
+    {:ok, degree} = Degrees.create_degree(attrs)
 
     degree
   end
@@ -25,16 +25,16 @@ defmodule Atlas.DegreesFixtures do
   Generate a course.
   """
   def course_fixture(attrs \\ %{}) do
-    {:ok, course} =
+    attrs =
       attrs
-      |> Enum.into(%{
-        code: "code",
-        name: "some name",
-        semester: 1,
-        year: 1,
-        degree_id: degree_fixture(%{code: "some code"}).id
-      })
-      |> Courses.create_course()
+      |> Map.new()
+      |> Map.put_new_lazy(:code, fn -> "course_#{System.unique_integer([:positive])}" end)
+      |> Map.put_new(:name, "some name")
+      |> Map.put_new(:semester, 1)
+      |> Map.put_new(:year, 1)
+      |> Map.put_new_lazy(:degree_id, fn -> degree_fixture().id end)
+
+    {:ok, course} = Courses.create_course(attrs)
 
     course
   end
