@@ -43,6 +43,10 @@ defmodule AtlasWeb.Router do
       post "/reset_password", AuthController, :reset_password
     end
 
+    scope "/public" do
+      get "/events", PublicEventController, :index
+    end
+
     # Authenticated routes
 
     pipe_through :auth
