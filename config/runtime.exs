@@ -123,8 +123,15 @@ if config_env() == :prod do
 
   config :atlas, :telescopium_api_url, telescopium_api_url
 
+  hydrogen_url =
+    System.get_env("HYDROGEN_URL") ||
+      raise """
+      environment variable HYDROGEN_URL is missing.
+      It should be the base URL of your Hydrogen application, e.g., https://cesium.di.uminho.pt
+      """
+
   # Configures CORS allowed origins
-  config :atlas, :allowed_origins, frontend_url
+  config :atlas, :allowed_origins, [frontend_url, hydrogen_url]
 
   # ## SSL Support
   #
