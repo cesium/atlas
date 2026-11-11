@@ -4,7 +4,6 @@ defmodule Atlas.Feedbacks do
   """
 
   use Atlas.Context
-  alias Atlas.Repo
 
   alias Atlas.Feedbacks.Feedback
 

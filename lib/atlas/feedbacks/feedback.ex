@@ -24,5 +24,6 @@ defmodule Atlas.Feedbacks.Feedback do
     |> cast(attrs, @required_fields)
     |> validate_required(@required_fields)
     |> validate_length(:subject, max: 255)
+    |> validate_length(:message, max: 5000)
   end
 end
