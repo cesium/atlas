@@ -8,23 +8,23 @@ defmodule Atlas.Feedbacks do
   alias Atlas.Feedbacks.Feedback
 
   @doc """
-  Returns the list of feedbacks with their user, newest first unless `:order_by` is given.
+  Returns a page of feedbacks with their user, newest first.
+
+  Accepts Flop params such as `page` and `page_size`.
 
   ## Examples
 
-      iex> list_feedbacks()
-      [%Feedback{}, ...]
+      iex> list_feedbacks(%{"page" => 1})
+      {:ok, {[%Feedback{}, ...], %Flop.Meta{}}}
+
+      iex> list_feedbacks(%{"page" => -1})
+      {:error, %Flop.Meta{}}
 
   """
-  def list_feedbacks(opts \\ []) do
-    opts =
-      opts
-      |> Keyword.put_new(:order_by, desc: :inserted_at)
-      |> Keyword.put_new(:preloads, :user)
-
+  def list_feedbacks(params \\ %{}) do
     Feedback
-    |> apply_filters(opts)
-    |> Repo.all()
+    |> preload(:user)
+    |> Flop.validate_and_run(params, for: Feedback)
   end
 
   @doc """

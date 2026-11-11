@@ -14,6 +14,13 @@ defmodule AtlasWeb.FeedbacksControllerTest do
     feedback
   end
 
+  defp create_feedback(user_id, inserted_at) do
+    user_id
+    |> create_feedback()
+    |> Ecto.Changeset.change(inserted_at: inserted_at)
+    |> Atlas.Repo.update!()
+  end
+
   defp admin_conn, do: authenticated_conn(%{type: :admin})
 
   describe "create" do
@@ -55,6 +62,16 @@ defmodule AtlasWeb.FeedbacksControllerTest do
       assert %{"errors" => %{"subject" => [_], "message" => [_]}} = json_response(conn, 422)
     end
 
+    test "returns a field error when message is too long" do
+      conn =
+        post(authenticated_conn(), "/v1/feedbacks", %{
+          "subject" => "Bug",
+          "message" => String.duplicate("m", 5001)
+        })
+
+      assert %{"errors" => %{"message" => [_]}} = json_response(conn, 422)
+    end
+
     test "returns a field error when subject is too long" do
       conn =
         post(authenticated_conn(), "/v1/feedbacks", %{
@@ -78,6 +95,41 @@ defmodule AtlasWeb.FeedbacksControllerTest do
                json_response(conn, 200)
 
       assert user_id == user.id
+    end
+
+    test "returns the newest feedbacks first with pagination meta" do
+      conn = admin_conn()
+      {user, _session} = Guardian.Plug.current_resource(conn)
+
+      older = create_feedback(user.id, ~U[2026-01-01 10:00:00Z])
+      newer = create_feedback(user.id, ~U[2026-02-01 10:00:00Z])
+
+      conn = get(conn, "/v1/feedbacks")
+
+      assert %{"data" => [%{"id" => first_id}, %{"id" => second_id}], "meta" => meta} =
+               json_response(conn, 200)
+
+      assert [first_id, second_id] == [newer.id, older.id]
+      assert %{"current_page" => 1, "page_size" => 20, "total_entries" => 2} = meta
+    end
+
+    test "paginates with page and page_size" do
+      conn = admin_conn()
+      {user, _session} = Guardian.Plug.current_resource(conn)
+      for _ <- 1..3, do: create_feedback(user.id)
+
+      conn = get(conn, "/v1/feedbacks", %{"page" => 2, "page_size" => 2})
+
+      assert %{
+               "data" => [_],
+               "meta" => %{"current_page" => 2, "total_pages" => 2, "has_next_page" => false}
+             } = json_response(conn, 200)
+    end
+
+    test "returns 400 for invalid pagination params" do
+      conn = get(admin_conn(), "/v1/feedbacks", %{"page" => -1})
+
+      assert %{"errors" => %{"detail" => _}} = json_response(conn, 400)
     end
 
     test "is forbidden for professors" do

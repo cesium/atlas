@@ -6,10 +6,16 @@ defmodule AtlasWeb.FeedbacksController do
 
   action_fallback AtlasWeb.FallbackController
 
-  def index(conn, _attrs) do
-    feedbacks = Feedbacks.list_feedbacks()
+  def index(conn, params) do
+    case Feedbacks.list_feedbacks(params) do
+      {:ok, {feedbacks, meta}} ->
+        render(conn, :index, feedbacks: feedbacks, meta: meta)
 
-    render(conn, :index, feedbacks: feedbacks)
+      {:error, _meta} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{errors: %{detail: "Invalid pagination parameters"}})
+    end
   end
 
   def show(conn, %{"id" => id}) do

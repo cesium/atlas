@@ -7,6 +7,16 @@ defmodule Atlas.Feedbacks.Feedback do
   import Ecto.Changeset
 
   @required_fields ~w(subject message user_id)a
+
+  @derive {
+    Flop.Schema,
+    filterable: [],
+    sortable: [:inserted_at],
+    default_order: %{order_by: [:inserted_at], order_directions: [:desc]},
+    default_limit: 20,
+    max_limit: 100
+  }
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "feedbacks" do

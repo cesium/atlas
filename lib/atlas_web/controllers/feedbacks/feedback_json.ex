@@ -1,11 +1,15 @@
 defmodule AtlasWeb.FeedbacksJSON do
   alias Atlas.Feedbacks.Feedback
+  alias AtlasWeb.MetaJSON
 
   @doc """
-  Renders a list of feedbacks.
+  Renders a page of feedbacks with its pagination meta.
   """
-  def index(%{feedbacks: feedbacks}) do
-    %{data: for(feedback <- feedbacks, do: data(feedback))}
+  def index(%{feedbacks: feedbacks, meta: meta}) do
+    %{
+      data: for(feedback <- feedbacks, do: data(feedback)),
+      meta: MetaJSON.data(meta)
+    }
   end
 
   @doc """
