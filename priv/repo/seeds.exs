@@ -9,7 +9,8 @@ defmodule Atlas.Repo.Seeds do
   def run do
     [
       "degrees.exs",
-      "users.exs"
+      "users.exs",
+      "feedbacks.exs"
     ]
     |> Enum.each(fn file ->
       Code.require_file("#{@seeds_dir}/#{file}")
