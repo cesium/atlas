@@ -31,9 +31,18 @@ defmodule Atlas.University.Degrees.Courses do
 
   """
   def list_courses_with_no_parent(opts \\ []) do
+    {include_shifts, opts} = Keyword.pop(opts, :include_shifts, true)
+
+    preloads =
+      if include_shifts do
+        [[shifts: [:timeslots]], [courses: [shifts: [:timeslots]]]]
+      else
+        [:courses]
+      end
+
     Course
     |> where([c], is_nil(c.parent_course_id))
-    |> preload([:shifts, courses: [:shifts]])
+    |> preload(^preloads)
     |> apply_filters(opts)
     |> Repo.all()
   end

@@ -28,6 +28,34 @@ defmodule Atlas.University.Degrees.Courses.Shifts.Timeslot do
     timeslot
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> validate_time_range()
+  end
+
+  defp validate_time_range(changeset) do
+    start_time = get_field(changeset, :start)
+    end_time = get_field(changeset, :end)
+
+    if start_time && end_time && Time.compare(start_time, end_time) != :lt do
+      add_error(changeset, :end, "must be after the start time")
+    else
+      changeset
+    end
+  end
+
+  import Ecto.Query, only: [dynamic: 2]
+
+  def preload_order do
+    [
+      asc:
+        dynamic(
+          [t],
+          fragment(
+            "CASE ? WHEN 'monday' THEN 1 WHEN 'tuesday' THEN 2 WHEN 'wednesday' THEN 3 WHEN 'thursday' THEN 4 WHEN 'friday' THEN 5 WHEN 'saturday' THEN 6 WHEN 'sunday' THEN 7 ELSE 8 END",
+            t.weekday
+          )
+        ),
+      asc: :start
+    ]
   end
 
   def weekdays do
